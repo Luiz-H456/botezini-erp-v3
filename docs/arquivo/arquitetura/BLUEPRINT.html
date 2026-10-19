@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueprint de Engenharia — Botezini ERP</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#09090b; --bg2:#18181b; --bg3:#27272a;
+    --line:#3f3f46; --line2:#27272a;
+    --txt:#fafafa; --txt2:#a1a1aa; --txt3:#71717a;
+    --gold:#f59e0b; --emerald:#10b981; --violet:#8b5cf6;
+    --rose:#f43f5e; --blue:#3b82f6; --cyan:#06b6d4;
+  }
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.65; padding:0 0 80px; font-size:14px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  header{
+    border-bottom:1px solid var(--line2); padding:48px 0 32px; margin-bottom:8px;
+    background:linear-gradient(180deg,rgba(245,158,11,.07),transparent);
+  }
+  h1{font-size:32px;font-weight:900;letter-spacing:-.02em;margin-bottom:8px}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--txt2);font-size:14px;max-width:820px}
+  .warn{
+    margin-top:18px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);
+    border-left:3px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--txt2)
+  }
+  .warn b{color:var(--gold)}
+
+  h2{
+    font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;
+    color:var(--txt3);margin:56px 0 20px;display:flex;align-items:center;gap:12px
+  }
+  h2 .num{
+    background:var(--bg3);border:1px solid var(--line);border-radius:7px;
+    width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+    color:var(--gold);font-size:11px;flex:none
+  }
+  h2::after{content:"";flex:1;height:1px;background:var(--line2)}
+  h3{font-size:15px;font-weight:800;margin:26px 0 10px;color:var(--txt)}
+  h4{font-size:12.5px;font-weight:800;margin:18px 0 8px;color:var(--gold)}
+  p{color:var(--txt2);margin-bottom:12px}
+
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+    background:var(--bg);border:1px solid var(--line2);border-radius:5px;
+    padding:1px 6px;color:var(--cyan)
+  }
+  pre{
+    background:var(--bg);border:1px solid var(--line2);border-radius:12px;
+    padding:16px 18px;overflow-x:auto;margin:12px 0 18px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.65
+  }
+  pre code{background:none;border:none;padding:0;color:var(--txt2);font-size:12px}
+  .c-kw{color:var(--violet)}   .c-fn{color:var(--gold)}
+  .c-str{color:var(--emerald)} .c-com{color:var(--txt3);font-style:italic}
+
+  table{
+    width:100%;border-collapse:collapse;margin:12px 0 20px;
+    background:var(--bg2);border:1px solid var(--line2);border-radius:14px;overflow:hidden
+  }
+  th{
+    background:var(--bg3);text-align:left;padding:11px 14px;
+    font-size:9.5px;font-weight:900;text-transform:uppercase;letter-spacing:.16em;color:var(--txt3)
+  }
+  td{padding:11px 14px;border-top:1px solid var(--line2);font-size:13px;color:var(--txt2);vertical-align:top}
+  td b,td strong{color:var(--txt)}
+  tr:hover td{background:rgba(255,255,255,.015)}
+  td.n{color:var(--gold);font-weight:900;width:34px;text-align:center}
+
+  /* princípios */
+  .princ{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+  .p{
+    background:var(--bg2);border:1px solid var(--line2);border-left:3px solid var(--gold);
+    border-radius:12px;padding:15px 17px
+  }
+  .p .pn{
+    font-size:9px;font-weight:900;color:var(--gold);letter-spacing:.2em;
+    text-transform:uppercase;margin-bottom:5px
+  }
+  .p b{display:block;font-size:14px;margin-bottom:5px;color:var(--txt)}
+  .p span{font-size:12.5px;color:var(--txt3)}
+
+  /* camadas */
+  .stack{background:var(--bg2);border:1px solid var(--line2);border-radius:14px;padding:20px;margin-bottom:16px}
+  .lay{display:flex;align-items:center;gap:14px;padding:9px 0}
+  .lay .nm{font-weight:800;font-size:13.5px;min-width:170px;color:var(--txt)}
+  .lay .rl{font-size:12px;color:var(--txt3)}
+  .lay .dot{width:9px;height:9px;border-radius:50%;background:var(--c,var(--gold));flex:none}
+  .down{color:var(--txt3);margin-left:4px;font-size:14px;line-height:.6}
+
+  .bad{
+    background:rgba(244,63,94,.05);border:1px solid rgba(244,63,94,.2);
+    border-radius:12px;padding:14px 18px;margin:14px 0
+  }
+  .bad div{font-size:13px;color:var(--txt2);margin-bottom:6px}
+  .bad div:last-child{margin-bottom:0}
+  .bad .x{color:var(--rose);font-weight:900;margin-right:6px}
+
+  /* checklist */
+  .chk{background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  .chk li{list-style:none;font-size:13px;color:var(--txt2);padding:5px 0 5px 26px;position:relative}
+  .chk li::before{
+    content:"";position:absolute;left:0;top:9px;width:14px;height:14px;
+    border:1.5px solid var(--line);border-radius:4px;background:var(--bg)
+  }
+
+  /* fluxo dinheiro */
+  .cyc{background:var(--bg2);border:1px solid var(--line2);border-radius:14px;padding:20px;margin:14px 0}
+  .cyc .step{display:flex;gap:14px;align-items:flex-start;padding:8px 0}
+  .cyc .tag{
+    font-family:ui-monospace,monospace;font-size:11px;background:var(--bg);
+    border:1px solid var(--line2);border-radius:6px;padding:4px 9px;color:var(--gold);
+    white-space:nowrap;flex:none;min-width:210px
+  }
+  .cyc .tx{font-size:12.5px;color:var(--txt2)}
+  .cyc .sep{color:var(--txt3);padding-left:96px;font-size:13px;line-height:.9}
+
+  .note{
+    font-size:12.5px;color:var(--txt3);background:var(--bg2);
+    border:1px solid var(--line2);border-radius:12px;padding:14px 18px;margin:14px 0
+  }
+  .note b{color:var(--txt2)}
+  .ok{color:var(--emerald);font-weight:900}
+  .no{color:var(--rose);font-weight:900}
+  footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--txt3)}
+  a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(245,158,11,.3)}
+  @media(max-width:640px){
+    h1{font-size:24px}
+    .lay{flex-wrap:wrap}
+    .lay .nm{min-width:auto}
+    .cyc .tag{min-width:auto}
+    .cyc .sep{padding-left:20px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Blueprint de Engenharia — <span>Botezini ERP</span></h1>
+    <p class="sub">
+      O <a href="arquitetura.html">mapa de arquitetura</a> descreve <b>o que existe</b>.
+      Este blueprint define <b>como construir</b> daqui pra frente: regras, receitas e padrões.
+    </p>
+    <div class="warn">
+      <b>Regra de precedência:</b> em caso de divergência entre este documento e o código,
+      este documento vence — corrija o código.
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 1 -->
+  <h2><span class="num">1</span> Os 7 princípios inegociáveis</h2>
+  <div class="princ">
+    <div class="p"><div class="pn">Princípio 01</div>
+      <b>O banco é a fonte da verdade sobre dinheiro</b>
+      <span>Regra financeira em JavaScript é regra que some quando alguém abre outra aba.</span></div>
+    <div class="p"><div class="pn">Princípio 02</div>
+      <b>Nada de dinheiro é editado — é lançado</b>
+      <span><code>original_amount</code> é imutável. Correção vira lançamento novo, auditável.</span></div>
+    <div class="p"><div class="pn">Princípio 03</div>
+      <b>Operação de dinheiro é atômica</b>
+      <span>Uma RPC transacional, nunca 3 chamadas do front que podem falhar no meio.</span></div>
+    <div class="p"><div class="pn">Princípio 04</div>
+      <b>Estado financeiro é derivado, nunca armazenado</b>
+      <span><code>obligation_summary</code> calcula; ninguém guarda “quanto já pagou” numa coluna.</span></div>
+    <div class="p"><div class="pn">Princípio 05</div>
+      <b>Cada camada só conhece a de baixo</b>
+      <span>Componente não importa Supabase. Hook não importa repositório.</span></div>
+    <div class="p"><div class="pn">Princípio 06</div>
+      <b>Idempotência onde há dinheiro</b>
+      <span>Clicar duas vezes não pode gerar cobrança dobrada.</span></div>
+    <div class="p"><div class="pn">Princípio 07</div>
+      <b>Nada é criado “à revelia”</b>
+      <span>Categorias e lançamentos nascem de um catálogo/fluxo, não de texto livre solto.</span></div>
+  </div>
+
+  <!-- 2 -->
+  <h2><span class="num">2</span> Regras de camada</h2>
+  <div class="stack">
+    <div class="lay"><span class="dot" style="--c:var(--gold)"></span>
+      <span class="nm">Página / Componente</span>
+      <span class="rl">só importa hooks, componentes, utils, types</span></div>
+    <div class="down">↓</div>
+    <div class="lay"><span class="dot" style="--c:var(--blue)"></span>
+      <span class="nm">Hook</span>
+      <span class="rl">só importa <code>storageService</code>, utils, types</span></div>
+    <div class="down">↓</div>
+    <div class="lay"><span class="dot" style="--c:var(--cyan)"></span>
+      <span class="nm">storageService</span>
+      <span class="rl">FACADE — ponto único; só importa repositórios</span></div>
+    <div class="down">↓</div>
+    <div class="lay"><span class="dot" style="--c:var(--violet)"></span>
+      <span class="nm">Repositório</span>
+      <span class="rl">ÚNICO que importa o cliente Supabase</span></div>
+    <div class="down">↓</div>
+    <div class="lay"><span class="dot" style="--c:var(--emerald)"></span>
+      <span class="nm">Supabase / Postgres</span>
+      <span class="rl">tabelas, views, RPCs, RLS</span></div>
+  </div>
+
+  <h3>Proibições explícitas</h3>
+  <div class="bad">
+    <div><span class="x">✕</span><code>import { supabase }</code> fora de <code>src/repositories/**</code> e <code>src/services/supabase.ts</code></div>
+    <div><span class="x">✕</span>Componente chamando <code>storageService</code> direto para <b>lógica de negócio</b>
+      <br><span style="padding-left:20px;color:var(--txt3);font-size:12px">exceção tolerada: leitura pontual isolada num modal autocontido (ex.: <code>DisparoModal</code> buscando contas)</span></div>
+    <div><span class="x">✕</span>Hook importando repositório direto — sempre via <code>storageService</code></div>
+    <div><span class="x">✕</span>Cálculo de saldo/dívida no front — isso vem de view ou RPC</div>
+  </div>
+
+  <h3>Onde a lógica vive</h3>
+<pre><code>A lógica envolve dinheiro, estoque ou consistência entre tabelas?
+├── <span class="c-fn">SIM</span> → RPC no Postgres (transacional, com assert_finance_access)
+└── <span class="c-fn">NÃO</span>
+    ├── Regra de negócio reutilizável? → src/utils/*.ts (função pura, testável)
+    ├── Orquestração de tela?          → src/hooks/*.ts
+    └── Só apresentação?               → componente</code></pre>
+
+  <!-- 3 -->
+  <h2><span class="num">3</span> Receitas</h2>
+
+  <h3>3.1 — Adicionar um novo módulo/aba</h3>
+  <table>
+    <tr><td class="n">1</td><td>Adicione a chave em <code>View</code> — <code>components/common/NavItem.tsx</code></td></tr>
+    <tr><td class="n">2</td><td>Crie a página em <code>src/pages/</code> ou o painel em <code>components/&lt;area&gt;/</code></td></tr>
+    <tr><td class="n">3</td><td><code>lazy()</code> import no <code>App.tsx</code></td></tr>
+    <tr><td class="n">4</td><td><code>case</code> no switch de <code>renderContent()</code></td></tr>
+    <tr><td class="n">5</td><td><code>NavItem</code> na sidebar com ícone <code>lucide-react</code></td></tr>
+    <tr><td class="n">6</td><td>Título no mapa de labels do header</td></tr>
+    <tr><td class="n">7</td><td>Se for financeiro → bloquear o papel <code>factory</code></td></tr>
+  </table>
+
+  <h3>3.2 — Adicionar uma operação de dinheiro (caminho completo)</h3>
+  <p>Exemplo real: <code>fund_envelopes</code> (provisionamento das caixinhas).</p>
+
+  <h4>Passo 1 — SQL <span style="color:var(--txt3);font-weight:400">(supabase/finance_phaseN_&lt;assunto&gt;.sql)</span></h4>
+<pre><code><span class="c-kw">CREATE OR REPLACE FUNCTION</span> public.<span class="c-fn">minha_operacao</span>(p_param numeric)
+<span class="c-kw">RETURNS</span> numeric
+<span class="c-kw">LANGUAGE</span> plpgsql <span class="c-kw">SECURITY DEFINER</span> <span class="c-kw">SET</span> search_path = public
+<span class="c-kw">AS</span> $$
+<span class="c-kw">DECLARE</span> v_total numeric := 0;
+<span class="c-kw">BEGIN</span>
+  <span class="c-kw">PERFORM</span> public.<span class="c-fn">assert_finance_access</span>();          <span class="c-com">-- 1. SEMPRE primeiro</span>
+  <span class="c-kw">IF</span> p_param <span class="c-kw">IS NULL OR</span> p_param &lt;= 0 <span class="c-kw">THEN</span>          <span class="c-com">-- 2. Valide a entrada</span>
+    <span class="c-kw">RAISE EXCEPTION</span> <span class="c-str">'Valor deve ser positivo'</span>;
+  <span class="c-kw">END IF</span>;
+  <span class="c-com">-- 3. Faça tudo aqui dentro (é uma transação)</span>
+  <span class="c-com">-- 4. Registre movimento/auditoria ao mexer em saldo</span>
+  <span class="c-kw">RETURN</span> v_total;
+<span class="c-kw">END</span>;
+$$;
+
+<span class="c-kw">REVOKE ALL ON FUNCTION</span> public.minha_operacao(numeric) <span class="c-kw">FROM</span> PUBLIC, anon;
+<span class="c-kw">GRANT EXECUTE ON FUNCTION</span> public.minha_operacao(numeric) <span class="c-kw">TO</span> authenticated;</code></pre>
+
+  <h4>Passo 2 — Repositório</h4>
+<pre><code><span class="c-kw">async</span> <span class="c-fn">minhaOperacao</span>(param: number): Promise&lt;number&gt; {
+    <span class="c-kw">if</span> (!supabase) <span class="c-kw">throw new</span> Error(<span class="c-str">'Supabase não configurado'</span>);
+    <span class="c-kw">const</span> { data, error } = <span class="c-kw">await</span> supabase.<span class="c-fn">rpc</span>(<span class="c-str">'minha_operacao'</span>, { p_param: param });
+    <span class="c-kw">if</span> (error) <span class="c-kw">throw new</span> Error(error.message);
+    <span class="c-kw">return</span> Number(data) || 0;
+}</code></pre>
+
+  <table>
+    <tr><td class="n">3</td><td><b>Facade</b> (<code>storage.ts</code>) — uma linha delegando</td></tr>
+    <tr><td class="n">4</td><td><b>Hook</b> — envolva com <code>busy</code>/<code>error</code> e <b>recarregue</b> os dados depois</td></tr>
+    <tr><td class="n">5</td><td><b>UI</b> — botão → modal de confirmação (<b>nunca</b> <code>window.prompt</code>)</td></tr>
+    <tr><td class="n">6</td><td><b>Teste</b> (<code>tests/test_phaseN_*.py</code>) — prove a regra, não o caminho feliz</td></tr>
+    <tr><td class="n">7</td><td><b>Docs</b> — acrescente o SQL na ordem em <code>QA_ROTINA_COMPLETA.md</code></td></tr>
+  </table>
+
+  <h3>3.3 — Adicionar um campo a uma entidade</h3>
+  <table>
+    <tr><td class="n">1</td><td><code>ALTER TABLE ... ADD COLUMN IF NOT EXISTS</code> (sempre idempotente)</td></tr>
+    <tr><td class="n">2</td><td>Campo no tipo (<code>types/index.ts</code> ou <code>types/finance.ts</code>) — <b>opcional</b> (<code>?</code>) se legado pode não ter</td></tr>
+    <tr><td class="n">3</td><td>Repositório: incluir na <b>leitura</b> e no <b>payload de escrita</b><br>
+      <span style="color:var(--gold)">⚠ Se o payload usa allowlist (ex.: <code>saveEnvelope</code>), adicionar lá — senão o campo é descartado em silêncio</span></td></tr>
+    <tr><td class="n">4</td><td>Formulário: input + estado + carregamento no modo edição</td></tr>
+  </table>
+
+  <h3>3.4 — Criar um modal</h3>
+<pre><code><span class="c-kw">export function</span> <span class="c-fn">MeuModal</span>({ onClose }: Props) {
+    <span class="c-kw">return</span> <span class="c-fn">createPortal</span>(
+        &lt;div className=<span class="c-str">"fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-[80]
+                        flex items-center justify-center p-4 animate-in fade-in duration-300"</span>
+             onClick={onClose}&gt;
+            &lt;div className=<span class="c-str">"bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl
+                            w-full max-w-md animate-in zoom-in-95 duration-300"</span>
+                 onClick={e =&gt; e.<span class="c-fn">stopPropagation</span>()}&gt;
+                <span class="c-com">{/* header: título + botão X */}</span>
+                <span class="c-com">{/* corpo */}</span>
+                <span class="c-com">{/* footer: [Cancelar] [Ação primária] */}</span>
+            &lt;/div&gt;
+        &lt;/div&gt;,
+        document.body   <span class="c-com">// ← SEMPRE portal</span>
+    );
+}</code></pre>
+  <div class="note">
+    <b>Obrigatório:</b> <code>createPortal</code> · fechar no clique fora ·
+    <code>stopPropagation</code> no conteúdo · z-index da tabela abaixo.
+  </div>
+
+  <!-- 4 -->
+  <h2><span class="num">4</span> Escala de z-index (formalizada)</h2>
+  <p>Auditoria encontrou <b>10 valores ad hoc</b> no código. Esta é a escala canônica —
+     use em código novo e migre o antigo ao encostar.</p>
+  <table>
+    <tr><th>Faixa</th><th>Uso</th><th>Exemplo</th></tr>
+    <tr><td><code>0–50</code></td><td>Conteúdo normal</td><td>cards, tabelas</td></tr>
+    <tr><td><code>z-[60]</code></td><td>Barras fixas / sticky</td><td>header de lista</td></tr>
+    <tr><td><code>z-[70]</code></td><td>Overlays de página</td><td>drawer lateral</td></tr>
+    <tr><td><code>z-[80]</code></td><td><b>Modal padrão</b></td><td>PaymentModal, EnvelopeForm, DisparoModal</td></tr>
+    <tr><td><code>z-[100]</code></td><td>Editor tela cheia</td><td>BudgetEditor</td></tr>
+    <tr><td><code>z-[110]</code></td><td>Modal <b>sobre</b> editor</td><td>FichaTecnicaMissingModal</td></tr>
+    <tr><td><code>z-[120]</code></td><td>Modal sobre editor (2º nível)</td><td>PaymentPlanModal</td></tr>
+    <tr><td><code>z-[150]</code></td><td>Crítico / bloqueante</td><td>erro fatal, confirmação destrutiva</td></tr>
+    <tr><td><code>9999</code></td><td><b>Dropdown em portal</b></td><td>SearchableSelect</td></tr>
+    <tr><td><code>99999</code></td><td><b>Tooltip em portal</b></td><td>InfoTooltip</td></tr>
+  </table>
+  <div class="note">
+    <b>Regra:</b> dropdown e tooltip ficam <b>sempre acima de qualquer modal</b> — daí os valores altos.
+    Se um modal precisa cobrir um dropdown, o problema é o fluxo, não o z-index.
+  </div>
+
+  <!-- 5 -->
+  <h2><span class="num">5</span> Regras específicas de dinheiro</h2>
+
+  <h3>O ciclo de um recebível</h3>
+  <div class="cyc">
+    <div class="step"><span class="tag">apply_order_payment_plan</span>
+      <span class="tx">cria parcelas <b>pré-lançadas</b> (<code>open</code> + <code>planned_method</code>)</span></div>
+    <div class="sep">↓</div>
+    <div class="step"><span class="tag" style="color:var(--txt3)">(produção / entrega)</span>
+      <span class="tx">pedido avança pelos estágios</span></div>
+    <div class="sep">↓</div>
+    <div class="step"><span class="tag">get_pending_installments</span>
+      <span class="tx">lista <b>só</b> de pedidos Concluídos/Entregues</span></div>
+    <div class="sep">↓</div>
+    <div class="step"><span class="tag">pay_obligation</span>
+      <span class="tx"><b>efetiva</b>, com data e meio escolhidos pelo usuário</span></div>
+  </div>
+  <div class="note">
+    • <b>Emitir pedido nunca gera recebimento.</b> Boleto/PIX só existe de fato no disparo manual.<br>
+    • <b>Ajustar plano</b> → <code>revise_order_plan</code>: cancela só as em aberto, <b>preserva as pagas</b>.<br>
+    • <b>Divergência de total</b> → <code>apply_order_adjustment</code>: lançamento novo, jamais editar o original.
+  </div>
+
+  <h3>Checklist ao mexer em dinheiro</h3>
+  <div class="chk"><ul>
+    <li>É uma RPC transacional (não várias chamadas do front)?</li>
+    <li>Tem <code>assert_finance_access()</code> na primeira linha?</li>
+    <li>Valida entrada (nulo, zero, negativo)?</li>
+    <li>É idempotente ou impede duplicação?</li>
+    <li>Registra movimento/auditoria?</li>
+    <li><code>REVOKE ... FROM anon</code> + <code>GRANT ... TO authenticated</code>?</li>
+    <li>Tem teste que prova a <b>regra</b> (não só o caminho feliz)?</li>
+  </ul></div>
+
+  <!-- 6 -->
+  <h2><span class="num">6</span> Segurança — padrão obrigatório</h2>
+  <h4>Toda tabela nova</h4>
+<pre><code><span class="c-kw">ALTER TABLE</span> public.minha_tabela <span class="c-kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="c-kw">DO</span> $$ <span class="c-kw">BEGIN</span>
+  <span class="c-kw">IF NOT EXISTS</span> (<span class="c-kw">SELECT</span> 1 <span class="c-kw">FROM</span> pg_policies
+                 <span class="c-kw">WHERE</span> schemaname=<span class="c-str">'public'</span> <span class="c-kw">AND</span> tablename=<span class="c-str">'minha_tabela'</span>
+                   <span class="c-kw">AND</span> policyname=<span class="c-str">'single_tenant_admin_manager_all'</span>) <span class="c-kw">THEN</span>
+    <span class="c-kw">CREATE POLICY</span> single_tenant_admin_manager_all <span class="c-kw">ON</span> public.minha_tabela
+      <span class="c-kw">FOR ALL TO</span> authenticated
+      <span class="c-kw">USING</span> (public.<span class="c-fn">is_admin_or_manager</span>())
+      <span class="c-kw">WITH CHECK</span> (public.<span class="c-fn">is_admin_or_manager</span>());
+  <span class="c-kw">END IF</span>;
+<span class="c-kw">END</span>; $$;
+
+<span class="c-kw">GRANT</span> SELECT, INSERT, UPDATE, DELETE <span class="c-kw">ON</span> public.minha_tabela <span class="c-kw">TO</span> authenticated;</code></pre>
+  <table>
+    <tr><td><b>Toda view nova</b></td><td><code>WITH (security_invoker = on)</code> — respeita o RLS de quem consulta</td></tr>
+    <tr><td><b>Toda RPC financeira</b></td><td><code>SECURITY DEFINER</code> + <code>assert_finance_access()</code> + <code>REVOKE anon</code></td></tr>
+    <tr><td><b>Papel <code>factory</code></b></td><td>bloqueado no banco (RLS) <b>e</b> na navegação — as duas coisas, sempre</td></tr>
+  </table>
+
+  <!-- 7 -->
+  <h2><span class="num">7</span> Convenções de banco</h2>
+  <table>
+    <tr><td><b>Arquivo</b></td><td><code>finance_phaseN_&lt;assunto&gt;.sql</code>, numerado, aplicado em ordem</td></tr>
+    <tr><td><b>Idempotente sempre</b></td><td><code>IF NOT EXISTS</code>, <code>CREATE OR REPLACE</code>, <code>ADD COLUMN IF NOT EXISTS</code></td></tr>
+    <tr><td><b>Nunca destrutivo sem confirmação</b></td><td><code>DROP</code> fica comentado, com um <code>SELECT</code> de inspeção acima (padrão do <code>finance_phase9</code>)</td></tr>
+    <tr><td><b>Datas</b></td><td>comparar vencimento com o fuso do negócio, não UTC cru</td></tr>
+    <tr><td><b>Ambiguidade em <code>RETURNS TABLE</code></b></td><td>qualifique <b>todas</b> as colunas com alias — o nome de saída sombreia o da tabela e gera erro <code>42702</code></td></tr>
+  </table>
+<pre><code><span class="c-com">-- Vencimento no fuso do negócio (evita marcar "vencido" cedo demais)</span>
+<span class="c-kw">WHEN</span> o.due_date &lt; (<span class="c-fn">now</span>() <span class="c-kw">AT TIME ZONE</span> <span class="c-str">'America/Sao_Paulo'</span>)::date <span class="c-kw">THEN</span> <span class="c-str">'overdue'</span></code></pre>
+
+  <!-- 8 -->
+  <h2><span class="num">8</span> Padrões de UI</h2>
+  <table>
+    <tr><th>Necessidade</th><th class="ok">Use</th><th class="no">Nunca use</th></tr>
+    <tr><td>Dropdown</td><td><code>SearchableSelect</code></td><td><code>&lt;select&gt;</code> nativo</td></tr>
+    <tr><td>Dica explicativa</td><td><code>InfoTooltip</code> (portal)</td><td><code>div absolute</code> com <code>group-hover</code></td></tr>
+    <tr><td>Entrada de valor</td><td>Modal próprio</td><td><code>window.prompt</code></td></tr>
+    <tr><td>Confirmação</td><td><code>ConfirmDialog</code> / modal</td><td><code>window.confirm</code> em fluxo crítico</td></tr>
+    <tr><td>Sobreposição</td><td><code>createPortal(…, document.body)</code></td><td><code>absolute</code> dentro do container</td></tr>
+  </table>
+  <div class="note">
+    <b>Estética:</b> fundo <code>zinc-900</code>, borda <code>zinc-800</code>, <code>rounded-3xl</code> em modais,
+    acento <code>amber-500</code>.<br>
+    <b>Rótulos:</b> <code>text-[9px] font-black uppercase tracking-widest text-zinc-500</code>
+  </div>
+<pre><code><span class="c-com">// Números vindos de input — o "|| 0" evita NaN no banco</span>
+value: <span class="c-fn">parseFloat</span>(e.target.value) || 0</code></pre>
+
+  <!-- 9 -->
+  <h2><span class="num">9</span> Testes</h2>
+  <div class="note" style="border-left:3px solid var(--emerald)">
+    <b>Filosofia:</b> o teste existe para <b>falhar quando a regra quebrar</b>.
+    Teste que só confirma o caminho feliz é decoração.
+  </div>
+  <table>
+    <tr><th>Tipo</th><th>Onde</th><th>O que provar</th></tr>
+    <tr><td>Invariante</td><td><code>tests/test_phaseN_*.py</code></td><td><code>livre = real − alocado</code>; soma das parcelas = total</td></tr>
+    <tr><td>Bloqueio</td><td>idem</td><td>alocar além do livre <b>levanta exceção</b></td></tr>
+    <tr><td>Preservação</td><td>idem</td><td>revisar plano <b>não apaga</b> parcela paga</td></tr>
+    <tr><td>Idempotência</td><td>idem</td><td>chamar 2× não duplica</td></tr>
+    <tr><td>Segurança</td><td><code>test_security_audit.py</code></td><td><code>factory</code> <b>não</b> lê dado financeiro</td></tr>
+  </table>
+  <div class="note">
+    <b>Fixtures:</b> limpe em ordem de FK (pagamentos → obrigações → pedido → cliente).<br>
+    <b>Datas:</b> use vencimento no futuro para status determinístico (evita flake de fuso).
+  </div>
+
+  <!-- 10 -->
+  <h2><span class="num">10</span> Anti-padrões</h2>
+  <p>Todos <b>encontrados e corrigidos neste código</b>. Não repita.</p>
+  <table>
+    <tr><th>Anti-padrão</th><th>Sintoma</th><th>Correção aplicada</th></tr>
+    <tr><td>Dois sistemas para a mesma coisa</td><td>Categoria com texto <b>e</b> catálogo global</td><td>Um seletor único sobre <code>global_categories</code></td></tr>
+    <tr><td>Campo escrito e nunca lido</td><td><code>global_category_id</code> gravado no quick create, invisível no resto</td><td>Sincronizar <code>category</code> + <code>global_category_id</code></td></tr>
+    <tr><td>Tooltip <code>absolute</code> em container com scroll</td><td>Corta e cria barra de rolagem</td><td><code>InfoTooltip</code> em portal</td></tr>
+    <tr><td><code>parseFloat</code> sem fallback</td><td><code>NaN</code> gravado no banco</td><td><code>|| 0</code></td></tr>
+    <tr><td>Prompt do navegador para dado de negócio</td><td>Feio, sem validação, sem prévia</td><td>Modal com preview</td></tr>
+    <tr><td>Campo duplicado no mesmo form</td><td>Dois inputs no mesmo <code>price</code></td><td>Remover a duplicata</td></tr>
+    <tr><td>Modal abaixo do editor</td><td>“O botão não faz nada”</td><td>Escala de z-index (§4)</td></tr>
+    <tr><td>Estado financeiro em coluna</td><td><code>orders.amount_paid</code> divergindo da verdade</td><td>Derivar de <code>obligation_summary</code></td></tr>
+    <tr><td>Tabela legada viva no código</td><td><code>financial_categories</code> lida/escrita sem uso real</td><td>Remover código → drop com inspeção antes</td></tr>
+  </table>
+
+  <!-- 11 -->
+  <h2><span class="num">11</span> Checklist antes de dar por pronto</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">
+    <div class="chk"><h4 style="margin-top:0">Código</h4><ul>
+      <li><code>npx tsc --noEmit</code> → exit 0</li>
+      <li>App sobe sem erro no console</li>
+      <li>Nenhuma camada furada (§2)</li>
+      <li>Dropdown/tooltip/modal seguem §8</li>
+    </ul></div>
+    <div class="chk"><h4 style="margin-top:0">Banco</h4><ul>
+      <li>SQL idempotente e numerado</li>
+      <li>RLS + GRANT/REVOKE (§6)</li>
+      <li>Adicionado à ordem no QA</li>
+    </ul></div>
+    <div class="chk"><h4 style="margin-top:0">Dinheiro</h4><ul>
+      <li>Checklist §5 inteiro</li>
+    </ul></div>
+    <div class="chk"><h4 style="margin-top:0">Testes &amp; Docs</h4><ul>
+      <li>Teste que prova a regra nova</li>
+      <li><code>pytest -v</code> sem regressão</li>
+      <li>Arquitetura atualizada se mudou estrutura</li>
+      <li>Passo novo em <code>TESTES_MANUAIS_APP.md</code></li>
+    </ul></div>
+  </div>
+
+  <!-- 12 -->
+  <h2><span class="num">12</span> Dívida técnica conhecida</h2>
+  <table>
+    <tr><th>Item</th><th>Situação</th><th>Próximo passo</th></tr>
+    <tr><td>Unificação de categorias</td><td><code>global_categories</code> é a fonte; texto <code>category</code> segue como fallback sincronizado</td><td>Migrar texto→global exige decisão de domínios (<code>crm</code> → <code>client</code>/<code>supplier</code>?)</td></tr>
+    <tr><td><code>orders.amount_paid</code> / <code>payment_status</code></td><td>Colunas legadas, escritas como <code>0</code>, ninguém lê</td><td>Remover após confirmar que nenhum relatório depende</td></tr>
+    <tr><td>Cache local de categorias</td><td><code>botezini_cat_*</code> em localStorage, não é fonte de verdade</td><td>Aposentar junto da unificação</td></tr>
+    <tr><td>Escala de z-index</td><td>Formalizada aqui; código antigo ainda ad hoc</td><td>Migrar ao encostar em cada arquivo</td></tr>
+    <tr><td>Provisionamento das caixinhas</td><td>Manual, valor-base digitado livremente</td><td>Ligar ao recebimento real para eliminar risco de provisionar 2×</td></tr>
+    <tr><td><code>wms_*</code>, <code>transactions</code>, <code>invoices</code></td><td>Tabelas órfãs no schema</td><td>Confirmar desuso e derrubar com inspeção</td></tr>
+  </table>
+
+  <footer>
+    Blueprint gerado em 18/07/2026 a partir da leitura do código ·
+    Companheiro do <a href="arquitetura.html">mapa de arquitetura</a> e do
+    <a href="arquitetura.json">JSON</a> · Botezini ERP
+  </footer>
+
+</div>
+</body>
+</html>

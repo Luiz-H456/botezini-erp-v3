@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0B0B0B" />
+  <meta name="description" content="Sistema de gestão industrial para confecções.">
+
+  <title>BOTEZINI ERP</title>
+
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png">
+
+  <!-- Estilos: Tailwind é compilado no build (src/index.css via PostCSS).
+       Nada de CDN em runtime — o app estiliza igual com ou sem internet. -->
+  <script>
+    // Polyfill para evitar crashes em bibliotecas que esperam Node.js environment
+    window.process = window.process || { env: {} };
+  </script>
+</head>
+
+<body class="bg-zinc-950 text-slate-200 antialiased selection:bg-gold-500 selection:text-black">
+  <div id="root"></div>
+
+  <!-- Importação do módulo principal -->
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

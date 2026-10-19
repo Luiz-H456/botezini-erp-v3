@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arquitetura — Botezini ERP</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#09090b; --bg2:#18181b; --bg3:#27272a;
+    --line:#3f3f46; --line2:#27272a;
+    --txt:#fafafa; --txt2:#a1a1aa; --txt3:#71717a;
+    --gold:#f59e0b; --emerald:#10b981; --violet:#8b5cf6;
+    --rose:#f43f5e; --blue:#3b82f6; --cyan:#06b6d4;
+  }
+  body{
+    background:var(--bg); color:var(--txt);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.6; padding:0 0 80px;
+  }
+  .wrap{max-width:1280px;margin:0 auto;padding:0 24px}
+  header{
+    border-bottom:1px solid var(--line2); padding:48px 0 32px; margin-bottom:40px;
+    background:linear-gradient(180deg,rgba(245,158,11,.06),transparent);
+  }
+  h1{font-size:32px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--txt2);font-size:14px;max-width:760px}
+  .meta{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+  .pill{
+    font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;
+    padding:5px 10px;border-radius:8px;background:var(--bg2);border:1px solid var(--line2);color:var(--txt2)
+  }
+  h2{
+    font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.2em;
+    color:var(--txt3);margin:56px 0 18px;display:flex;align-items:center;gap:10px
+  }
+  h2::after{content:"";flex:1;height:1px;background:var(--line2)}
+  h3{font-size:15px;font-weight:800;margin-bottom:4px}
+
+  /* ── Camadas ── */
+  .layers{display:flex;flex-direction:column;gap:10px}
+  .layer{
+    display:grid;grid-template-columns:52px 1fr;gap:18px;align-items:stretch;
+    background:var(--bg2);border:1px solid var(--line2);border-radius:16px;padding:18px 20px;
+    border-left:3px solid var(--c,var(--gold));position:relative
+  }
+  .layer .n{
+    font-size:26px;font-weight:900;color:var(--c,var(--gold));opacity:.35;
+    display:flex;align-items:center;justify-content:center
+  }
+  .layer .path{font-family:ui-monospace,monospace;font-size:11px;color:var(--c,var(--gold));margin:2px 0 8px}
+  .layer .desc{font-size:13px;color:var(--txt2)}
+  .layer .rule{
+    margin-top:8px;font-size:11.5px;color:var(--txt3);
+    border-left:2px solid var(--line);padding-left:10px
+  }
+  .arrow{text-align:center;color:var(--txt3);font-size:16px;line-height:1;margin:-4px 0}
+
+  /* ── Grid de cards ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .card{
+    background:var(--bg2);border:1px solid var(--line2);border-radius:16px;padding:18px;
+    border-top:3px solid var(--c,var(--gold));transition:border-color .2s,transform .2s
+  }
+  .card:hover{border-color:var(--line);transform:translateY(-2px)}
+  .card .route{
+    font-family:ui-monospace,monospace;font-size:10px;color:var(--c,var(--gold));
+    text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px
+  }
+  .card p{font-size:12.5px;color:var(--txt2);margin-bottom:12px}
+  .kv{font-size:11px;margin-top:8px}
+  .kv b{
+    display:block;color:var(--txt3);text-transform:uppercase;
+    letter-spacing:.14em;font-size:9px;font-weight:900;margin-bottom:4px
+  }
+  code{
+    font-family:ui-monospace,monospace;font-size:10.5px;background:var(--bg);
+    border:1px solid var(--line2);border-radius:5px;padding:2px 6px;color:var(--txt2);
+    display:inline-block;margin:2px 3px 2px 0
+  }
+
+  /* ── Fluxos ── */
+  .flow{background:var(--bg2);border:1px solid var(--line2);border-radius:16px;padding:20px;margin-bottom:14px}
+  .flow h3{color:var(--gold);margin-bottom:12px;font-size:14px}
+  .flow ol{list-style:none;counter-reset:s}
+  .flow li{
+    counter-increment:s;position:relative;padding-left:34px;
+    margin-bottom:10px;font-size:12.5px;color:var(--txt2)
+  }
+  .flow li::before{
+    content:counter(s);position:absolute;left:0;top:0;width:22px;height:22px;
+    background:var(--bg3);border:1px solid var(--line);border-radius:7px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:900;color:var(--gold)
+  }
+
+  /* ── Invariantes ── */
+  .inv{
+    background:linear-gradient(90deg,rgba(245,158,11,.06),transparent);
+    border:1px solid var(--line2);border-left:3px solid var(--gold);
+    border-radius:12px;padding:14px 18px;margin-bottom:10px
+  }
+  .inv b{display:block;font-size:13px;margin-bottom:3px}
+  .inv span{font-size:12.5px;color:var(--txt2)}
+
+  /* ── Banco ── */
+  .db{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .dbcol{background:var(--bg2);border:1px solid var(--line2);border-radius:16px;padding:18px}
+  .dbcol h4{
+    font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.16em;
+    margin-bottom:12px;color:var(--c,var(--gold))
+  }
+  .tag{
+    display:inline-block;font-family:ui-monospace,monospace;font-size:10.5px;
+    background:var(--bg);border:1px solid var(--line2);border-radius:6px;
+    padding:3px 8px;margin:0 4px 5px 0;color:var(--txt2)
+  }
+  .tag.legacy{opacity:.45;text-decoration:line-through}
+  .tag.truth{border-color:var(--emerald);color:var(--emerald)}
+
+  .note{
+    font-size:12px;color:var(--txt3);background:var(--bg2);
+    border:1px solid var(--line2);border-radius:12px;padding:14px 18px;margin-top:14px
+  }
+  footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--line2);font-size:11px;color:var(--txt3)}
+  @media(max-width:640px){
+    .layer{grid-template-columns:1fr}
+    .layer .n{display:none}
+    h1{font-size:24px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>Arquitetura — <span>Botezini ERP</span></h1>
+    <p class="sub">
+      ERP de confecção: orçamento → pedido → produção → recebimento, com módulo financeiro
+      completo (obrigações, recebíveis, reconciliação e caixinhas virtuais).
+    </p>
+    <div class="meta">
+      <span class="pill">React 18 + TS</span>
+      <span class="pill">Vite 7</span>
+      <span class="pill">Tailwind 4</span>
+      <span class="pill">Supabase / Postgres</span>
+      <span class="pill">React Query</span>
+      <span class="pill">RLS + RPCs</span>
+      <span class="pill">jsPDF</span>
+      <span class="pill">pytest</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <h2>Arquitetura em camadas</h2>
+  <div class="layers">
+    <div class="layer" style="--c:var(--gold)">
+      <div class="n">1</div>
+      <div>
+        <h3>Apresentação</h3>
+        <div class="path">src/pages · src/components</div>
+        <div class="desc">Telas e componentes visuais. Não falam com o banco diretamente.</div>
+        <div class="rule">Componentes recebem dados via hooks; nunca importam o cliente Supabase.</div>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="layer" style="--c:var(--blue)">
+      <div class="n">2</div>
+      <div>
+        <h3>Estado &amp; Orquestração</h3>
+        <div class="path">src/hooks · src/hooks/finance</div>
+        <div class="desc">Carregam, filtram, calculam e expõem dados + ações para as telas.</div>
+        <div class="rule">Hooks chamam o <code>storageService</code>, nunca repositórios direto.</div>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="layer" style="--c:var(--cyan)">
+      <div class="n">3</div>
+      <div>
+        <h3>Facade de Serviço</h3>
+        <div class="path">src/services/storage.ts</div>
+        <div class="desc">Ponto <b>único</b> de entrada para dados. Delega a cada repositório.</div>
+        <div class="rule">Toda leitura/escrita passa por aqui — troca de backend fica isolada.</div>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="layer" style="--c:var(--violet)">
+      <div class="n">4</div>
+      <div>
+        <h3>Repositórios</h3>
+        <div class="path">src/repositories (10 arquivos)</div>
+        <div class="desc">Conhecem tabelas, colunas e RPCs. Traduzem banco ↔ tipos do app.</div>
+        <div class="rule">Única camada que importa o cliente Supabase.</div>
+      </div>
+    </div>
+    <div class="arrow">↓</div>
+    <div class="layer" style="--c:var(--emerald)">
+      <div class="n">5</div>
+      <div>
+        <h3>Banco de Dados</h3>
+        <div class="path">supabase/*.sql — PostgreSQL</div>
+        <div class="desc">Tabelas, views (verdade derivada), RPCs atômicas e Row Level Security.</div>
+        <div class="rule">Regras críticas de dinheiro vivem no banco, não no front.</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Módulos</h2>
+  <div class="grid">
+
+    <div class="card" style="--c:var(--blue)">
+      <div class="route">/dashboard</div>
+      <h3>Dashboard</h3>
+      <p>KPIs executivos, receitas/despesas por categoria, visão geral do negócio.</p>
+      <div class="kv"><b>Página</b><code>pages/Dashboard.tsx</code></div>
+      <div class="kv"><b>Hooks</b><code>useFinanceQueries</code></div>
+    </div>
+
+    <div class="card" style="--c:var(--emerald)">
+      <div class="route">/finance</div>
+      <h3>Financeiro</h3>
+      <p>Contas a pagar/receber, pagamentos, estornos, recorrências, fluxo de caixa e presets de filtro.</p>
+      <div class="kv"><b>Hooks</b>
+        <code>useFinanceData</code><code>useFinanceFilters</code><code>useFinanceKPIs</code><code>useFinanceActions</code><code>useObligationForm</code><code>usePaymentModal</code>
+      </div>
+      <div class="kv"><b>RPCs</b>
+        <code>pay_obligation</code><code>reverse_payment</code><code>cancel_obligation</code><code>get_cashflow_series</code><code>get_liquidity_kpis</code>
+      </div>
+    </div>
+
+    <div class="card" style="--c:var(--gold)">
+      <div class="route">/receivables</div>
+      <h3>Recebíveis</h3>
+      <p>Parcelas nascem <b>pré-lançadas</b> e só são efetivadas manualmente, com data escolhida, na aba “A disparar”.</p>
+      <div class="kv"><b>Abas</b>
+        <code>A disparar</code><code>Entregues</code><code>Adiantamentos</code><code>Por cliente</code><code>Por meio</code><code>Reconciliação</code>
+      </div>
+      <div class="kv"><b>RPCs</b>
+        <code>get_pending_installments</code><code>revise_order_plan</code><code>apply_order_adjustment</code>
+      </div>
+    </div>
+
+    <div class="card" style="--c:var(--violet)">
+      <div class="route">/envelopes</div>
+      <h3>Caixinhas</h3>
+      <p>Envelopes <b>virtuais</b> sobre o saldo real — reservam sem mover dinheiro. <code>livre = real − reservado</code>. Metas, saldo mínimo, extrato e provisionamento por %.</p>
+      <div class="kv"><b>Tabelas</b><code>cash_envelopes</code><code>cash_envelope_movements</code></div>
+      <div class="kv"><b>RPCs</b>
+        <code>get_envelope_overview</code><code>move_envelope</code><code>transfer_envelope</code><code>fund_envelopes</code>
+      </div>
+    </div>
+
+    <div class="card" style="--c:var(--gold)">
+      <div class="route">/budgets</div>
+      <h3>Orçamentos</h3>
+      <p>Itens, tecidos, personalizações e plano de pagamento opcional (vai no PDF). Conversão cria o pedido + plano atomicamente.</p>
+      <div class="kv"><b>Componentes</b><code>BudgetEditor</code><code>PaymentPlanModal</code><code>BudgetPreviewModal</code></div>
+      <div class="kv"><b>RPC</b><code>apply_order_payment_plan</code> <i>(idempotente)</i></div>
+    </div>
+
+    <div class="card" style="--c:var(--blue)">
+      <div class="route">/orders</div>
+      <h3>Pedidos</h3>
+      <p>Gerados a partir de orçamentos. O estado financeiro é <b>derivado</b> da view, nunca armazenado no pedido.</p>
+      <div class="kv"><b>View</b><code>order_financial_status</code></div>
+      <div class="kv"><b>Hooks</b><code>useOrders</code></div>
+    </div>
+
+    <div class="card" style="--c:var(--rose)">
+      <div class="route">/production</div>
+      <h3>Produção</h3>
+      <p>Kanban por estágio. Ao avançar valida <b>ficha técnica (BOM)</b> e estoque. Sem ficha → modal explicativo com deep-link. Único módulo do papel <code>factory</code>.</p>
+      <div class="kv"><b>Modais</b><code>FichaTecnicaMissingModal</code><code>StockShortageModal</code><code>DeliveryConfirmModal</code></div>
+    </div>
+
+    <div class="card" style="--c:var(--cyan)">
+      <div class="route">/inventory</div>
+      <h3>Estoque</h3>
+      <p>Insumos, movimentações de entrada/saída e custo médio (CMV) atualizado no banco.</p>
+      <div class="kv"><b>Tabelas</b><code>insumos</code><code>insumo_movements</code><code>product_insumos</code></div>
+      <div class="kv"><b>RPC</b><code>update_insumo_stock_and_cost</code></div>
+    </div>
+
+    <div class="card" style="--c:var(--violet)">
+      <div class="route">/masterdata</div>
+      <h3>Cadastros</h3>
+      <p>Empresa, metas, centros de custo, clientes, fornecedores, produtos e ficha técnica. Categoria unificada no catálogo global.</p>
+      <div class="kv"><b>Forms</b><code>ClientForm</code><code>SupplierForm</code><code>ProductForm</code><code>ProductInsumosForm</code><code>GlobalCategorySelect</code></div>
+    </div>
+
+    <div class="card" style="--c:var(--rose)">
+      <div class="route">/login</div>
+      <h3>Autenticação</h3>
+      <p>Supabase Auth. Papéis <code>admin</code>, <code>manager</code>, <code>factory</code> — controlam navegação <b>e</b> RLS.</p>
+      <div class="kv"><b>RPCs</b><code>current_user_role</code><code>is_admin_or_manager</code><code>is_factory</code></div>
+    </div>
+
+  </div>
+
+  <h2>Camada de dados</h2>
+  <div class="db">
+    <div class="dbcol" style="--c:var(--emerald)">
+      <h4>Views — fonte da verdade</h4>
+      <span class="tag truth">obligation_summary</span>
+      <span class="tag truth">order_financial_status</span>
+      <div class="note" style="margin-top:12px">
+        <b>obligation_summary</b> soma os pagamentos ativos e calcula <code>remaining_amount</code> +
+        <code>derived_status</code> (open/partial/paid/overdue/cancelled). É a <b>única</b> fonte
+        do estado financeiro.
+      </div>
+    </div>
+
+    <div class="dbcol" style="--c:var(--gold)">
+      <h4>Tabelas principais</h4>
+      <span class="tag">profiles</span><span class="tag">company_profile</span>
+      <span class="tag">clients</span><span class="tag">suppliers</span>
+      <span class="tag">products</span><span class="tag">insumos</span>
+      <span class="tag">product_insumos</span><span class="tag">insumo_movements</span>
+      <span class="tag">budgets</span><span class="tag">orders</span>
+      <span class="tag">financial_obligations</span><span class="tag">obligation_payments</span>
+      <span class="tag">bank_accounts</span><span class="tag">cost_centers</span>
+      <span class="tag">budget_lines</span><span class="tag">cash_snapshots</span>
+      <span class="tag">global_categories</span><span class="tag">app_settings</span>
+      <span class="tag">lookup_values</span><span class="tag">audit_logs</span>
+      <span class="tag">cash_envelopes</span><span class="tag">cash_envelope_movements</span>
+    </div>
+
+    <div class="dbcol" style="--c:var(--rose)">
+      <h4>Legado / aposentado</h4>
+      <span class="tag legacy">financial_categories</span>
+      <span class="tag legacy">transactions</span>
+      <span class="tag legacy">invoices</span>
+      <span class="tag legacy">payable_accounts</span>
+      <span class="tag legacy">wms_*</span>
+      <span class="tag legacy">product_materials</span>
+      <div class="note" style="margin-top:12px">
+        <b>financial_categories</b> foi aposentada — substituída por
+        <code>global_categories(domain='finance')</code>. Código removido do app.
+      </div>
+    </div>
+
+    <div class="dbcol" style="--c:var(--violet)">
+      <h4>RPCs por área</h4>
+      <div class="kv"><b>Segurança</b>
+        <code>assert_finance_access</code><code>is_admin_or_manager</code><code>is_factory</code><code>current_user_role</code>
+      </div>
+      <div class="kv"><b>Recebíveis</b>
+        <code>create_order_receivable</code><code>apply_order_payment_plan</code><code>revise_order_plan</code><code>get_pending_installments</code>
+      </div>
+      <div class="kv"><b>Pagamentos</b>
+        <code>pay_obligation</code><code>reverse_payment</code><code>cancel_obligation</code><code>create_recurrence_obligations</code><code>update_bank_balance</code>
+      </div>
+      <div class="kv"><b>Controles</b>
+        <code>get_delivered_unpaid</code><code>get_advance_received</code><code>get_client_receivables</code><code>get_payment_method_breakdown</code>
+      </div>
+      <div class="kv"><b>Reconciliação</b>
+        <code>get_order_reconciliation</code><code>get_orders_needing_reconciliation</code><code>apply_order_adjustment</code>
+      </div>
+      <div class="kv"><b>Caixinhas</b>
+        <code>get_envelope_overview</code><code>move_envelope</code><code>transfer_envelope</code><code>fund_envelopes</code>
+      </div>
+      <div class="kv"><b>Score / Analytics</b>
+        <code>get_client_score</code><code>refresh_client_scores</code><code>get_cashflow_series</code><code>get_liquidity_kpis</code>
+      </div>
+    </div>
+
+    <div class="dbcol" style="--c:var(--emerald)">
+      <h4>Segurança</h4>
+      <p style="font-size:12.5px;color:var(--txt2);margin-bottom:10px">
+        Single-tenant com <b>Row Level Security</b> em todas as tabelas.
+      </p>
+      <div class="kv"><b>Papéis</b>
+        <code>admin</code><code>manager</code><code>factory</code>
+      </div>
+      <div class="note" style="margin-top:12px">
+        • Policies usando <code>is_admin_or_manager()</code><br>
+        • RPCs <code>SECURITY DEFINER</code> com <code>assert_finance_access()</code><br>
+        • Views com <code>security_invoker = on</code><br>
+        • <code>anon</code> nunca executa RPC financeira<br>
+        • <code>factory</code> é bloqueado do financeiro por RLS <b>e</b> por navegação
+      </div>
+    </div>
+  </div>
+
+  <h2>Fluxos-chave</h2>
+
+  <div class="flow">
+    <h3>Orçamento → Pedido → Produção → Recebimento</h3>
+    <ol>
+      <li>Orçamento criado no <b>BudgetEditor</b> (itens, tecidos, plano de pagamento opcional).</li>
+      <li>Conversão: cria o pedido e chama <code>apply_order_payment_plan</code> — atômico e idempotente por <code>order_id</code>. Se o orçamento já tinha plano, apenas confirma.</li>
+      <li>As parcelas nascem <b>pré-lançadas</b>: obrigações <code>open</code> com <code>planned_method</code> (PIX/Boleto). Nada foi recebido ainda.</li>
+      <li>Produção avança por estágios, validando ficha técnica e estoque.</li>
+      <li>Pedido concluído/entregue → parcelas aparecem em <b>Recebíveis › A disparar</b>.</li>
+      <li>Disparo manual (<code>pay_obligation</code>) com data e meio escolhidos → recebimento efetivado, saldo bancário atualizado.</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <h3>Ajuste de plano pós-emissão</h3>
+    <ol>
+      <li><code>revise_order_plan</code> cancela <b>apenas</b> as parcelas em aberto e recria o plano novo.</li>
+      <li>Parcelas com pagamento ativo são <b>preservadas</b> (imutáveis).</li>
+      <li>As canceladas ficam auditáveis via <code>cancelled_at</code> / <code>cancelled_reason</code>.</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <h3>Reconciliação</h3>
+    <ol>
+      <li><code>get_order_reconciliation</code> compara o total do pedido com a soma das obrigações.</li>
+      <li>Havendo divergência, <code>apply_order_adjustment</code> cria um lançamento <b>novo</b> de ajuste — nunca edita o valor original.</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <h3>Caixinhas — reserva virtual</h3>
+    <ol>
+      <li><code>saldo_real</code> = soma das contas bancárias ativas.</li>
+      <li><code>move_envelope</code> aloca (livre→caixinha) ou libera (caixinha→livre), validando o livre.</li>
+      <li><code>fund_envelopes</code> aplica a % automática de cada caixinha sobre um valor-base.</li>
+      <li>Todo movimento vira linha em <code>cash_envelope_movements</code> (extrato auditável).</li>
+    </ol>
+  </div>
+
+  <div class="flow">
+    <h3>Ficha técnica (BOM) alimentando o app</h3>
+    <ol>
+      <li>Produto ganha ficha em Cadastros — ou semi-preenchida no QuickCreate (tecido + m/peça).</li>
+      <li>No orçamento, selecionar o produto <b>pré-preenche o tecido</b> a partir da ficha.</li>
+      <li>Na produção, a ficha define a baixa de estoque; sem ela o avanço é bloqueado com modal + deep-link para criá-la.</li>
+    </ol>
+  </div>
+
+  <h2>Invariantes do sistema</h2>
+
+  <div class="inv">
+    <b>Fonte única da verdade financeira</b>
+    <span>O estado de uma obrigação vem <b>sempre</b> de <code>obligation_summary</code>.
+    <code>orders.amount_paid</code> e <code>payment_status</code> são legados e não devem ser lidos.</span>
+  </div>
+  <div class="inv">
+    <b>Imutabilidade do valor original</b>
+    <span><code>financial_obligations.original_amount</code> nunca é alterado. Correções criam novos lançamentos de ajuste.</span>
+  </div>
+  <div class="inv">
+    <b>Idempotência por pedido</b>
+    <span><code>apply_order_payment_plan</code> não duplica recebíveis se chamado duas vezes para o mesmo <code>order_id</code>.</span>
+  </div>
+  <div class="inv">
+    <b>Atomicidade no banco</b>
+    <span>Operações de dinheiro (pagar, estornar, revisar plano, transferir caixinha) são RPCs transacionais — nunca sequências de chamadas do front.</span>
+  </div>
+  <div class="inv">
+    <b>Categoria unificada</b>
+    <span><code>global_categories</code> é a fonte oficial (domínios finance/inventory/crm). O campo texto <code>category</code> é fallback histórico, gravado em sincronia com <code>global_category_id</code>.</span>
+  </div>
+  <div class="inv">
+    <b>Pré-lançamento</b>
+    <span>Emitir o pedido <b>não</b> gera recebimento. O boleto/PIX só é efetivado no disparo manual, com data escolhida pelo usuário.</span>
+  </div>
+
+  <h2>Componentes transversais</h2>
+  <div class="grid">
+    <div class="card" style="--c:var(--cyan)">
+      <h3>SearchableSelect</h3>
+      <p>Dropdown padrão do app: busca, navegação por teclado e render em <b>portal</b> (escapa de overflow).</p>
+      <div class="kv"><b>Arquivo</b><code>components/common/SearchableSelect.tsx</code></div>
+    </div>
+    <div class="card" style="--c:var(--cyan)">
+      <h3>InfoTooltip</h3>
+      <p>Tooltip ℹ️ renderizado em portal — nunca é cortado por scroll/overflow do container.</p>
+      <div class="kv"><b>Arquivo</b><code>components/common/InfoTooltip.tsx</code></div>
+    </div>
+    <div class="card" style="--c:var(--violet)">
+      <h3>categoryResolver</h3>
+      <p>Resolve o nome da categoria (global → texto legado), detecta conflito e <b>nunca</b> exibe UUID.</p>
+      <div class="kv"><b>Arquivo</b><code>utils/categoryResolver.ts</code></div>
+    </div>
+    <div class="card" style="--c:var(--gold)">
+      <h3>paymentPlan</h3>
+      <p>Semeia planos por condição (à vista, 50/50, 30/60/90). Default: <b>50% entrada + PIX</b>.</p>
+      <div class="kv"><b>Arquivo</b><code>utils/paymentPlan.ts</code></div>
+    </div>
+    <div class="card" style="--c:var(--rose)">
+      <h3>pdfService</h3>
+      <p>PDF de orçamento (plano dentro das caixas de pagamento) e ficha de produção.</p>
+      <div class="kv"><b>Arquivo</b><code>services/pdfService.ts</code></div>
+    </div>
+    <div class="card" style="--c:var(--emerald)">
+      <h3>ErrorBoundary</h3>
+      <p>Captura erros de render e evita tela branca.</p>
+      <div class="kv"><b>Arquivo</b><code>components/common/ErrorBoundary.tsx</code></div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:32px">
+    <b style="color:var(--txt)">Documentação relacionada</b><br>
+    <code>docs/qa/TESTES_MANUAIS_APP.md</code> — bateria de testes manuais ·
+    <code>docs/qa/QA_ROTINA_COMPLETA.md</code> — rotina de QA + ordem dos SQLs ·
+    <code>docs/PLANO_FASE7_PAGAMENTO_E_CAIXINHAS.md</code> — plano do pagamento pré-lançado ·
+    <code>docs/plano-unificacao-categorias.md</code> — unificação de categorias ·
+    <code>docs/arquitetura/arquitetura.json</code> — esta mesma arquitetura em JSON
+  </div>
+
+  <footer>
+    Gerado a partir da leitura do código em 18/07/2026 · Botezini ERP ·
+    5 camadas · 10 módulos · 10 repositórios · 30 RPCs · 2 views de verdade derivada
+  </footer>
+
+</div>
+</body>
+</html>

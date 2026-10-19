@@ -1,0 +1,228 @@
+/* Fonte com fallback gracioso: se o Google Fonts falhar (offline), cai no
+   system-ui sem quebrar nada. O Tailwind, esse sim, é compilado no build —
+   o app NUNCA depende de CDN para estilo. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* Paleta custom que antes vivia no tailwind.config inline do index.html */
+@theme {
+  --color-gold-500: #C9A24D;
+  --color-gold-600: #B08D3C;
+  --color-zinc-850: #1f1f22;
+  --color-zinc-900: #141414;
+  --color-zinc-950: #0B0B0B;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ── CAMADAS ────────────────────────────────────────────────────────────
+     Toda sobreposicao do app sai desta lista, e de lugar nenhum mais.
+
+     Antes os valores eram escolhidos avulsos: 60, 70, 80, 85, 100, 110, 120,
+     130, 140, 150, 200, 210, 9998, 9999, 99999. Cada tela nova espiava a
+     vizinha e somava dez. O resultado previsivel: a previa do orcamento
+     nasceu em 70 e passou a ficar EMBAIXO dos quinze elementos que vieram
+     depois — sem botao de fechar alcancavel.
+
+     A folga de 100 entre camadas existe para ninguem precisar inventar um
+     valor no meio. Se um caso novo nao couber em nenhuma delas, o certo e
+     acrescentar uma camada AQUI, com nome, e nao um z-[135] solto na tela.
+
+     A ordem e a de quem cobre quem:
+       cabecalho    barra de topo e lateral — acima da pagina, abaixo de tudo
+       veu          escurecido atras de um painel que desliza
+       painel       menu lateral no celular, dropdown do usuario
+       modal        dialogo de tela cheia
+       sobreposto   dialogo aberto de DENTRO de outro dialogo
+       balao        popover ancorado — precisa vencer o que o abriu
+       confirmacao  "tem certeza?" — vence tudo sobre o que pergunta
+       aviso        toast — sempre por cima, e some sozinho              */
+  --z-index-cabecalho: 30;
+  --z-index-veu: 40;
+  --z-index-painel: 50;
+  --z-index-modal: 100;
+  --z-index-sobreposto: 200;
+  --z-index-balao: 300;
+  --z-index-confirmacao: 400;
+  --z-index-aviso: 500;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+  background-color: #0B0B0B;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C9A24D;
+}
+
+/* Fileira de chips com rolagem horizontal: a MESMA barra do resto do app
+   (trilho #141414, polegar #333, dourado no hover — ver ::-webkit-scrollbar
+   acima), só mais fina, porque a linha inteira tem uns 24px de altura e a
+   barra padrão de 8px comeria um terço disso. Continua sendo scrollbar, só
+   que do tamanho certo — não é escondida. */
+.chips-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #333 #141414;
+}
+
+.chips-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.chips-scroll::-webkit-scrollbar-track {
+  background: #141414;
+}
+
+.chips-scroll::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.chips-scroll::-webkit-scrollbar-thumb:hover {
+  background: #C9A24D;
+}
+
+/* Anel de espera do InfoTooltip: o traço se fecha ao longo do segundo de
+   permanência, para a demora parecer carregamento e não travamento. */
+/* Barra de espera do hover, para alvos largos onde o anel não cabe. */
+@keyframes preencher-barra {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes preencher-anel {
+  from { stroke-dashoffset: 53.4; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOVIMENTO
+   ─────────────────────────────────────────────────────────────────────────────
+   Uma escala só, em quatro faixas, porque tempo de animação não é gosto — é
+   função do que o movimento está dizendo:
+
+     150 ms  resposta ao ponteiro (hover, foco, cor, estado)
+             A mão já está indo para outro lugar. Acima de ~200 ms o retorno
+             chega depois da intenção e a interface parece travada.
+
+     200 ms  aparição de interface (modal, balão, gaveta curta, aviso)
+             Tempo suficiente para o olho registrar DE ONDE a coisa veio, sem
+             virar espera. Sempre com ease-out: sai rápido e assenta devagar,
+             que é o perfil que se lê como cuidado em vez de lentidão.
+
+     300 ms  painel de percurso longo (gaveta que atravessa a tela)
+             Velocidade percebida é distância sobre tempo. O mesmo 150 ms que
+             parece imediato num botão parece um salto numa gaveta inteira.
+
+     500 ms+ movimento de DADO (barra de progresso, gráfico)
+             Aqui a demora é o ponto: a animação existe para o valor mudando ser
+             acompanhado com os olhos. Encurtar isso não deixa mais rápido,
+             deixa ilegível.
+
+   Deslocamento de entrada fica em 8 px (`slide-in-from-*-2`). Distância maior
+   chama atenção para o movimento; o que se quer é que ele passe despercebido e
+   só deixe a sensação de que a tela está inteira. */
+
+/* O pulso do Tailwind vai até 50% de opacidade — no escuro isso pisca. Há 30 e
+   tantos pontos pulsando no app; nesse volume, o pisca-pisca deixa de sinalizar
+   e vira ruído de fundo. Amplitude menor e ciclo mais longo mantêm o "está
+   vivo" sem competir com a leitura. */
+/* Nome proprio, e nao um override de `pulse`: keyframes de mesmo nome se
+   resolvem por ordem no documento, e o do Tailwind e injetado depois — a
+   redefinicao passava a duracao mas continuava usando os quadros dele. */
+@keyframes pulso-suave {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.72; }
+}
+.animate-pulse {
+  animation: pulso-suave 2.6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Quem pediu menos movimento no sistema operacional tem motivo — enjoo,
+   vertigem, déficit de atenção. Anular a animação é obrigação, não enfeite: o
+   conteúdo continua aparecendo, só que sem percurso. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   TOQUE
+
+   O ERP é feito para monitor: fonte de 10 e 11px, alvo pequeno, muita coisa
+   na tela de uma vez. Isso é decisão de projeto e continua valendo — o que
+   estas regras fazem é impedir que ela quebre no celular e no tablet, SEM
+   mudar nada em quem usa mouse.
+
+   `pointer: coarse` é o ponteiro grosso: dedo. Monitor com mouse não entra
+   aqui, então nenhuma tela do dia a dia muda de aparência.
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (pointer: coarse) {
+  /* O Safari do iPhone dá ZOOM na página sozinho quando o campo focado tem
+     fonte abaixo de 16px — e a página fica torta depois, porque ele não
+     desfaz o zoom ao sair do campo. Os campos deste app herdam 10 e 11px:
+     medido na tela de login, que é a primeira coisa que alguém toca.
+
+     Só no dedo. No mouse os campos continuam compactos como o app pede. */
+  input, textarea, select {
+    font-size: max(16px, 1em);
+  }
+
+  /* 44px é o alvo que o dedo acerta. Vale para o que é controle; link dentro
+     de parágrafo fica de fora, que é a exceção que a própria WCAG faz. */
+  button, [role="button"], a.botao, summary,
+  input[type="checkbox"], input[type="radio"] {
+    min-height: 44px;
+  }
+  /* Botão só de ícone precisa dos 44 nos dois sentidos. */
+  button:not(:has(> :not(svg))) { min-width: 44px; }
+}

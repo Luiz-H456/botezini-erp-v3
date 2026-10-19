@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "botezini-v3",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:v3"],
+      "port": 5175
+    },
+    {
+      "name": "botezini-erp",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "C:\\Users\\luuii\\OneDrive\\Documentos\\botezinipvd-1", "run", "dev", "--", "--port", "5174", "--strictPort"],
+      "port": 5174
+    },
+    {
+      "name": "botezini-v2ref",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Users\\luuii\\OneDrive\\Documentos\\botezinipvd-v2ref && node node_modules\\vite\\bin\\vite.js --mode v3 --port 5176 --strictPort"],
+      "port": 5176
+    }
+  ]
+}

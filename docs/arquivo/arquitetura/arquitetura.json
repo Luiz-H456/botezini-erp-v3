@@ -1,0 +1,363 @@
+{
+  "meta": {
+    "app": "Botezini ERP",
+    "descricao": "ERP de confecção/uniformes: orçamento → pedido → produção → recebimento, com módulo financeiro completo (obrigações, recebíveis, reconciliação e caixinhas virtuais).",
+    "gerado_em": "2026-07-18",
+    "repo_raiz": "botezinipvd-1"
+  },
+
+  "stack": {
+    "frontend": ["React 18", "TypeScript 5.8", "Vite 7", "TailwindCSS 4"],
+    "estado_dados": ["@tanstack/react-query 5", "zustand 5", "hooks próprios"],
+    "backend": ["Supabase (PostgreSQL)", "Row Level Security", "RPCs SECURITY DEFINER"],
+    "bibliotecas": ["lucide-react (ícones)", "recharts (gráficos)", "jspdf + jspdf-autotable (PDF)", "zod (validação)"],
+    "testes": ["pytest (integração contra Supabase real) — pasta tests/"]
+  },
+
+  "arquitetura_em_camadas": [
+    {
+      "nivel": 1,
+      "camada": "Apresentação",
+      "pasta": "src/pages, src/components",
+      "responsabilidade": "Telas e componentes visuais. Não fala com o banco diretamente.",
+      "regra": "Componentes recebem dados via hooks; nunca importam supabase."
+    },
+    {
+      "nivel": 2,
+      "camada": "Estado / Orquestração",
+      "pasta": "src/hooks",
+      "responsabilidade": "Carrega, filtra, calcula e expõe dados + ações para as telas.",
+      "regra": "Hooks chamam o storageService (facade), nunca repositórios direto."
+    },
+    {
+      "nivel": 3,
+      "camada": "Facade de Serviço",
+      "pasta": "src/services/storage.ts",
+      "responsabilidade": "Ponto único de entrada para dados. Delega a cada repositório.",
+      "regra": "Toda leitura/escrita do app passa por aqui — facilita trocar backend."
+    },
+    {
+      "nivel": 4,
+      "camada": "Repositórios",
+      "pasta": "src/repositories",
+      "responsabilidade": "Conhecem tabelas, colunas e RPCs. Traduzem banco ↔ tipos do app.",
+      "regra": "Único lugar que importa o cliente Supabase."
+    },
+    {
+      "nivel": 5,
+      "camada": "Banco de Dados",
+      "pasta": "supabase/*.sql",
+      "responsabilidade": "Tabelas, views (verdade derivada), RPCs atômicas e RLS.",
+      "regra": "Regras críticas de dinheiro vivem no banco, não no front."
+    }
+  ],
+
+  "modulos": [
+    {
+      "id": "dashboard",
+      "nome": "Dashboard",
+      "rota": "dashboard",
+      "pagina": "src/pages/Dashboard.tsx",
+      "hooks": ["useFinanceQueries"],
+      "descricao": "KPIs executivos, receitas/despesas por categoria, visão geral."
+    },
+    {
+      "id": "finance",
+      "nome": "Financeiro",
+      "rota": "finance",
+      "pagina": "src/pages/Finance.tsx",
+      "componentes": [
+        "src/pages/FinanceComponents.tsx",
+        "src/components/finance/ObligationCard.tsx",
+        "src/components/finance/ObligationForm.tsx",
+        "src/components/finance/PaymentModal.tsx",
+        "src/components/finance/CashflowChart.tsx",
+        "src/components/finance/CategoryPieChart.tsx",
+        "src/components/finance/CashSimulator.tsx"
+      ],
+      "hooks": [
+        "src/hooks/finance/useFinanceData.ts",
+        "src/hooks/finance/useFinanceFilters.ts",
+        "src/hooks/finance/useFinanceKPIs.ts",
+        "src/hooks/finance/useFinanceActions.ts",
+        "src/hooks/finance/useObligationForm.ts",
+        "src/hooks/finance/usePaymentModal.ts"
+      ],
+      "repositorios": ["financeRepository"],
+      "dados": {
+        "views": ["obligation_summary"],
+        "tabelas": ["financial_obligations", "obligation_payments", "bank_accounts", "cost_centers"],
+        "rpcs": ["pay_obligation", "reverse_payment", "cancel_obligation", "create_recurrence_obligations", "get_cashflow_series", "get_liquidity_kpis"]
+      },
+      "descricao": "Contas a pagar/receber, pagamentos, estornos, recorrências, fluxo de caixa e presets de filtro (persistidos em company_profile.finance_presets)."
+    },
+    {
+      "id": "receivables",
+      "nome": "Recebíveis",
+      "rota": "receivables",
+      "pagina": "src/components/finance/ReceivablesControlPanel.tsx",
+      "hooks": ["src/hooks/finance/useReceivablesControl.ts"],
+      "repositorios": ["financeRepository"],
+      "abas": [
+        "A disparar (parcelas pré-lançadas de pedidos concluídos/entregues)",
+        "Entregues não quitados",
+        "Adiantamentos",
+        "Por cliente",
+        "Por meio de pagamento",
+        "Reconciliação"
+      ],
+      "dados": {
+        "rpcs": ["get_pending_installments", "get_delivered_unpaid", "get_advance_received", "get_client_receivables", "get_payment_method_breakdown", "get_order_reconciliation", "get_orders_needing_reconciliation", "apply_order_adjustment", "revise_order_plan", "pay_obligation"]
+      },
+      "descricao": "Controle de recebimentos. Parcelas nascem PRÉ-LANÇADAS (pendentes com meio previsto) e só são efetivadas manualmente com data escolhida na aba 'A disparar'."
+    },
+    {
+      "id": "envelopes",
+      "nome": "Caixinhas",
+      "rota": "envelopes",
+      "pagina": "src/components/finance/EnvelopesPanel.tsx",
+      "hooks": ["src/hooks/finance/useEnvelopes.ts"],
+      "repositorios": ["envelopeRepository"],
+      "dados": {
+        "tabelas": ["cash_envelopes", "cash_envelope_movements"],
+        "rpcs": ["get_envelope_overview", "move_envelope", "transfer_envelope", "fund_envelopes"]
+      },
+      "descricao": "Envelopes VIRTUAIS sobre o saldo real. Não movem dinheiro — apenas reservam. livre = saldo_real − reservado. Suporta metas com prazo, saldo mínimo, extrato e provisionamento automático por %."
+    },
+    {
+      "id": "budgets",
+      "nome": "Orçamentos",
+      "rota": "budgets",
+      "pagina": "src/pages/Budgets.tsx",
+      "componentes": [
+        "src/components/budgets/BudgetEditor.tsx",
+        "src/components/budgets/BudgetPreviewModal.tsx",
+        "src/components/finance/PaymentPlanModal.tsx"
+      ],
+      "hooks": ["src/hooks/useBudgetController.ts"],
+      "repositorios": ["budgetRepository", "financeRepository"],
+      "dados": {
+        "tabelas": ["budgets"],
+        "rpcs": ["apply_order_payment_plan"]
+      },
+      "descricao": "Monta a proposta (itens, tecidos, personalizações) e o plano de pagamento opcional (exibido no PDF). Ao converter: cria o pedido e aplica o plano atomicamente; se o orçamento já tem plano, pula o modal e apenas confirma."
+    },
+    {
+      "id": "orders",
+      "nome": "Pedidos",
+      "rota": "orders",
+      "pagina": "src/pages/Orders.tsx",
+      "componentes": ["src/components/orders/OrderPreviewModal.tsx"],
+      "hooks": ["src/hooks/useOrders.ts"],
+      "repositorios": ["orderRepository", "inventoryRepository"],
+      "dados": { "tabelas": ["orders"], "views": ["order_financial_status"] },
+      "descricao": "Pedidos gerados a partir de orçamentos. O estado financeiro é DERIVADO (order_financial_status), não armazenado."
+    },
+    {
+      "id": "production",
+      "nome": "Produção",
+      "rota": "production",
+      "pagina": "src/pages/Production.tsx",
+      "componentes": [
+        "src/components/modals/StockShortageModal.tsx",
+        "src/components/modals/FichaTecnicaMissingModal.tsx",
+        "src/components/modals/DeliveryConfirmModal.tsx"
+      ],
+      "hooks": ["src/hooks/useProduction.ts"],
+      "repositorios": ["productionRepository"],
+      "dados": { "tabelas": ["orders", "product_insumos", "insumos"] },
+      "descricao": "Kanban por estágio. Ao avançar, valida a ficha técnica (BOM) e o estoque. Sem ficha técnica → modal explicativo com deep-link para criar a ficha no produto. Único módulo visível ao papel 'factory'."
+    },
+    {
+      "id": "inventory",
+      "nome": "Estoque",
+      "rota": "inventory",
+      "pagina": "src/pages/Inventory.tsx",
+      "hooks": ["src/hooks/useInventoryQueries.ts"],
+      "repositorios": ["inventoryRepository"],
+      "dados": {
+        "tabelas": ["insumos", "insumo_movements", "product_insumos"],
+        "rpcs": ["update_insumo_stock_and_cost"]
+      },
+      "descricao": "Insumos, movimentações de entrada/saída e custo médio (CMV) atualizado por trigger/RPC."
+    },
+    {
+      "id": "masterdata",
+      "nome": "Cadastros",
+      "rota": "masterdata",
+      "pagina": "src/pages/MasterData.tsx",
+      "componentes": [
+        "src/pages/masterdata/CompanyTab.tsx",
+        "src/pages/masterdata/FinancialTab.tsx",
+        "src/pages/masterdata/EntityListTab.tsx",
+        "src/components/masterdata/ClientForm.tsx",
+        "src/components/masterdata/SupplierForm.tsx",
+        "src/components/masterdata/ProductForm.tsx",
+        "src/components/masterdata/ProductInsumosForm.tsx",
+        "src/components/masterdata/GlobalCategorySelect.tsx"
+      ],
+      "hooks": ["src/hooks/useMasterData.ts", "src/hooks/useMasterDataActions.ts"],
+      "repositorios": ["crmRepository", "inventoryRepository", "financeRepository", "globalCategoryRepository", "settingsRepository"],
+      "dados": {
+        "tabelas": ["clients", "suppliers", "products", "product_insumos", "company_profile", "cost_centers", "global_categories", "app_settings", "lookup_values"]
+      },
+      "descricao": "Empresa, metas, centros de custo, clientes, fornecedores, produtos e ficha técnica (BOM). Categoria unificada no catálogo global."
+    },
+    {
+      "id": "auth",
+      "nome": "Autenticação",
+      "rota": "login",
+      "pagina": "src/pages/Login.tsx",
+      "servicos": ["src/services/auth.ts"],
+      "dados": { "tabelas": ["profiles"], "rpcs": ["current_user_role", "is_admin_or_manager", "is_factory", "handle_new_user"] },
+      "descricao": "Login Supabase Auth. Papéis: admin, manager, factory. O papel controla navegação e RLS."
+    }
+  ],
+
+  "repositorios": [
+    { "arquivo": "src/repositories/financeRepository.ts", "dominio": "Obrigações, pagamentos, contas bancárias, centros de custo, KPIs, reconciliação, planos de pagamento" },
+    { "arquivo": "src/repositories/crmRepository.ts", "dominio": "Clientes, fornecedores, perfil da empresa, presets financeiros" },
+    { "arquivo": "src/repositories/inventoryRepository.ts", "dominio": "Insumos, movimentos, produtos, ficha técnica (product_insumos), pedidos" },
+    { "arquivo": "src/repositories/budgetRepository.ts", "dominio": "Orçamentos (com hidratação de nomes de produtos)" },
+    { "arquivo": "src/repositories/orderRepository.ts", "dominio": "Pedidos e exclusão em cascata" },
+    { "arquivo": "src/repositories/productionRepository.ts", "dominio": "Kanban de produção, checagem de BOM e faltas de estoque" },
+    { "arquivo": "src/repositories/envelopeRepository.ts", "dominio": "Caixinhas: saldos, movimentos, transferências, provisionamento" },
+    { "arquivo": "src/repositories/globalCategoryRepository.ts", "dominio": "Catálogo global de categorias (fonte oficial)" },
+    { "arquivo": "src/repositories/settingsRepository.ts", "dominio": "Configurações, listas e metadados de categoria" },
+    { "arquivo": "src/repositories/attachmentRepository.ts", "dominio": "Upload/download de anexos (Supabase Storage)" }
+  ],
+
+  "banco_de_dados": {
+    "tabelas_principais": [
+      "profiles", "company_profile", "clients", "suppliers", "products", "insumos",
+      "product_insumos", "insumo_movements", "budgets", "orders",
+      "financial_obligations", "obligation_payments", "bank_accounts", "cost_centers",
+      "budget_lines", "cash_snapshots", "global_categories", "app_settings",
+      "lookup_values", "audit_logs", "cash_envelopes", "cash_envelope_movements"
+    ],
+    "tabelas_legadas": [
+      { "nome": "financial_categories", "status": "APOSENTADA — substituída por global_categories(domain='finance')" },
+      { "nome": "transactions / invoices / payable_accounts", "status": "legado histórico" },
+      { "nome": "wms_* / sectors / product_materials", "status": "não integrado ao fluxo principal" }
+    ],
+    "views": [
+      { "nome": "obligation_summary", "papel": "FONTE DA VERDADE financeira: soma pagamentos ativos, calcula saldo restante e derived_status (open/partial/paid/overdue/cancelled)." },
+      { "nome": "order_financial_status", "papel": "Estado financeiro derivado do pedido: total, recebido, a receber, atraso." }
+    ],
+    "rpcs_por_area": {
+      "seguranca": ["current_user_role", "is_admin_or_manager", "is_factory", "assert_finance_access", "handle_new_user"],
+      "recebiveis": ["create_order_receivable", "apply_order_payment_plan", "revise_order_plan", "get_pending_installments"],
+      "pagamentos": ["pay_obligation", "reverse_payment", "cancel_obligation", "create_recurrence_obligations", "update_bank_balance"],
+      "controles": ["get_delivered_unpaid", "get_advance_received", "get_client_receivables", "get_payment_method_breakdown"],
+      "score_cliente": ["get_client_score", "refresh_client_scores"],
+      "reconciliacao": ["get_order_reconciliation", "get_orders_needing_reconciliation", "apply_order_adjustment"],
+      "caixinhas": ["get_envelope_overview", "move_envelope", "transfer_envelope", "fund_envelopes"],
+      "analytics": ["get_cashflow_series", "get_liquidity_kpis"],
+      "estoque": ["update_insumo_stock_and_cost"]
+    },
+    "seguranca": {
+      "modelo": "Single-tenant com Row Level Security em todas as tabelas",
+      "papeis": {
+        "admin": "acesso total",
+        "manager": "acesso total ao financeiro e cadastros",
+        "factory": "apenas Produção — bloqueado de dados financeiros por RLS e por navegação"
+      },
+      "mecanismos": [
+        "Policies RLS usando is_admin_or_manager()",
+        "RPCs SECURITY DEFINER com assert_finance_access() no início",
+        "Views com security_invoker = on (respeitam RLS de quem consulta)",
+        "GRANT/REVOKE explícitos: anon nunca executa RPC financeira"
+      ]
+    }
+  },
+
+  "fluxos_chave": [
+    {
+      "nome": "Orçamento → Pedido → Produção → Recebimento",
+      "passos": [
+        "1. Orçamento criado no BudgetEditor (itens, tecidos, plano de pagamento opcional).",
+        "2. Conversão: cria o pedido e chama apply_order_payment_plan (atômico e idempotente por order_id). Se o orçamento já tinha plano, só confirma.",
+        "3. As parcelas nascem PRÉ-LANÇADAS: financial_obligations 'open' com planned_method (ex.: PIX/Boleto). Nada é recebido ainda.",
+        "4. Produção avança por estágios; valida ficha técnica (BOM) e estoque.",
+        "5. Pedido concluído/entregue → parcelas aparecem em Recebíveis › 'A disparar'.",
+        "6. Disparo manual (pay_obligation) com data e meio escolhidos → o recebimento é efetivado e o saldo bancário atualiza."
+      ]
+    },
+    {
+      "nome": "Ajuste de plano pós-emissão",
+      "passos": [
+        "revise_order_plan cancela apenas as parcelas EM ABERTO e recria o plano novo.",
+        "Parcelas com pagamento ativo são preservadas (imutáveis).",
+        "As canceladas ficam auditáveis (cancelled_at, cancelled_reason)."
+      ]
+    },
+    {
+      "nome": "Reconciliação",
+      "passos": [
+        "get_order_reconciliation compara o total do pedido com a soma das obrigações.",
+        "Divergência → apply_order_adjustment cria um lançamento NOVO de ajuste (nunca edita o valor original)."
+      ]
+    },
+    {
+      "nome": "Caixinhas (reserva virtual)",
+      "passos": [
+        "saldo_real = soma das contas bancárias ativas.",
+        "move_envelope aloca (livre→caixinha) ou libera (caixinha→livre), validando o livre disponível.",
+        "fund_envelopes aplica a % automática de cada caixinha sobre um valor-base.",
+        "Todo movimento é registrado em cash_envelope_movements (extrato)."
+      ]
+    },
+    {
+      "nome": "Ficha técnica (BOM) alimentando o app",
+      "passos": [
+        "Produto ganha ficha técnica em Cadastros (ou semi-preenchida no QuickCreate com tecido + m/peça).",
+        "No orçamento, selecionar o produto pré-preenche o tecido a partir da ficha.",
+        "Na produção, a ficha define a baixa de estoque; sem ela o avanço é bloqueado com modal explicativo + deep-link."
+      ]
+    }
+  ],
+
+  "invariantes": [
+    {
+      "regra": "Fonte única da verdade financeira",
+      "detalhe": "O estado de uma obrigação vem SEMPRE de obligation_summary. Campos como orders.amount_paid e payment_status são LEGADOS e não devem ser lidos."
+    },
+    {
+      "regra": "Imutabilidade do valor original",
+      "detalhe": "financial_obligations.original_amount nunca é alterado. Correções criam novos lançamentos (ajustes)."
+    },
+    {
+      "regra": "Idempotência por pedido",
+      "detalhe": "apply_order_payment_plan não duplica recebíveis se chamado duas vezes para o mesmo order_id."
+    },
+    {
+      "regra": "Atomicidade no banco",
+      "detalhe": "Operações de dinheiro (pagar, estornar, revisar plano, transferir caixinha) são RPCs transacionais — nunca sequências de chamadas do front."
+    },
+    {
+      "regra": "Categoria unificada",
+      "detalhe": "global_categories é a fonte oficial (domínios finance/inventory/crm). O campo texto 'category' é fallback histórico, gravado em sincronia com global_category_id."
+    },
+    {
+      "regra": "Pré-lançamento",
+      "detalhe": "Emitir o pedido NÃO gera recebimento. O boleto/PIX só é efetivado no disparo manual, com data escolhida."
+    }
+  ],
+
+  "componentes_transversais": [
+    { "arquivo": "src/components/common/SearchableSelect.tsx", "papel": "Dropdown padrão do app (busca, teclado, renderizado em portal)." },
+    { "arquivo": "src/components/common/InfoTooltip.tsx", "papel": "Tooltip ℹ️ em portal — nunca é cortado por overflow/scroll." },
+    { "arquivo": "src/components/common/ErrorBoundary.tsx", "papel": "Captura erros de render e evita tela branca." },
+    { "arquivo": "src/utils/categoryResolver.ts", "papel": "Resolve nome da categoria (global → texto legado), detecta conflito, nunca exibe UUID." },
+    { "arquivo": "src/utils/paymentPlan.ts", "papel": "Semeia planos de pagamento por condição (à vista, 50/50, 30/60/90); default 50% + PIX." },
+    { "arquivo": "src/services/pdfService.ts", "papel": "Gera PDF de orçamento (com plano nas caixas de pagamento) e ficha de produção." },
+    { "arquivo": "src/services/idService.ts", "papel": "UUIDs e numeração sequencial (pedidos/orçamentos)." }
+  ],
+
+  "documentacao_relacionada": [
+    { "arquivo": "docs/qa/TESTES_MANUAIS_APP.md", "conteudo": "Bateria de testes manuais por módulo." },
+    { "arquivo": "docs/qa/QA_ROTINA_COMPLETA.md", "conteudo": "Rotina de QA + ordem de aplicação dos SQLs." },
+    { "arquivo": "docs/PLANO_FASE7_PAGAMENTO_E_CAIXINHAS.md", "conteudo": "Plano técnico do pagamento pré-lançado e caixinhas." },
+    { "arquivo": "docs/plano-unificacao-categorias.md", "conteudo": "Diagnóstico e plano de unificação de categorias." }
+  ]
+}
