@@ -21,7 +21,10 @@
 # Para aplicar no banco novo: scripts\v3_aplicar_migracao.ps1.
 # =============================================================================
 
-param([string]$Dump)
+# -JaTratado: o backup e do proprio banco da v3 na nuvem (scripts\v3_backup_nuvem.ps1), que ja
+# passou pelos SQLs e pela limpeza. Rodar a limpeza de novo apagaria insumos e juntaria clientes
+# criados depois dela: com -JaTratado, nenhum SQL de tratamento roda, so a montagem.
+param([string]$Dump, [switch]$JaTratado)
 
 $ErrorActionPreference = 'Stop'
 
@@ -85,10 +88,19 @@ try {
 } finally { $ErrorActionPreference = $antes }
 if (-not $pronto) { Falhar "O banco descartavel nao ficou pronto em 4 minutos." }
 
+# Backup da v3 guarda permissoes de papeis internos do Supabase que o descartavel nao tem.
+$antes = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
+foreach ($papel in @('supabase_realtime_admin')) {
+    & docker exec $Transito psql -U supabase_admin -d postgres -qc "DO `$`$ BEGIN CREATE ROLE $papel NOLOGIN; EXCEPTION WHEN duplicate_object THEN NULL; END `$`$;" 2>&1 | Out-Null
+}
+$ErrorActionPreference = $antes
 Invoke-Nativo docker @('cp', $Dump, "${Transito}:/tmp/dump.sql")
 Invoke-Nativo docker @('exec', $Transito, 'psql', '-U', 'supabase_admin', '-d', 'postgres', '-q', '-v', 'ON_ERROR_STOP=1', '-f', '/tmp/dump.sql')
 if ($LASTEXITCODE -ne 0) { Falhar "O backup nao restaurou no banco descartavel." }
 
+
+if ($JaTratado) { $Sqls = @(); Write-Host "  Backup ja tratado (v3): nenhum SQL de tratamento roda." -ForegroundColor DarkGray }
 foreach ($nome in $Sqls) {
     Write-Host "  Rodando $nome.sql..." -ForegroundColor DarkGray
     Invoke-Nativo docker @('cp', (Join-Path $Raiz "supabase\$nome.sql"), "${Transito}:/tmp/x.sql")
@@ -106,6 +118,17 @@ if ($LASTEXITCODE -ne 0) { Falhar "Nao consegui montar a migracao." }
 
 New-Item -ItemType Directory -Force (Split-Path -Parent $Saida) | Out-Null
 Invoke-Nativo docker @('cp', "${Transito}:/tmp/v3/carga.sql", $Saida)
+
+# O backup guarda as permissoes que existem, nao as que foram TIRADAS: ao recriar o objeto, o
+# Supabase devolve o padrao (anon com tudo). Os ajustes de permissao rodam de novo no fim da
+# carga, dentro da mesma transacao (antes do COMMIT final). Achado em 19/10: a view de atrasos
+# voltava a ser lida pelo anonimo.
+$DepoisDaCarga = @('seguranca_view_atrasos')
+$carga = [IO.File]::ReadAllText($Saida)
+$fim = $carga.LastIndexOf('COMMIT;')
+if ($fim -lt 0) { Falhar "A carga nao termina em COMMIT; - nao sei onde acrescentar os ajustes." }
+$extra = ($DepoisDaCarga | ForEach-Object { "-- ===== $_.sql (reaplicado no fim da carga) =====`n" + [IO.File]::ReadAllText((Join-Path $Raiz "supabase\$_.sql")) }) -join "`n"
+[IO.File]::WriteAllText($Saida, $carga.Substring(0, $fim) + $extra + "`n" + $carga.Substring($fim), (New-Object Text.UTF8Encoding $false))
 $contagem = "SELECT 'pedidos ' || (SELECT count(*) FROM public.orders) || ' | orcamentos ' || (SELECT count(*) FROM public.budgets) || ' | clientes ' || (SELECT count(*) FROM public.clients) || ' | insumos ' || (SELECT count(*) FROM public.insumos) || ' | contas financeiras ' || (SELECT count(*) FROM public.financial_obligations) || ' | logins ' || (SELECT count(*) FROM auth.users);" |
     & docker exec -i $Transito psql -U postgres -tA 2>$null
 Invoke-Nativo docker @('rm', '-f', $Transito)
