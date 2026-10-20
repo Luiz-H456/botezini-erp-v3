@@ -24,7 +24,10 @@ Write-Host ""
 Write-Host "  BACKUP DA V3 NA NUVEM" -ForegroundColor Cyan
 Write-Host "  ---------------------"
 
-if (-not $env:BOTEZINI_NOVO_DB_URI) { $env:BOTEZINI_NOVO_DB_URI = [Environment]::GetEnvironmentVariable('BOTEZINI_NOVO_DB_URI', 'User') }
+# O perfil (variavel de usuario) e a fonte da verdade: o processo pode ter herdado um valor
+# velho de quando foi aberto (foi assim que a conferencia de 20/10 bateu em Oregon pausado).
+$doPerfil = [Environment]::GetEnvironmentVariable('BOTEZINI_NOVO_DB_URI', 'User')
+if ($doPerfil) { $env:BOTEZINI_NOVO_DB_URI = $doPerfil }
 if (-not $env:BOTEZINI_NOVO_DB_URI) { Falhar 'BOTEZINI_NOVO_DB_URI nao definida.' }
 $prod = [Environment]::GetEnvironmentVariable('BOTEZINI_DB_URI', 'User')
 if ($prod -and $env:BOTEZINI_NOVO_DB_URI -eq $prod) { Falhar 'Esta e a conexao da producao antiga. Recusando.' }

@@ -69,7 +69,9 @@ sem_restrict() { grep -v -e '^\\restrict' -e '^\\unrestrict' "$1"; }
 # Na nuvem o postgres nao pode mexer nos privilegios padrao do supabase_admin (e o
 # projeto novo ja nasce com eles): so no modo SEM_DONO essas linhas saem.
 sem_padroes_do_admin() {
-    if [ -n "${SEM_DONO:-}" ]; then grep -v '^ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin'; else cat; fi
+    # rls_auto_enable() e do proprio Supabase na nuvem (gatilho ensure_rls): o projeto novo ja nasce
+    # com ela, e um backup da v3 na nuvem a traz junto. CREATE OR REPLACE em vez de colidir (20/10).
+    if [ -n "${SEM_DONO:-}" ]; then grep -v '^ALTER DEFAULT PRIVILEGES FOR ROLE supabase_admin'         | sed 's/^CREATE FUNCTION public\.rls_auto_enable()/CREATE OR REPLACE FUNCTION public.rls_auto_enable()/'; else cat; fi
 }
 
 {

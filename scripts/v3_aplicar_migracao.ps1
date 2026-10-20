@@ -14,7 +14,8 @@
 # A URI nunca e impressa. A migracao e uma transacao so: ou tudo, ou nada.
 # =============================================================================
 
-param([string]$Arquivo)
+# -Local: aplica no Supabase local da v3 (teste). Sem ele, a conexao vem do seu perfil.
+param([string]$Arquivo, [switch]$Local)
 
 $ErrorActionPreference = 'Stop'
 $Raiz   = Split-Path -Parent $PSScriptRoot
@@ -44,6 +45,11 @@ Write-Host ""
 Write-Host "  APLICAR A MIGRACAO NO BANCO NOVO" -ForegroundColor Cyan
 Write-Host "  --------------------------------"
 
+# O perfil (variavel de usuario) e a fonte da verdade: o processo pode ter herdado um valor
+# velho de quando foi aberto (foi assim que a conferencia de 20/10 bateu em Oregon pausado).
+$doPerfil = [Environment]::GetEnvironmentVariable('BOTEZINI_NOVO_DB_URI', 'User')
+if ($doPerfil) { $env:BOTEZINI_NOVO_DB_URI = $doPerfil }
+if ($Local) { $env:BOTEZINI_NOVO_DB_URI = 'postgresql://postgres:postgres@host.docker.internal:55322/postgres' }
 if (-not $env:BOTEZINI_NOVO_DB_URI) { Falhar "Defina `$env:BOTEZINI_NOVO_DB_URI com a conexao Session pooler do projeto NOVO." }
 if ($env:BOTEZINI_DB_URI -and ($env:BOTEZINI_NOVO_DB_URI -eq $env:BOTEZINI_DB_URI)) { Falhar "Esta e a conexao da PRODUCAO. Recusando." }
 if (-not (Test-Path $Arquivo)) { Falhar "Migracao nao encontrada: $Arquivo (rode scripts\v3_montar_migracao.ps1)." }
