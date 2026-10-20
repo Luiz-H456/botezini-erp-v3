@@ -233,7 +233,9 @@ export const RendimentoDoCortePanel: React.FC = () => {
                                 key={l.id}
                                 className={`${ITEM} flex items-center gap-3 p-3 flex-wrap`}
                             >
-                                <div className="min-w-0 flex-1">
+                                {/* basis-48: sem largura mínima o nome encolhia até "GA…" e o campo nunca
+                                    descia de linha; com ela, no celular o campo e o botão vão para baixo. */}
+                                <div className="min-w-0 flex-1 basis-48">
                                     <p className="text-xs font-bold text-zinc-200 truncate">
                                         {l.insumo_name || '(sem nome)'}
                                         {l.order_number && (
@@ -245,14 +247,14 @@ export const RendimentoDoCortePanel: React.FC = () => {
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-2 shrink-0">
+                                <div className="flex min-w-0 flex-1 basis-full items-center gap-2 sm:flex-none sm:basis-auto">
                                     <input
                                         value={rascunho[l.id] ?? ''}
                                         onChange={e => setRascunho(r => ({ ...r, [l.id]: e.target.value }))}
                                         onKeyDown={e => { if (e.key === 'Enter') informar(l); }}
                                         inputMode="decimal"
                                         placeholder={`gasto em ${l.unidade || 'un'}`}
-                                        className={`${CAMPO} w-32 font-mono`}
+                                        className={`${CAMPO} min-w-0 flex-1 font-mono sm:w-32 sm:flex-none`}
                                     />
                                     <button
                                         onClick={() => informar(l)}

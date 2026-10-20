@@ -54,7 +54,7 @@ export function PCP({ abas, semFinanceiro = false, destaque, onIrPara, onVerRece
                     {visiveis.map(t => {
                         const Icon = t.icon;
                         return (
-                            <button key={t.key} type="button" onClick={() => setTab(t.key)} className={pilula(ativa === t.key)}>
+                            <button key={t.key} type="button" onClick={() => setTab(t.key)} aria-pressed={ativa === t.key} className={pilula(ativa === t.key)}>
                                 <Icon size={14} /> {t.label}
                             </button>
                         );

@@ -223,6 +223,12 @@ body {
   input[type="checkbox"], input[type="radio"] {
     min-height: 44px;
   }
+  /* Campo de digitação também é alvo de dedo: os de 40px (rendimento do corte, baixa)
+     ficavam abaixo do mínimo no celular e no tablet do chão de fábrica. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+  select {
+    min-height: 44px;
+  }
   /* Botão só de ícone precisa dos 44 nos dois sentidos. */
   button:not(:has(> :not(svg))) { min-width: 44px; }
 }

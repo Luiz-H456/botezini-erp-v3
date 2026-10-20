@@ -36,18 +36,20 @@ export function ProductionControlPanel({ semFinanceiro = false }: { semFinanceir
                         const { order, progress, client_name, client_contact } = row;
                         return (
                         <div key={order.id} className={`${ITEM} p-3`}>
-                            <div className="flex items-center justify-between mb-1.5">
-                                <div className="flex items-center gap-2 min-w-0">
+                            {/* Celular: duas linhas (pedido e cliente / contagem e botões). Numa linha só,
+                                o lado direito não encolhe e o número do pedido escrevia por cima do cliente. */}
+                            <div className="flex flex-col gap-2 mb-1.5 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 min-w-0">
                                     <button onClick={() => setPreview(row)} title="Ver pedido"
                                         className="text-xs font-black text-white hover:text-amber-400 transition-colors shrink-0">
                                         #{order.order_number}
                                     </button>
-                                    <span className="text-[11px] text-zinc-300 font-bold truncate">{client_name || 'Cliente'}</span>
-                                    {client_contact && <span className="text-[10px] text-zinc-600 truncate">· {client_contact}</span>}
-                                    <span className="text-[10px] text-zinc-600 font-bold truncate">· {order.production_stage || '—'}</span>
+                                    <span className="text-[11px] text-zinc-300 font-bold truncate max-w-full">{client_name || 'Cliente'}</span>
+                                    {client_contact && <span className="text-[11px] text-zinc-500 truncate">· {client_contact}</span>}
+                                    <span className="text-[11px] text-zinc-500 font-bold truncate">· {order.production_stage || '—'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 shrink-0">
-                                    <span className="text-[10px] font-mono text-zinc-500">
+                                <div className="flex items-center gap-3 sm:shrink-0">
+                                    <span className="mr-auto text-[11px] font-mono text-zinc-400 sm:mr-0">
                                         {progress.done}/{progress.total_pieces} pç · resta <span className="text-amber-400 font-bold">{progress.remaining}</span>
                                         {progress.expedited > 0 && <span className="text-emerald-400"> · exp {progress.expedited}</span>}
                                     </span>

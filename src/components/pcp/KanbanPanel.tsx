@@ -10,7 +10,7 @@ import { BotaoMensagem } from '@/components/common/BotaoMensagem';
 import { ProximoPasso } from '@/components/common/ProximoPasso';
 import { storageService } from '@/services/storage';
 import { InfoTooltip } from '@/components/common';
-import { ROTULO, ROTULO_PEQUENO, CARTAO, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PRINCIPAL } from '@/components/finance/ui/estilo';
+import { ROTULO, CARTAO, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PRINCIPAL } from '@/components/finance/ui/estilo';
 import { BaixaModal, type Lancamento } from '@/components/pcp/BaixaModal';
 import { saldoPorItem, feitoSemItem, type SaldoItem } from '@/utils/baixaPorItem';
 import { resumirPagamentoDoPedido } from '@/utils/situacaoDoPedido';
@@ -283,11 +283,14 @@ export function KanbanPanel({ semFinanceiro = false, destaque, onIrPara, onVerRe
 
     const quadro = (
         <div className={full ? 'fixed inset-0 z-modal bg-zinc-950 p-5 overflow-auto space-y-3' : 'space-y-3'}>
-            <div className="flex items-center gap-2">
-                <p className={ROTULO}>
-                    Quadro de produção por setor
-                </p>
-                <InfoTooltip iconSize={13}>Arraste o cartão para trocar de setor, ou o fundo para deslizar o quadro.</InfoTooltip>
+            {/* No celular o título fica com a linha toda; espremido pelos botões, quebrava em três. */}
+            <div className="flex flex-wrap items-center gap-2">
+                <div className="flex basis-full items-center gap-2 sm:basis-auto">
+                    <p className={ROTULO}>
+                        Quadro de produção por setor
+                    </p>
+                    <InfoTooltip iconSize={13}>Arraste o cartão para trocar de setor, ou o fundo para deslizar o quadro.</InfoTooltip>
+                </div>
                 {/* Setas discretas: só aparecem quando há para onde ir, e
                     apagam ao chegar na ponta em vez de sumirem — botão que
                     some faz o vizinho pular de lugar. */}
@@ -582,7 +585,7 @@ function Legenda() {
     return (
         <div className="flex items-center gap-3 flex-wrap">
             {itens.map(({ urgencia, rotulo }) => (
-                <span key={urgencia} className={`flex items-center gap-2 ${ROTULO_PEQUENO}`}>
+                <span key={urgencia} className={`flex items-center gap-2 ${ROTULO}`}>
                     <span className={`w-2.5 h-2.5 rounded border ${ESTILO_URGENCIA[urgencia].caixa}`} />
                     {rotulo}
                 </span>
@@ -682,10 +685,10 @@ function Card({ card, canPrev, canNext, isLast, busy, full, arrastando, fantasma
                     )}
                     #{card.order_number}
                 </span>
-                <span className={`font-mono text-zinc-500 ${full ? 'text-sm' : 'text-[10px]'}`}>{card.pieces} pç</span>
+                <span className={`font-mono text-zinc-500 ${full ? 'text-sm' : 'text-[11px]'}`}>{card.pieces} pç</span>
             </div>
             <p className={`text-zinc-300 font-bold truncate ${full ? 'text-base' : 'text-[11px]'}`}>{card.client_name || 'Cliente'}</p>
-            {card.client_contact && <p className={`text-zinc-600 truncate ${full ? 'text-xs' : 'text-[9px]'}`}>{card.client_contact}</p>}
+            {card.client_contact && <p className={`text-zinc-500 truncate ${full ? 'text-xs' : 'text-[11px]'}`}>{card.client_contact}</p>}
 
             {/* Aviso de produção iniciada. Fica no card porque é aqui que o
                 pedido muda de setor — o momento em que a notícia existe. */}
@@ -707,25 +710,27 @@ function Card({ card, canPrev, canNext, isLast, busy, full, arrastando, fantasma
             )}
 
             {estilo.texto && (
-                <span className={`inline-block mt-1.5 px-1.5 py-0.5 rounded font-black uppercase tracking-widest ${estilo.etiqueta} ${full ? 'text-[10px]' : 'text-[8px]'}`}>
+                <span className={`inline-block mt-1.5 px-1.5 py-0.5 rounded font-black uppercase tracking-widest ${estilo.etiqueta} text-[10px]`}>
                     {estilo.texto}
                 </span>
             )}
 
             {card.travado_ate && (
-                <p className={`mt-1 flex items-start gap-1 text-amber-400/80 font-bold leading-snug ${full ? 'text-[11px]' : 'text-[9px]'}`}
+                <p className={`mt-1 flex items-start gap-1 text-amber-400/80 font-bold leading-snug text-[11px]`}
                     title={card.motivo_atraso}>
                     <Lock size={12} className="shrink-0 mt-px" />
                     <span className="truncate">travado até {card.travado_ate.split('-').reverse().join('/')} · {card.motivo_atraso}</span>
                 </p>
             )}
 
-            <div className={`flex items-center justify-between ${full ? 'mt-3' : 'mt-1.5'}`}>
-                <span className={`font-mono ${full ? 'text-sm' : 'text-[9px]'} ${estilo.data}`}>
+            {/* Quebra linha quando falta espaço: no toque os botões sobem para 44px (regra de
+                pointer: coarse) e, sem quebrar, cobriam a data do pedido no celular e no tablet. */}
+            <div className={`flex flex-wrap items-center justify-between gap-x-2 gap-y-1.5 ${full ? 'mt-3' : 'mt-1.5'}`}>
+                <span className={`font-mono font-bold ${full ? 'text-sm' : 'text-[11px]'} ${estilo.data}`}>
                     {card.deadline ? card.deadline.split('-').reverse().join('/') : '—'}
                 </span>
                 {!fantasma && (
-                    <div className={`flex items-center ${full ? 'gap-2' : 'gap-1'}`}>
+                    <div className={`ml-auto flex items-center ${full ? 'gap-2' : 'gap-1'}`}>
                         {/* `data-no-drag` é o que impede o clique de virar
                             arraste: sem ele, pressionar o olho começaria um
                             gesto e o cartão sairia junto com o ponteiro. */}

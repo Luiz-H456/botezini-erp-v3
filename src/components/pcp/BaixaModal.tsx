@@ -4,7 +4,7 @@ import { PackageCheck, X, Truck } from 'lucide-react';
 import { SearchableSelect } from '@/components/common';
 import { parseBRL } from '@/utils/currency';
 import type { SaldoItem } from '@/utils/baixaPorItem';
-import { ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
+import { ITEM, CAMPO, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
 export interface Lancamento {
     qty_done: number;
@@ -101,9 +101,9 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
                     ) : (
                         <div className="space-y-2">
                             <div className="flex items-center gap-2 px-3">
-                                <span className={`flex-1 ${ROTULO_PEQUENO}`}>Peça</span>
-                                <span className={`w-24 ${ROTULO_PEQUENO} text-center`}>Produzida</span>
-                                <span className={`w-24 ${ROTULO_PEQUENO} text-center flex items-center justify-center gap-1`}>
+                                <span className={`flex-1 ${ROTULO}`}>Peça</span>
+                                <span className={`w-24 ${ROTULO} text-center`}>Produzida</span>
+                                <span className={`w-24 ${ROTULO} text-center flex items-center justify-center gap-1`}>
                                     <Truck size={12} /> Expedida
                                 </span>
                             </div>
@@ -164,13 +164,13 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className={`${ROTULO_PEQUENO} block mb-2`}>Setor (opcional)</label>
+                            <label className={`${ROTULO} block mb-2`}>Setor (opcional)</label>
                             <SearchableSelect value={sectorId} onChange={setSectorId}
                                 options={[{ value: '', label: '— Nenhum —' }, ...sectors.map(s => ({ value: s.id, label: s.name }))]}
                                 placeholder="SETOR..." />
                         </div>
                         <div>
-                            <label className={`${ROTULO_PEQUENO} block mb-2`}>Operação (opcional)</label>
+                            <label className={`${ROTULO} block mb-2`}>Operação (opcional)</label>
                             <input value={operation} onChange={e => setOperation(e.target.value)} placeholder="Ex: Costura"
                                 className={`${CAMPO} w-full`} />
                         </div>

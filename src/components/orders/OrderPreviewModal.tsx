@@ -69,16 +69,18 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
             <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden ease-out animate-in zoom-in-95 duration-200 relative">
 
                 {/* Modal Header */}
-                <div className="bg-zinc-900/50 border-b border-zinc-800 px-6 py-3 flex justify-between items-center shrink-0 backdrop-blur-md">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-zinc-950 rounded-xl flex items-center justify-center border border-zinc-800 shadow-inner">
+                {/* No celular o título encolhe e quebra; o lado direito (status e fechar) nunca encolhe:
+                    antes ele era empurrado para fora da tela e a janela não tinha como ser fechada. */}
+                <div className="bg-zinc-900/50 border-b border-zinc-800 px-4 sm:px-6 py-3 flex justify-between items-center gap-3 shrink-0 backdrop-blur-md">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <div className="hidden sm:flex w-10 h-10 shrink-0 bg-zinc-950 rounded-xl items-center justify-center border border-zinc-800 shadow-inner">
                             <Package size={20} className="text-amber-500" />
                         </div>
-                        <div className="flex flex-col">
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-black text-white text-lg uppercase tracking-tighter">Pedido #{order.order_number}</h3>
+                        <div className="flex min-w-0 flex-col">
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                <h3 className="font-black text-white text-base sm:text-lg uppercase tracking-tighter break-words">Pedido #{order.order_number}</h3>
                                 {order.budget_serial_number && (
-                                    <span className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[9px] font-black uppercase tracking-widest text-amber-500">
+                                    <span className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[10px] font-black uppercase tracking-widest text-amber-500">
                                         Origem: Orç #{order.budget_serial_number}
                                     </span>
                                 )}
@@ -87,8 +89,8 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className={`px-4 py-1.5 rounded-xl border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${getStatusStyle(order.status)}`}>
+                    <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+                        <div className={`px-3 sm:px-4 py-1.5 rounded-xl border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${getStatusStyle(order.status)}`}>
                             {order.status === OrderStatus.PENDING ? <Clock size={12} /> : order.status === OrderStatus.DELIVERED ? <CheckCircle size={12} /> : <Hash size={12} />}
                             {getStatusLabel(order.status)}
                         </div>
@@ -105,7 +107,7 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                 </div>
 
                 {/* Preview Content */}
-                <div className="flex-1 overflow-y-auto bg-zinc-950 p-6 custom-scrollbar relative">
+                <div className="flex-1 overflow-y-auto bg-zinc-950 p-4 sm:p-6 custom-scrollbar relative">
                     <div className="max-w-4xl mx-auto space-y-6">
 
                         {/* Company & Client Header */}
@@ -153,30 +155,31 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                         </div>
 
                         {/* Items */}
-                        <div className="px-6 py-8 border border-zinc-800 bg-zinc-900/30 rounded-2xl shadow-xl">
+                        {/* Celular: margens e títulos curtos, para a coluna de quantidade caber sem rolar. */}
+                        <div className="px-3 py-5 sm:px-6 sm:py-8 border border-zinc-800 bg-zinc-900/30 rounded-2xl shadow-xl">
                             <p className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.2em] mb-4">Grade de Produção</p>
-                            <div className="bg-zinc-950/50 border border-zinc-800 rounded-2xl overflow-hidden">
+                            <div className="bg-zinc-950/50 border border-zinc-800 rounded-2xl overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
                                         <tr className="bg-zinc-900/80 border-b border-zinc-800">
-                                            <th className="px-6 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest">ID</th>
-                                            <th className="px-4 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest w-full">ESPECIFICAÇÕES DA PEÇA (TAM, GÊNERO, TECIDO)</th>
-                                            <th className="px-6 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">QUANTIDADE</th>
+                                            <th className="px-2 sm:px-6 py-3 sm:py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest">ID</th>
+                                            <th className="px-2 sm:px-4 py-3 sm:py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest w-full"><span className="sm:hidden">Peça</span><span className="hidden sm:inline">ESPECIFICAÇÕES DA PEÇA (TAM, GÊNERO, TECIDO)</span></th>
+                                            <th className="px-2 sm:px-6 py-3 sm:py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center"><span className="sm:hidden">Qtd</span><span className="hidden sm:inline">QUANTIDADE</span></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-zinc-800/50">
                                         {order.items.map((item, index) => (
                                             <tr key={index} className="hover:bg-zinc-800/20 transition-colors">
-                                                <td className="px-6 py-4">
+                                                <td className="px-2 sm:px-6 py-3 sm:py-4 align-top">
                                                     <span className="text-xs font-mono font-black text-zinc-500">{(index + 1).toString().padStart(2, '0')}</span>
                                                 </td>
-                                                <td className="px-4 py-4">
+                                                <td className="px-2 sm:px-4 py-3 sm:py-4">
                                                     <div className="flex flex-col gap-1">
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-sm font-black text-white uppercase tracking-tighter">
                                                                 {item.product_name || `Item ${index + 1}`}
                                                             </span>
-                                                            <span className="px-2 py-0.5 bg-zinc-950 border border-zinc-800 rounded text-[9px] font-black text-amber-500 uppercase tracking-widest">
+                                                            <span className="px-2 py-0.5 bg-zinc-950 border border-zinc-800 rounded text-[10px] font-black text-amber-500 uppercase tracking-widest">
                                                                 {item.size}
                                                             </span>
                                                         </div>
@@ -195,15 +198,15 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                                                         </div>
                                                         {item.prod_notes && item.prod_notes.trim() && (
                                                             <div className="mt-2 bg-amber-500/5 px-3 py-2 rounded-xl border border-amber-500/10 w-fit">
-                                                                <p className="text-[9px] font-bold text-amber-500/80 italic">
+                                                                <p className="text-[10px] font-bold text-amber-500/80 italic">
                                                                     " {item.prod_notes} "
                                                                 </p>
                                                             </div>
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 text-center items-center justify-center">
-                                                    <div className="inline-flex py-1 px-4 bg-zinc-900 text-amber-500 text-sm font-black rounded-lg border border-zinc-800">
+                                                <td className="px-2 sm:px-6 py-3 sm:py-4 text-center items-center justify-center">
+                                                    <div className="inline-flex whitespace-nowrap py-1 px-2 sm:px-4 bg-zinc-900 text-amber-500 text-sm font-black rounded-lg border border-zinc-800">
                                                         {item.quantity} un
                                                     </div>
                                                 </td>
@@ -225,7 +228,7 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                                             <div key={c.id} className="flex justify-between items-center bg-zinc-950/50 border border-zinc-800 p-3 rounded-xl">
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-white uppercase tracking-widest">{translateCustType(c.type)} • {c.quantity} un</span>
-                                                    <span className="text-[9px] font-medium text-zinc-500 uppercase">{c.description || '-'} • Pos: {c.position || '-'}</span>
+                                                    <span className="text-[10px] font-medium text-zinc-500 uppercase">{c.description || '-'} • Pos: {c.position || '-'}</span>
                                                 </div>
                                                 {!isFactoryMode && (
                                                     <span className="text-[10px] font-black text-zinc-400">{formatCurrency(c.total)}</span>
@@ -245,7 +248,7 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                                             <div key={e.id} className="flex justify-between items-center bg-zinc-950/50 border border-zinc-800 p-3 rounded-xl">
                                                 <div className="flex flex-col">
                                                     <span className="text-[10px] font-black text-white uppercase tracking-widest">{e.description || '-'}</span>
-                                                    <span className="text-[9px] font-medium text-zinc-500 uppercase">{(e.quantity || 0)} unidades</span>
+                                                    <span className="text-[10px] font-medium text-zinc-500 uppercase">{(e.quantity || 0)} unidades</span>
                                                 </div>
                                                 {!isFactoryMode && (
                                                     <span className="text-[10px] font-black text-zinc-400">{formatCurrency(e.total || 0)}</span>
@@ -265,7 +268,7 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                                         <Calendar size={18} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Data Limite de Entrega</span>
+                                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Data Limite de Entrega</span>
                                         <span className="text-xs font-black text-amber-500 uppercase tracking-wider mt-1">{formatDate(order.deadline)}</span>
                                     </div>
                                 </div>
@@ -285,19 +288,19 @@ export const OrderPreviewModal: React.FC<Props> = ({ order, client, companyProfi
                                 <div className="w-full md:w-72">
                                     <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl">
                                         <div className="flex justify-between items-center py-1">
-                                            <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Base Pçs</span>
+                                            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Base Pçs</span>
                                             <span className="text-[11px] font-black text-zinc-400">{formatCurrency(subtotalBase)}</span>
                                         </div>
 
                                         {(order.discount ?? 0) > 0 && (
                                             <div className="flex justify-between items-center py-1 border-t border-zinc-900 pt-3 mt-2">
-                                                <span className="text-[9px] font-black text-rose-500/60 uppercase tracking-widest">Desconto</span>
+                                                <span className="text-[10px] font-black text-rose-500/60 uppercase tracking-widest">Desconto</span>
                                                 <span className="text-[11px] font-black text-rose-500/80">-{formatCurrency(order.discount || 0)}</span>
                                             </div>
                                         )}
 
                                         <div className="pt-6 border-t border-zinc-800 flex flex-col items-end mt-4">
-                                            <span className="text-[9px] font-black text-amber-500 uppercase tracking-[0.3em] mb-1">Total Confirmado</span>
+                                            <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-1">Total Confirmado</span>
                                             <span className="text-3xl font-black text-white tracking-tighter leading-none">
                                                 {formatCurrency(order.total_amount || 0)}
                                             </span>

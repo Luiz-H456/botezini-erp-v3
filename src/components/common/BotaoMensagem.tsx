@@ -113,7 +113,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
                 onBlur={fecharComAtraso}
                 title={`${titulo} — clique para copiar`}
                 className={rotulo ? `${BOTAO_SUAVE} shrink-0` : `inline-flex items-center gap-1.5 rounded-lg border font-black uppercase tracking-widest transition-colors shrink-0 ${
-                    compacto ? 'px-2 py-1 text-[9px]' : 'px-2.5 py-1.5 text-[10px]'
+                    compacto ? 'px-2 py-1 text-[10px]' : 'px-2.5 py-1.5 text-[10px]'
                 } ${
                     copiado
                         ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
@@ -132,7 +132,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
                     className="bg-zinc-950 border border-zinc-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden ease-out animate-in fade-in zoom-in-95 duration-150"
                 >
                     <div className="px-3 py-2 border-b border-zinc-800">
-                        <span className="text-[9px] font-black text-amber-500 uppercase tracking-widest">{titulo}</span>
+                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">{titulo}</span>
                     </div>
                     <p className="px-3 py-2.5 text-[11px] text-zinc-300 leading-relaxed whitespace-pre-wrap max-h-64 overflow-y-auto custom-scrollbar">
                         {texto}
@@ -141,7 +141,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); copiar(); }}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-300 border border-zinc-700 hover:text-white hover:border-zinc-600 transition-colors"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-300 border border-zinc-700 hover:text-white hover:border-zinc-600 transition-colors"
                         >
                             {copiado ? <Check size={14} /> : <Copy size={14} />}
                             {copiado ? 'Copiado' : 'Copiar'}
@@ -152,7 +152,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => { e.stopPropagation(); onEnviar?.(); }}
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
+                                className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
                             >
                                 <Send size={14} /> Enviar
                             </a>
