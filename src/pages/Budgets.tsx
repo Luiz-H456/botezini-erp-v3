@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { storageService } from '@/services/storage';
 import { pdfService } from '@/services/pdfService';
+import { fotosCarregadas, avisoDeFotosFaltando } from '@/utils/gradeDeFotos';
 import { idService } from '@/services/idService';
 import { Budget, Order, OrderStatus, ProductionStage, PaymentStatus } from '@/types';
 import { formatCurrency, formatDate, getTodayStr, addBusinessDays } from '@/utils';
@@ -259,14 +260,15 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
                 'error');
         }
 
+        // Foto a foto: uma ausente no armazenamento não derruba as outras (antes, Promise.all
+        // descartava TODAS e o aviso era só "não foi possível carregar as fotos").
         let fotos: string[] | undefined;
         if (comFotos && budget.reference_photos?.length) {
-            try {
-                fotos = await Promise.all(
-                    budget.reference_photos.map(p => storageService.getAttachmentDataUrl(p)));
-            } catch (e: any) {
-                openAlert(`Não foi possível carregar as fotos: ${e?.message || 'erro'}. Gerando sem elas.`, 'error');
-            }
+            const lidas = fotosCarregadas(await Promise.allSettled(
+                budget.reference_photos.map(p => storageService.getAttachmentDataUrl(p))));
+            fotos = lidas.fotos.length ? lidas.fotos : undefined;
+            const aviso = avisoDeFotosFaltando(lidas.faltando, budget.reference_photos.length);
+            if (aviso) openAlert(aviso, 'error');
         }
 
         // A geração fica dentro de try: `handlePrint` é async, então uma exceção

@@ -169,3 +169,21 @@ export function posicoesDoBloco(
         };
     });
 }
+
+/**
+ * As fotos que de fato vieram do armazenamento, na ordem original, e quantas faltaram.
+ * Com Promise.all, UMA foto ausente (arquivo que não veio na migração, ou apagado) derrubava
+ * todas do PDF; com allSettled + isto, sai o que existe e o resto é contado no aviso.
+ */
+export function fotosCarregadas(resultados: PromiseSettledResult<string>[]): { fotos: string[]; faltando: number } {
+    const fotos = resultados.flatMap(r => (r.status === 'fulfilled' && r.value ? [r.value] : []));
+    return { fotos, faltando: resultados.length - fotos.length };
+}
+
+/** Aviso para quem gera o PDF; null quando nada faltou. */
+export function avisoDeFotosFaltando(faltando: number, total: number): string | null {
+    if (faltando <= 0) return null;
+    if (total === 1) return 'Faltou a foto de referência no armazenamento: o PDF saiu sem ela.';
+    if (faltando >= total) return `Nenhuma das ${total} fotos de referência está no armazenamento: o PDF saiu sem elas.`;
+    return `${faltando} de ${total} fotos de referência não estão no armazenamento e ficaram de fora do PDF.`;
+}

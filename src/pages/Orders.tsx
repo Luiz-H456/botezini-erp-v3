@@ -15,6 +15,7 @@ import { Toast } from '@/components/common/Toast';
 import { SearchableSelect } from '@/components/common';
 import { useOrders } from '@/hooks/useOrders';
 import { pdfService } from '@/services/pdfService';
+import { fotosCarregadas, avisoDeFotosFaltando } from '@/utils/gradeDeFotos';
 import { storageService } from '@/services/storage';
 import { FichaOptionsModal } from '@/components/orders/FichaOptionsModal';
 import { BotaoMensagem } from '@/components/common/BotaoMensagem';
@@ -62,7 +63,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
         currentPage, setCurrentPage,
         paginatedOrders, totalPages, processedOrders,
         itemsPerPage,
-        deleteOrder, toast, loadData
+        deleteOrder, toast, showToast, loadData
     } = useOrders(initialSearch);
 
     const [isRevertModalOpen, setIsRevertModalOpen] = useState(false);
@@ -94,15 +95,15 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
         if (!client) return;
         setFichaOpts(null);
 
+        // Foto a foto: a ficha de corte é o essencial e sai sempre; das fotos, sai o que existe.
+        // Antes, uma ausente derrubava todas — e em silêncio.
         let fotos: string[] | undefined;
         if (incluirFotos && order.reference_photos?.length) {
-            try {
-                fotos = await Promise.all(
-                    order.reference_photos.map(p => storageService.getAttachmentDataUrl(p)));
-            } catch {
-                // A ficha de corte é o essencial; sem as fotos ela ainda serve.
-                fotos = undefined;
-            }
+            const lidas = fotosCarregadas(await Promise.allSettled(
+                order.reference_photos.map(p => storageService.getAttachmentDataUrl(p))));
+            fotos = lidas.fotos.length ? lidas.fotos : undefined;
+            const aviso = avisoDeFotosFaltando(lidas.faltando, order.reference_photos.length);
+            if (aviso) showToast(aviso, 'error');
         }
 
         pdfService.generateOrderProductionPDF(

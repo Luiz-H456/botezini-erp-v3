@@ -9,7 +9,7 @@ import { montarGrade, paginarFotos, posicoesDoBloco } from '@/utils/gradeDeFotos
 import { conferirPlano } from '@/utils/planoDoPedido';
 import { descreverCondicao } from '@/utils/condicaoDePagamento';
 import { getTodayStr } from '@/utils/date';
-import { dadosBancariosDoOrcamento } from '@/utils/perfilDaEmpresa';
+import { dadosBancariosDoOrcamento, alturaDoQuadroBancario, QUADRO_BANCARIO } from '@/utils/perfilDaEmpresa';
 import { percentual } from '@/utils/numeros';
 
 class PdfService {
@@ -544,12 +544,8 @@ class PdfService {
 
         // Bank info box height
         const banco = dadosBancariosDoOrcamento(companyProfile || {});
-        const bankH = 13
-            + (banco.bank_name ? 5 : 0)
-            + ((banco.agency || banco.account_number) ? 5 : 0)
-            + (banco.holder ? 5 : 0)
-            + (banco.pix_key ? 5 : 0)
-            + 4;
+        // Mesmos passos do desenho, e com o TOTAL dentro (ver alturaDoQuadroBancario).
+        const bankH = alturaDoQuadroBancario(banco);
 
         const boxH = Math.max(totalsH, bankH);
 
@@ -704,7 +700,8 @@ tY += 5;
             doc.setLineWidth(0.2);
             doc.line(bankX + 3, boxY + 9, bankX + halfW - 3, boxY + 9);
 
-            let bY = boxY + 15;
+            const Q = QUADRO_BANCARIO;
+            let bY = boxY + Q.inicio;
             doc.setFontSize(9);
             if (banco.bank_name) {
                 doc.setFont("helvetica", 'bold');
@@ -712,15 +709,15 @@ tY += 5;
                 doc.text(banco.bank_name, bankX + 4, bY);
                 doc.setFont("helvetica", 'normal');
                 doc.setTextColor(180, 180, 180);
-                bY += 6;
+                bY += Q.linha;
             }
             if (banco.agency || banco.account_number) {
                 doc.text(`Ag: ${banco.agency || '-'}  CC: ${banco.account_number || '-'}`, bankX + 4, bY);
-                bY += 6;
+                bY += Q.linha;
             }
             if (banco.holder) {
                 doc.text(`Titular: ${banco.holder}`, bankX + 4, bY);
-                bY += 6;
+                bY += Q.linha;
             }
             if (banco.pix_key) {
                 doc.setFontSize(8.5);
@@ -730,7 +727,7 @@ tY += 5;
                 doc.setFont("helvetica", 'normal');
                 doc.setTextColor(255, 255, 255);
                 doc.text(banco.pix_key, bankX + 4 + doc.getTextWidth("PIX  "), bY);
-                bY += 8;
+                bY += Q.pix;
             }
 
             // TOTAL MOVED HERE
@@ -741,9 +738,9 @@ tY += 5;
             doc.setFontSize(14);
             doc.setFont("helvetica", 'bold');
             doc.setTextColor(...C.amber);
-            doc.text("TOTAL:", bankX + 4, bY + 5);
+            doc.text("TOTAL:", bankX + 4, bY + Q.baseDoTotal);
             doc.setTextColor(255, 255, 255);
-            doc.text(formatCurrency(budget.total_amount), bankX + halfW - 4, bY + 5, { align: 'right' });
+            doc.text(formatCurrency(budget.total_amount), bankX + halfW - 4, bY + Q.baseDoTotal, { align: 'right' });
         }
 
         // A seção de totais/pagamento desenha com cursores próprios (lY, boxY, tY)

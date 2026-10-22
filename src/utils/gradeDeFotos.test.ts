@@ -165,3 +165,25 @@ test('nenhuma foto é desenhada fora da moldura', () => {
         }
     }
 });
+
+// --- fotos que carregaram (22/10) ---
+// Antes: Promise.all — UMA foto ausente no armazenamento derrubava TODAS do PDF.
+import { fotosCarregadas, avisoDeFotosFaltando } from './gradeDeFotos.ts';
+
+const ok = (v: string): PromiseSettledResult<string> => ({ status: 'fulfilled', value: v });
+const falhou = (): PromiseSettledResult<string> => ({ status: 'rejected', reason: new Error('Object not found') });
+
+test('uma foto ausente nao derruba as outras, e a ordem das que vieram e mantida', () => {
+    assert.deepEqual(fotosCarregadas([ok('a'), falhou(), ok('c')]), { fotos: ['a', 'c'], faltando: 1 });
+});
+
+test('foto vazia conta como faltando (download que nao trouxe nada)', () => {
+    assert.deepEqual(fotosCarregadas([ok(''), ok('b')]), { fotos: ['b'], faltando: 1 });
+});
+
+test('aviso diz quantas ficaram de fora; sem falta, sem aviso', () => {
+    assert.equal(avisoDeFotosFaltando(0, 3), null);
+    assert.match(avisoDeFotosFaltando(1, 3)!, /1 de 3 fotos/);
+    assert.match(avisoDeFotosFaltando(3, 3)!, /Nenhuma das 3 fotos/);
+    assert.match(avisoDeFotosFaltando(1, 1)!, /Nenhuma das 1 foto|a foto/);
+});

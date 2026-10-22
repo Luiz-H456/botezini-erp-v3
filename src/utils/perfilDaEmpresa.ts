@@ -55,3 +55,25 @@ export function dadosBancariosDoOrcamento(p: PerfilComBanco): DadosBancarios {
 export function colunasOpcionaisDoPerfil(p: PerfilComBanco): Record<string, unknown> {
     return 'banco_do_orcamento_id' in p ? { banco_do_orcamento_id: p.banco_do_orcamento_id ?? null } : {};
 }
+
+/**
+ * Passos verticais (mm) do quadro "Dados para pagamento" no PDF do orçamento. O desenho
+ * (pdfService) anda exatamente estes passos e a altura do fundo preto é somada com eles:
+ * os dois liam números diferentes, e o TOTAL — escrito em branco — caía abaixo do fundo.
+ *   inicio       do topo do quadro até a 1ª linha (etiqueta + separador)
+ *   linha        banco, agência/conta, titular
+ *   pix          a linha do PIX (fonte própria, um pouco mais de ar)
+ *   baseDoTotal  da última linha até a base do valor do total (14pt)
+ *   total        o bloco do total inteiro, com a margem de baixo
+ */
+export const QUADRO_BANCARIO = { inicio: 15, linha: 6, pix: 8, baseDoTotal: 5, total: 10 } as const;
+
+export function alturaDoQuadroBancario(b: DadosBancarios): number {
+    const q = QUADRO_BANCARIO;
+    return q.inicio
+        + (b.bank_name ? q.linha : 0)
+        + ((b.agency || b.account_number) ? q.linha : 0)
+        + (b.holder ? q.linha : 0)
+        + (b.pix_key ? q.pix : 0)
+        + q.total;
+}
