@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Trash2, X, Loader2, AlertTriangle, Download } from 'lucide-react';
+import { Trash2, X, Loader2, AlertTriangle, Download, FileText } from 'lucide-react';
 import { storageService } from '@/services/storage';
+import { ehPdf } from '@/utils/anexosDeReferencia';
 
 /**
  * Peças reutilizáveis de uma galeria de fotos com miniatura, ampliação e
@@ -67,6 +68,10 @@ export function Miniatura({ path, onOpen, onRemove, nomeParaBaixar }: {
 }) {
     const { url, falhou } = useSignedUrl(path);
     const [baixando, setBaixando] = useState(false);
+    // PDF não vira <img>: o bloco abre o arquivo numa aba nova (o leitor do navegador).
+    // As páginas dele aparecem ao lado como fotos comuns.
+    const pdf = ehPdf(path);
+    const rotulo = pdf ? 'PDF' : 'foto';
 
     const baixar = async (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -86,6 +91,15 @@ export function Miniatura({ path, onOpen, onRemove, nomeParaBaixar }: {
                 <div className="w-full h-full flex items-center justify-center" title="Arquivo não encontrado no armazenamento">
                     <AlertTriangle size={14} className="text-rose-500/70" />
                 </div>
+            ) : url && pdf ? (
+                <a
+                    href={url} target="_blank" rel="noopener noreferrer"
+                    title="Abrir PDF"
+                    className="w-full h-full flex flex-col items-center justify-center gap-1 bg-zinc-900 hover:bg-zinc-800 transition-colors"
+                >
+                    <FileText size={22} className="text-rose-400/80" />
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">PDF</span>
+                </a>
             ) : url ? (
                 /*
                  * O clique já ampliava, mas a única pista era o cursor de lupa —
@@ -122,7 +136,7 @@ export function Miniatura({ path, onOpen, onRemove, nomeParaBaixar }: {
                         type="button"
                         onClick={baixar}
                         disabled={baixando}
-                        title="Baixar foto" aria-label="Baixar foto"
+                        title={`Baixar ${rotulo}`} aria-label={`Baixar ${rotulo}`}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950/80 text-zinc-400 hover:text-amber-500 transition-colors disabled:opacity-50"
                     >
                         {baixando
@@ -136,7 +150,7 @@ export function Miniatura({ path, onOpen, onRemove, nomeParaBaixar }: {
                 <button
                     type="button"
                     onClick={onRemove}
-                    title="Remover foto" aria-label="Remover foto"
+                    title={`Remover ${rotulo}`} aria-label={`Remover ${rotulo}`}
                     className="absolute top-1 right-1 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950/80 text-zinc-400 opacity-0 group-hover:opacity-100 hover:text-rose-400 transition-all"
                 >
                     <Trash2 size={16} />

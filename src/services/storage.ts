@@ -57,7 +57,7 @@ export const storageService = {
   saveCategoryMeta: async (type: string, metaMap: Record<string, any>) => settingsRepository.saveCategoryMeta(type, metaMap),
 
   // -- ATTACHMENTS --
-  uploadAttachment: async (file: File, folder: string): Promise<string> => attachmentRepository.uploadAttachment(file, folder),
+  uploadAttachment: async (file: File, folder: string, base?: string): Promise<string> => attachmentRepository.uploadAttachment(file, folder, base),
   getAttachmentUrl: async (path: string): Promise<string> => attachmentRepository.getAttachmentUrl(path),
   getAttachmentDataUrl: async (path: string): Promise<string> => attachmentRepository.getAttachmentDataUrl(path),
   supportsReferencePhotos: async (): Promise<boolean> => budgetRepository.supportsReferencePhotos(),

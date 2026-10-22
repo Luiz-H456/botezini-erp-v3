@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { storageService } from '@/services/storage';
 import { pdfService } from '@/services/pdfService';
 import { fotosCarregadas, avisoDeFotosFaltando } from '@/utils/gradeDeFotos';
+import { somenteImagens } from '@/utils/anexosDeReferencia';
 import { idService } from '@/services/idService';
 import { Budget, Order, OrderStatus, ProductionStage, PaymentStatus } from '@/types';
 import { formatCurrency, formatDate, getTodayStr, addBusinessDays } from '@/utils';
@@ -263,11 +264,12 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
         // Foto a foto: uma ausente no armazenamento não derruba as outras (antes, Promise.all
         // descartava TODAS e o aviso era só "não foi possível carregar as fotos").
         let fotos: string[] | undefined;
-        if (comFotos && budget.reference_photos?.length) {
+        const imagens = somenteImagens(budget.reference_photos || []);
+        if (comFotos && imagens.length) {
             const lidas = fotosCarregadas(await Promise.allSettled(
-                budget.reference_photos.map(p => storageService.getAttachmentDataUrl(p))));
+                imagens.map(p => storageService.getAttachmentDataUrl(p))));
             fotos = lidas.fotos.length ? lidas.fotos : undefined;
-            const aviso = avisoDeFotosFaltando(lidas.faltando, budget.reference_photos.length);
+            const aviso = avisoDeFotosFaltando(lidas.faltando, imagens.length);
             if (aviso) openAlert(aviso, 'error');
         }
 
@@ -673,7 +675,7 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
                         const mensagemAVista = e.acao === 'enviar' || e.acao === 'retomar';
                         const itensDoMenu = [
                             { rotulo: 'Duplicar', onClick: () => handleDuplicateClick(budget) },
-                            ...(budget.reference_photos?.length ? [{ rotulo: 'PDF sem fotos', onClick: () => handlePrint(budget, false) }] : []),
+                            ...(somenteImagens(budget.reference_photos || []).length ? [{ rotulo: 'PDF sem fotos', onClick: () => handlePrint(budget, false) }] : []),
                                             // Antes o "Gerar pedido" estava sempre à vista; com a ação à vista trocando, ele fica aqui.
                             ...(budget.status !== 'Converted' && e.acao !== 'virar-pedido' ? [{ rotulo: 'Gerar pedido', onClick: () => handleConvertClick(budget) }] : []),
                             { rotulo: 'Excluir', onClick: () => handleDeleteClick(budget), perigo: true },
@@ -800,7 +802,7 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
                     onPrint={() => handlePrint(previewBudget)}
                     // Botão secundário virou o inverso: as fotos já entram por
                     // padrão, então o que faz falta é a versão limpa.
-                    onPrintWithoutPhotos={previewBudget.reference_photos?.length
+                    onPrintWithoutPhotos={somenteImagens(previewBudget.reference_photos || []).length
                         ? () => handlePrint(previewBudget, false)
                         : undefined}
                 />

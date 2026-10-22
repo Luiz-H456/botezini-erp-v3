@@ -16,6 +16,7 @@ import { SearchableSelect } from '@/components/common';
 import { useOrders } from '@/hooks/useOrders';
 import { pdfService } from '@/services/pdfService';
 import { fotosCarregadas, avisoDeFotosFaltando } from '@/utils/gradeDeFotos';
+import { somenteImagens } from '@/utils/anexosDeReferencia';
 import { storageService } from '@/services/storage';
 import { FichaOptionsModal } from '@/components/orders/FichaOptionsModal';
 import { BotaoMensagem } from '@/components/common/BotaoMensagem';
@@ -98,11 +99,12 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
         // Foto a foto: a ficha de corte é o essencial e sai sempre; das fotos, sai o que existe.
         // Antes, uma ausente derrubava todas — e em silêncio.
         let fotos: string[] | undefined;
-        if (incluirFotos && order.reference_photos?.length) {
+        const imagens = somenteImagens(order.reference_photos || []);
+        if (incluirFotos && imagens.length) {
             const lidas = fotosCarregadas(await Promise.allSettled(
-                order.reference_photos.map(p => storageService.getAttachmentDataUrl(p))));
+                imagens.map(p => storageService.getAttachmentDataUrl(p))));
             fotos = lidas.fotos.length ? lidas.fotos : undefined;
-            const aviso = avisoDeFotosFaltando(lidas.faltando, order.reference_photos.length);
+            const aviso = avisoDeFotosFaltando(lidas.faltando, imagens.length);
             if (aviso) showToast(aviso, 'error');
         }
 
@@ -117,7 +119,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
      * escolha que resta é anexar as fotos — e ela só existe se houver foto.
      */
     const handlePrintPDF = (order: Order) => {
-        if (order.reference_photos?.length) setFichaOpts(order);
+        if (somenteImagens(order.reference_photos || []).length) setFichaOpts(order);
         else gerarFicha(order, false);
     };
 
@@ -505,7 +507,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
             {fichaOpts && (
                 <FichaOptionsModal
                     orderNumber={fichaOpts.order_number}
-                    photoCount={fichaOpts.reference_photos?.length || 0}
+                    photoCount={somenteImagens(fichaOpts.reference_photos || []).length}
                     onConfirm={(comFotos) => gerarFicha(fichaOpts, comFotos)}
                     onClose={() => setFichaOpts(null)}
                 />

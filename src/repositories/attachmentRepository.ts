@@ -1,14 +1,16 @@
 import { supabase } from '@/services/supabase';
 import { isColunaAusente } from '@/utils/postgrestErrors';
+import { novaBase } from '@/utils/anexosDeReferencia';
 
 export class AttachmentRepository {
-    async uploadAttachment(file: File, folder: string): Promise<string> {
+    /** @param base  nome sem extensão; o PDF e as páginas dele compartilham a base (anexosDeReferencia). */
+    async uploadAttachment(file: File, folder: string, base = novaBase()): Promise<string> {
         if (!supabase) throw new Error('Supabase não configurado');
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('Usuário não autenticado');
 
         const ext = file.name.split('.').pop();
-        const fileName = `${user.id}/${folder}/${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${ext}`;
+        const fileName = `${user.id}/${folder}/${base}.${ext}`;
 
         const { data, error } = await supabase.storage
             .from('financial-attachments')

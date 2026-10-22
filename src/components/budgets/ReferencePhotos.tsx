@@ -7,8 +7,12 @@ import {
     Miniatura, FotoAmpliada, TIPOS_DE_IMAGEM_ACEITOS, TAMANHO_MAX_MB_IMAGEM,
 } from '@/components/common/GaleriaDeFotos';
 import { mensagemDaRemocao } from '@/utils/anexoCompartilhado';
+import {
+    ehPdf, novaBase, nomeDaPagina, paginasDoPdf, removerComPaginas, TAMANHO_MAX_MB_PDF,
+} from '@/utils/anexosDeReferencia';
 
-const TIPOS_ACEITOS = TIPOS_DE_IMAGEM_ACEITOS;
+const TIPO_PDF = 'application/pdf';
+const TIPOS_ACEITOS = [...TIPOS_DE_IMAGEM_ACEITOS, TIPO_PDF];
 const TAMANHO_MAX_MB = TAMANHO_MAX_MB_IMAGEM;
 
 interface Props {
@@ -34,7 +38,8 @@ interface Props {
  * link na hora de exibir.
  */
 export function ReferencePhotos({ photos, onChange, folder, registroId = '', disabled }: Props) {
-    const [enviando, setEnviando] = useState(false);
+    /** Etapa em curso no botão ('Convertendo', 'Enviando'), ou false. */
+    const [enviando, setEnviando] = useState<string | false>(false);
     const [erro, setErro] = useState('');
     const [ampliada, setAmpliada] = useState<string | null>(null);
     /** Diz que o arquivo sobreviveu em outro registro — senão a pessoa acha que apagou. */
@@ -61,36 +66,64 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
         const recusados: string[] = [];
         const aceitos = arquivos.filter(f => {
             if (!TIPOS_ACEITOS.includes(f.type)) { recusados.push(`${f.name} (formato)`); return false; }
-            if (f.size > TAMANHO_MAX_MB * 1024 * 1024) { recusados.push(`${f.name} (acima de ${TAMANHO_MAX_MB} MB)`); return false; }
+            const limite = f.type === TIPO_PDF ? TAMANHO_MAX_MB_PDF : TAMANHO_MAX_MB;
+            if (f.size > limite * 1024 * 1024) { recusados.push(`${f.name} (acima de ${limite} MB)`); return false; }
             return true;
         });
-        if (recusados.length > 0) setErro(`Não enviado: ${recusados.join(', ')}`);
+        const avisos: string[] = recusados.length > 0 ? [`Não enviado: ${recusados.join(', ')}`] : [];
+        setErro(avisos.join(' · '));
         if (aceitos.length === 0) return;
 
-        setEnviando(true);
+        // Sequencial de propósito: em upload paralelo, uma falha no meio deixa
+        // parte dos arquivos no bucket sem referência no orçamento. E o que já
+        // subiu entra na lista mesmo se um seguinte falhar — senão vira órfão.
+        const pasta = `budgets/${folder}`;
+        const novos: string[] = [];
         try {
-            // Sequencial de propósito: em upload paralelo, uma falha no meio deixa
-            // parte dos arquivos no bucket sem referência no orçamento.
-            const novos: string[] = [];
             for (const arquivo of aceitos) {
-                novos.push(await storageService.uploadAttachment(arquivo, `budgets/${folder}`));
+                if (arquivo.type !== TIPO_PDF) {
+                    setEnviando('Enviando');
+                    novos.push(await storageService.uploadAttachment(arquivo, pasta));
+                    continue;
+                }
+                // PDF: guarda o original e cada página como JPEG, com a mesma base no nome
+                // (`<base>.pdf`, `<base>_p01.jpg`…) — é como a remoção acha as páginas dele.
+                setEnviando('Convertendo');
+                let imagens: Blob[] = [];
+                try {
+                    const r = await (await import('@/services/pdfParaImagens')).pdfParaImagens(arquivo);
+                    imagens = r.imagens;
+                    if (r.deFora > 0) avisos.push(`${arquivo.name}: só as ${imagens.length} primeiras páginas viraram foto; as outras ${r.deFora} ficam só no PDF`);
+                } catch {
+                    avisos.push(`${arquivo.name}: não consegui ler as páginas (PDF protegido ou danificado). O PDF fica salvo, sem as fotos.`);
+                }
+                setEnviando('Enviando');
+                const base = novaBase();
+                novos.push(await storageService.uploadAttachment(arquivo, pasta, base));
+                for (let n = 1; n <= imagens.length; n++) {
+                    const nome = nomeDaPagina(base, n);
+                    const pagina = new File([imagens[n - 1]], `${nome}.jpg`, { type: 'image/jpeg' });
+                    novos.push(await storageService.uploadAttachment(pagina, pasta, nome));
+                }
             }
-            onChange([...photos, ...novos]);
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao enviar a foto');
+            avisos.push(e?.message || 'Falha ao enviar o arquivo');
         } finally {
+            if (novos.length > 0) onChange([...photos, ...novos]);
+            setErro(avisos.join(' · '));
             setEnviando(false);
         }
     };
 
     const remover = async (indice: number) => {
-        const caminho = photos[indice];
+        // Remover um PDF leva as páginas convertidas dele junto.
+        const { nova, removidos } = removerComPaginas(photos, indice);
         setConfirmarRemocao(null);
         setAviso('');
         // Tira da lista primeiro: se o arquivo já não existir no bucket, o
         // orçamento não pode ficar preso a uma referência morta. E se a
         // contagem abaixo falhar, o clique já fez o que a pessoa pediu.
-        onChange(photos.filter((_, i) => i !== indice));
+        onChange(nova);
 
         // O ARQUIVO SÓ MORRE QUANDO NINGUÉM MAIS APONTA PARA ELE.
         //
@@ -99,25 +132,30 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
         // foto da cópia apagava o arquivo do bucket e deixava o original com uma
         // imagem quebrada — os erros 400 em `financial-attachments` no console
         // eram isso.
-        try {
-            const outros = await storageService.contarOutrasReferencias(caminho, registroId);
-            if (outros > 0) {
-                setAviso(mensagemDaRemocao({ desvincular: true, apagarArquivo: false, outrosUsos: outros }));
-                return;
+        for (const caminho of removidos) {
+            try {
+                const outros = await storageService.contarOutrasReferencias(caminho, registroId);
+                if (outros > 0) {
+                    setAviso(mensagemDaRemocao({ desvincular: true, apagarArquivo: false, outrosUsos: outros }));
+                    continue;
+                }
+                await storageService.deleteAttachment(caminho);
+            } catch {
+                // Não deu para saber se alguém mais usa: NÃO apaga. Órfão no bucket
+                // custa alguns kilobytes; foto quebrada num orçamento que o cliente
+                // vai receber custa uma conversa.
             }
-            await storageService.deleteAttachment(caminho);
-        } catch {
-            // Não deu para saber se alguém mais usa: NÃO apaga. Órfão no bucket
-            // custa alguns kilobytes; foto quebrada num orçamento que o cliente
-            // vai receber custa uma conversa.
         }
     };
+
+    const alvoDaRemocao = confirmarRemocao !== null ? photos[confirmarRemocao] ?? '' : '';
+    const paginasDoAlvo = paginasDoPdf(alvoDaRemocao, photos).length;
 
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-1.5">
                 <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">
-                    Fotos de referência
+                    Fotos e PDFs de referência
                 </label>
                 <InfoTooltip width={300}>
                     <p className="text-[11px] font-black text-white mb-1">Material interno de produção</p>
@@ -131,7 +169,8 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
                         você marque a opção ao gerar.
                     </p>
                     <p className="text-[10px] text-zinc-500 leading-relaxed mt-1.5">
-                        JPG, PNG, WebP ou HEIC até {TAMANHO_MAX_MB} MB cada.
+                        JPG, PNG, WebP ou HEIC até {TAMANHO_MAX_MB} MB cada. PDF até {TAMANHO_MAX_MB_PDF} MB:
+                        o original fica salvo e cada página vira uma foto, que entra no PDF e na ficha.
                     </p>
                 </InfoTooltip>
                 {photos.length > 0 && (
@@ -172,7 +211,7 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
                             ? <Loader2 size={16} className="text-amber-500 animate-spin" />
                             : <ImagePlus size={16} className="text-zinc-500" />}
                         <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">
-                            {enviando ? 'Enviando' : 'Adicionar'}
+                            {enviando || 'Adicionar'}
                         </span>
                         <input
                             ref={inputRef}
@@ -181,7 +220,7 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
                             multiple
                             accept={TIPOS_ACEITOS.join(',')}
                             onChange={selecionar}
-                            disabled={enviando}
+                            disabled={!!enviando}
                         />
                     </label>
                 )}
@@ -203,9 +242,11 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
             {confirmarRemocao !== null && (
                 <ConfirmModal
                     isOpen
-                    title="Remover foto?"
-                    message="A foto sai do orçamento e do pedido gerado a partir dele. Esta ação não tem desfazer."
-                    confirmLabel="Remover"
+                    title={ehPdf(alvoDaRemocao) ? 'Remover PDF?' : 'Remover foto?'}
+                    message={ehPdf(alvoDaRemocao)
+                        ? `O PDF${paginasDoAlvo ? ` e as ${paginasDoAlvo} página(s) convertidas dele saem` : ' sai'} do orçamento e do pedido gerado a partir dele. Esta ação não tem desfazer.`
+                        : 'A foto sai do orçamento e do pedido gerado a partir dele. Esta ação não tem desfazer.'}
+                    confirmLabel={ehPdf(alvoDaRemocao) ? 'Remover PDF' : 'Remover foto'}
                     isDanger
                     onConfirm={() => remover(confirmarRemocao)}
                     onClose={() => setConfirmarRemocao(null)}
