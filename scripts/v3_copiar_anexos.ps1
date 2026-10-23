@@ -86,8 +86,13 @@ foreach ($c in $caminhos) {
     try {
         $r = Invoke-WebRequest -Uri (UrlDo $refProd $c) -Headers (Cabecalhos $chaveProd) -UseBasicParsing -OutFile $tmp -PassThru
     } catch {
+        # O Storage responde 400 tanto para "objeto nao existe" quanto para chave recusada
+        # (InvalidJWT, invalid signature). So conta como faltando quando o corpo diz not_found;
+        # o resto e erro, com a mensagem do servidor (que nao carrega a chave).
         $codigo = $_.Exception.Response.StatusCode.value__
-        if ($codigo -in 400, 404) { $faltaNoAntigo++ } else { $erros += "$c (ler no antigo: $codigo)" }
+        $corpo = "$($_.ErrorDetails.Message)"
+        if ($codigo -eq 404 -or $corpo -match 'not_found|Object not found') { $faltaNoAntigo++ }
+        else { $erros += "$c (ler no antigo: $codigo $corpo)" }
         continue
     }
     $copiaveis++
@@ -108,4 +113,5 @@ Write-Host "  Ja estavam no novo      : $ja"
 Write-Host "  Existem no antigo       : $copiaveis $(if ($Copiar) { "(copiados: $copiados)" } else { '(nada copiado: rode com -Copiar)' })"
 Write-Host "  Nao existem nem no antigo: $faltaNoAntigo (registro sem arquivo; o PDF sai sem eles e avisa)"
 if ($erros.Count) { Write-Host "  Erros: $($erros.Count)" -ForegroundColor Red; $erros | Select-Object -First 5 | ForEach-Object { Write-Host "    $_" -ForegroundColor Red } }
+if ($erros.Count -eq $caminhos.Count) { Write-Host "  TODOS falharam igual: e a chave do projeto ANTIGO (ou o project-ref), nao os arquivos." -ForegroundColor Yellow }
 Write-Host ""
