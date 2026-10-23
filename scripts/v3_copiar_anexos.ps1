@@ -48,6 +48,22 @@ if (-not $chaveProd -or -not $chaveNovo) {
     exit 1
 }
 if ($chaveProd -eq $chaveNovo) { Falhar 'As duas chaves sao iguais. Recusando.' }
+
+# A chave anon/publishable e ACEITA pelo Supabase, mas o bucket e privado: com ela todo arquivo
+# "nao existe" (RLS) e o script contaria 62 de 62 como faltando. Recusa antes de comecar.
+function PapelDaChave([string]$k) {
+    if ($k.StartsWith('sb_secret_')) { return 'service_role' }
+    if ($k.StartsWith('sb_publishable_')) { return 'anon' }
+    if ($k -match '^eyJ[\w-]+\.([\w-]+)\.') {
+        $p = $Matches[1]; $p += '=' * ((4 - $p.Length % 4) % 4)
+        try { return ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p.Replace('-', '+').Replace('_', '/'))) | ConvertFrom-Json).role } catch { }
+    }
+    return 'desconhecido'
+}
+foreach ($par in @(@('BOTEZINI_PROD_SERVICE_KEY', $chaveProd), @('BOTEZINI_NOVO_SERVICE_KEY', $chaveNovo))) {
+    $papel = PapelDaChave $par[1]
+    if ($papel -ne 'service_role') { Falhar "$($par[0]) e uma chave '$papel', nao a de servico. Pegue a 'secret' (sb_secret_...) ou 'service_role' em Project Settings > API Keys." }
+}
 Write-Host "  antigo: $($refProd.Substring(0,6))...   novo: $($refNovo.Substring(0,6))..." -ForegroundColor DarkGray
 
 # Chave nova (sb_secret_...) vai so no apikey; a antiga (JWT service_role) vai nos dois cabecalhos.
