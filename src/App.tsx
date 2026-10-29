@@ -79,10 +79,12 @@ const App: React.FC = () => {
   const [filtrosParaContas, setFiltrosParaContas] = useState<Partial<FiltrosDaLista> | null>(null);
   const [aberturaClientes, setAberturaClientes] = useState<AberturaDeCadastro | null>(null);
   const [aberturaProdutos, setAberturaProdutos] = useState<AberturaDeCadastro | null>(null);
+  const [aberturaFornecedores, setAberturaFornecedores] = useState<AberturaDeCadastro | null>(null);
   const [filtroDeCompras, setFiltroDeCompras] = useState<'this_week' | null>(null);
   // Mesma regra do banco: a abertura vale só para a visita que a pediu (sair antes da carga a descarta).
   useEffect(() => { if (currentView !== 'clientes') setAberturaClientes(null); }, [currentView]);
   useEffect(() => { if (currentView !== 'produtos') setAberturaProdutos(null); }, [currentView]);
+  useEffect(() => { if (currentView !== 'fornecedores') setAberturaFornecedores(null); }, [currentView]);
   useEffect(() => { if (currentView !== 'compras') setFiltroDeCompras(null); }, [currentView]);
 
   // A fila do Início (e os contadores do menu). Fábrica e deslogado não leem nada.
@@ -204,7 +206,7 @@ const App: React.FC = () => {
     switch (currentView) {
       case 'clientes': return <MasterData key="clientes" aba="clients" abertura={aberturaClientes} limparAbertura={() => setAberturaClientes(null)} {...comuns} />;
       case 'produtos': return <MasterData key="produtos" aba="products" abertura={aberturaProdutos} limparAbertura={() => setAberturaProdutos(null)} {...comuns} />;
-      case 'fornecedores': return <MasterData key="fornecedores" aba="suppliers" {...comuns} />;
+      case 'fornecedores': return <MasterData key="fornecedores" aba="suppliers" abertura={aberturaFornecedores} limparAbertura={() => setAberturaFornecedores(null)} {...comuns} />;
       case 'bancos': return <MasterData key="bancos" aba="bancos" {...comuns} />;
       case 'empresa': return <MasterData key="empresa" aba="company" {...comuns} />;
       case 'categorias': return <MasterData key="categorias" aba="categorias" {...comuns} />;

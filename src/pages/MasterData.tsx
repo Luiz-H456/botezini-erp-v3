@@ -30,6 +30,7 @@ import { MensagensTab } from '@/pages/masterdata/MensagensTab';
 import { CategoriasTab } from '@/pages/masterdata/CategoriasTab';
 import { PainelDeCompletude } from '@/pages/masterdata/PainelDeCompletude';
 import { PaginaDoCliente } from '@/pages/masterdata/PaginaDoCliente';
+import { PaginaDoFornecedor } from '@/pages/masterdata/PaginaDoFornecedor';
 import { PaginaDoGrupo } from '@/pages/masterdata/PaginaDoGrupo';
 import { BarraDeGrupo } from '@/components/masterdata/BarraDeGrupo';
 import ProductInsumosForm from '@/components/masterdata/ProductInsumosForm';
@@ -41,7 +42,7 @@ export type TabId = 'company' | 'clients' | 'suppliers' | 'products' | 'bancos' 
 type ModalEntityType = 'client' | 'supplier' | 'product';
 
 /** Quem abre um cartão já apontando para algo dentro dele (fila do Início, PCP). */
-export type AberturaDeCadastro = { clienteId?: string; dormentes?: boolean; completude?: boolean };
+export type AberturaDeCadastro = { clienteId?: string; fornecedorId?: string; dormentes?: boolean; completude?: boolean };
 
 const DEFAULT_PROFILE: CompanyProfile = {
   name: '',
@@ -88,6 +89,8 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
    * cópia congelada de antes da última edição.
    */
   const [clienteAberto, setClienteAberto] = useState<string | null>(null);
+  /** Fornecedor com a página aberta (tabela de preços, v3.1). Id pelo mesmo motivo do cliente. */
+  const [fornecedorAberto, setFornecedorAberto] = useState<string | null>(null);
   /** Grupo econômico com a página consolidada aberta. */
   const [grupoAberto, setGrupoAberto] = useState<string | null>(null);
   /** Clientes marcados para a ação em lote de grupo. */
@@ -145,8 +148,9 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
   useEffect(() => {
     if (!abertura || isLoading) return;
     if (abertura.clienteId && clients.some(c => c.id === abertura.clienteId)) setClienteAberto(abertura.clienteId);
+    if (abertura.fornecedorId && suppliers.some(s => s.id === abertura.fornecedorId)) setFornecedorAberto(abertura.fornecedorId);
     limparAbertura?.();
-  }, [abertura, clients, isLoading]);
+  }, [abertura, clients, suppliers, isLoading]);
 
   const { saveProductInsumoMutation } = useInventoryMutations();
 
@@ -424,9 +428,19 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
         />
       )}
 
-      {(activeTab === 'clients' || activeTab === 'suppliers' || activeTab === 'products') && !clienteAberto && !grupoAberto && (
+      {activeTab === 'suppliers' && fornecedorAberto && suppliers.find(s => s.id === fornecedorAberto) && (
+        <PaginaDoFornecedor
+          fornecedor={suppliers.find(s => s.id === fornecedorAberto)!}
+          onVoltar={() => setFornecedorAberto(null)}
+          onEditar={() => handleOpenModal('supplier', suppliers.find(s => s.id === fornecedorAberto))}
+        />
+      )}
+
+      {(activeTab === 'clients' || activeTab === 'suppliers' || activeTab === 'products') && !clienteAberto && !grupoAberto
+        && !(activeTab === 'suppliers' && fornecedorAberto) && (
         <EntityListTab
-          onAbrirPagina={activeTab === 'clients' ? (item) => setClienteAberto(item.id) : undefined}
+          onAbrirPagina={activeTab === 'clients' ? (item) => setClienteAberto(item.id)
+            : activeTab === 'suppliers' ? (item) => setFornecedorAberto(item.id) : undefined}
           getGrupo={activeTab === 'clients'
             ? (item) => ((item as any).grupo_economico || '').trim() || undefined
             : undefined}
