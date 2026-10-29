@@ -172,6 +172,8 @@ export interface Insumo extends DbEntity {
   // A cor escolhida no item define a faixa (ver fabric_colors).
   fabric_family?: string;
   color_tier?: ColorTier;
+  /** Faixa da tabela verdade (v3.1). Null em aviamento. */
+  faixa_id?: string | null;
   /**
    * "Este insumo e o mesmo que aquele."
    *
@@ -184,7 +186,8 @@ export interface Insumo extends DbEntity {
   canonical_insumo_id?: string | null;
 }
 
-export type ColorTier = 'Branco' | 'Padrão' | 'Especial';
+/** Nome da faixa de cor do tecido: até 6 por tecido, livres desde a v3.1 (antes: Branco/Padrão/Especial). */
+export type ColorTier = string;
 
 // Cartela homologada (espelha botezini.com.br/cores).
 export interface FabricColor extends DbEntity {
@@ -192,6 +195,8 @@ export interface FabricColor extends DbEntity {
   color_name: string;
   hex: string;
   color_tier: ColorTier;
+  /** Faixa da tabela verdade (v3.1). */
+  faixa_id?: string | null;
   sort_order?: number;
   is_active?: boolean;
 }

@@ -715,11 +715,24 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
   const isFabricCat = (i: Insumo) =>
     !i.category || ['tecidos', 'tecido'].includes(i.category.toLowerCase());
 
+  // Um item por tecido no seletor (v3.1: faixas livres, até 6). Fica a faixa "Padrão" quando
+  // existe — é o preço-base de sempre dos tecidos antigos —; senão a de menor nome.
+  const representantes = useMemo(() => {
+    const porFamilia = new Map<string, Insumo>();
+    const peso = (i: Insumo) => (i.color_tier === 'Padrão' ? 0 : 1);
+    for (const i of localInsumos) {
+      if (!i.fabric_family || i.canonical_insumo_id) continue;
+      const atual = porFamilia.get(i.fabric_family);
+      if (!atual || peso(i) < peso(atual) || (peso(i) === peso(atual) && (i.name || '') < (atual.name || ''))) porFamilia.set(i.fabric_family, i);
+    }
+    return new Set([...porFamilia.values()].map(i => i.id));
+  }, [localInsumos]);
+
   const fabricOptionsFor = (currentId?: string) => [
     { value: '', label: 'Tecido livre...' },
     ...localInsumos
       .filter(isFabricCat)
-      .filter((i: Insumo) => !i.fabric_family || i.color_tier === 'Padrão' || i.id === currentId)
+      .filter((i: Insumo) => !i.fabric_family || representantes.has(i.id) || i.id === currentId)
       .map((i: Insumo) => ({
         value: i.id,
         label: (i.fabric_family || i.name).toUpperCase(),
@@ -734,7 +747,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
     if (cores.length === 0) return null;
 
     const opts: { value: string; label: string; swatch?: string; isHeader?: boolean }[] = [];
-    for (const tier of ['Branco', 'Padrão', 'Especial'] as const) {
+    // As faixas na ordem da cartela (até 6, nomes livres desde a v3.1).
+    for (const tier of [...new Set(cores.map(c => c.color_tier))]) {
       const doTier = cores.filter(c => c.color_tier === tier);
       if (doTier.length === 0) continue;
       opts.push({ value: `__h_${tier}`, label: `Faixa ${tier}`, isHeader: true });
@@ -775,11 +789,11 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
     });
   };
 
-  // Faixa atual da linha — mostrada só quando não é a Padrão, para o usuário
-  // saber que aquele item saiu do preço-base.
+  // Faixa atual da linha — mostrada só quando não é a do preço-base (o representante
+  // do tecido no seletor), para o usuário saber que aquele item saiu dele.
   const tierBadgeFor = (fabricInsumoId?: string) => {
     const ins = localInsumos.find((i: Insumo) => i.id === fabricInsumoId);
-    return ins?.color_tier && ins.color_tier !== 'Padrão' ? ins.color_tier : null;
+    return ins?.color_tier && !representantes.has(ins.id) ? ins.color_tier : null;
   };
 
   // ── Peças do conjunto ──────────────────────────────────────────────────

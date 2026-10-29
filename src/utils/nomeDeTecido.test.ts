@@ -92,7 +92,7 @@ test('cartela padrão está limpa e coerente', () => {
     for (const c of CARTELA_PADRAO) {
         assert.match(c.hex, /^#[0-9A-F]{6}$/, `hex inválido em ${c.nome}`);
         assert.equal(c.nome, c.nome.toUpperCase());
-        assert.ok(FAIXAS_DE_COR.includes(c.faixa), `faixa inválida em ${c.nome}`);
+        assert.ok((FAIXAS_DE_COR as readonly string[]).includes(c.faixa), `faixa inválida em ${c.nome}`);
     }
     assert.equal(CARTELA_PADRAO.find(c => c.nome === 'BRANCO')?.faixa, 'Branco');
 });
@@ -142,4 +142,14 @@ test('lista colada descarta repetida e linha sem nome', () => {
 test('lista vazia não quebra', () => {
     assert.deepEqual(interpretarListaDeCores(''), []);
     assert.deepEqual(interpretarListaDeCores(undefined as any), []);
+});
+
+test('faixas livres: "; escuras" reconhece a faixa do tecido, sem acento e sem caixa', () => {
+    const r = interpretarListaDeCores('MARINHO ; escuras\nAREIA', 'Claras', ['Claras', 'Escuras', 'Especiais']);
+    assert.deepEqual(r.map(c => [c.nome, c.faixa]), [['MARINHO', 'Escuras'], ['AREIA', 'Claras']]);
+});
+
+test('faixa desconhecida depois do separador não inventa faixa: fica na padrão', () => {
+    const r = interpretarListaDeCores('VINHO ; ROXAS', 'Claras', ['Claras']);
+    assert.equal(r[0].faixa, 'Claras');
 });

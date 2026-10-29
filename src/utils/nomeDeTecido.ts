@@ -68,14 +68,15 @@ export const FAIXAS_DE_COR = ['Branco', 'Padrão', 'Especial'] as const;
 export type FaixaDeCor = (typeof FAIXAS_DE_COR)[number];
 
 /** O nome do insumo de cada faixa: a família mais o sufixo da faixa. */
-export function nomeDoInsumoDaFaixa(familia: string, faixa: FaixaDeCor): string {
+export function nomeDoInsumoDaFaixa(familia: string, faixa: string): string {
     return `${limpa(familia).toUpperCase()} ${faixa.toUpperCase()}`.trim();
 }
 
 export interface CorDaCartela {
     nome: string;
     hex: string;
-    faixa: FaixaDeCor;
+    /** Nome da faixa do tecido (até 6 por tecido, livres desde a v3.1). */
+    faixa: string;
 }
 
 /**
@@ -145,8 +146,13 @@ const FAIXA_POR_TEXTO: Record<string, FaixaDeCor> = {
  */
 export function interpretarListaDeCores(
     texto: string,
-    faixaPadrao: FaixaDeCor = 'Padrão',
+    faixaPadrao: string = 'Padrão',
+    /** As faixas do tecido (v3.1). Sem elas, as três antigas. */
+    faixas: readonly string[] = FAIXAS_DE_COR,
 ): CorDaCartela[] {
+    const semAcento = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
+    const porTexto = new Map(faixas.map(f => [semAcento(f), f]));
+    for (const [k, v] of Object.entries(FAIXA_POR_TEXTO)) if (faixas.includes(v)) porTexto.set(semAcento(k), v);
     const saida: CorDaCartela[] = [];
     for (const bruta of (texto || '').split(/\r?\n/)) {
         let linha = bruta.trim();
@@ -156,7 +162,7 @@ export function interpretarListaDeCores(
         const corte = linha.search(/[;|]/);
         if (corte >= 0) {
             const depois = linha.slice(corte + 1).trim().toUpperCase();
-            const achada = FAIXA_POR_TEXTO[depois];
+            const achada = porTexto.get(semAcento(depois));
             if (achada) {
                 faixa = achada;
                 linha = linha.slice(0, corte).trim();

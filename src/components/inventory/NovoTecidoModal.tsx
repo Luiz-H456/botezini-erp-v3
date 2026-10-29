@@ -124,7 +124,7 @@ export const NovoTecidoModal: React.FC<Props> = ({
         }
 
         // Cor apontando para faixa sem insumo ficaria sem preço no orçamento.
-        const orfas = [...new Set(cartela.filter(c => !comCusto.includes(c.faixa)).map(c => c.faixa))];
+        const orfas = [...new Set(cartela.filter(c => !(comCusto as readonly string[]).includes(c.faixa)).map(c => c.faixa))];
         if (orfas.length > 0) {
             setErro(`Há cores na faixa ${orfas.join(' e ')}, mas essa faixa está sem custo. Preencha o custo ou mova as cores.`);
             return;
