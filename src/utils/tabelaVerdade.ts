@@ -121,6 +121,9 @@ export function mapaDeReferencia(cat: Catalogo, insumosComFaixa: { id: string; f
     return mapa;
 }
 
+/** Preço no campo como se digita na grade: vírgula e duas casas (19,10, não 19.1). */
+export const paraCampo = (v: number | null | undefined): string => (v == null ? '' : v.toFixed(2).replace('.', ','));
+
 export function menosDias(dataIso: string, dias: number): string {
     const d = new Date(`${dataIso}T12:00:00Z`);
     d.setUTCDate(d.getUTCDate() - dias);

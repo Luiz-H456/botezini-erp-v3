@@ -104,3 +104,9 @@ test('sem compra na janela de 90 dias: null', () => {
     assert.equal(comparacaoComComprado([{ data: '2026-07-01', quantidade: 1, custo_unitario: 1 }], () => 1, '2026-10-29'), null);
     assert.equal(menosDias('2026-10-29', 90), '2026-07-31');
 });
+
+test('preço no campo da grade: vírgula e duas casas; vazio sem preço', async () => {
+    const { paraCampo } = await import('./tabelaVerdade.ts');
+    assert.equal(paraCampo(19.1), '19,10');
+    assert.equal(paraCampo(null), '');
+});

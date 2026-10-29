@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, ChevronDown, Pencil, TrendingUp } from 'lucide-react';
 import {
-    condicoesDaLinha, custoDeReferencia, precoVigente, comparacaoComComprado, freteNaUnidade, freteDaLinha,
+    condicoesDaLinha, custoDeReferencia, precoVigente, paraCampo, comparacaoComComprado, freteNaUnidade, freteDaLinha,
     type Catalogo, type TVTipo, type Comparacao,
 } from '@/utils/tabelaVerdade';
 import type { CompraDoInsumoTV } from '@/repositories/tabelaVerdadeRepository';
@@ -98,8 +98,10 @@ export function CartaoDoTipo({ tipo, catalogo, compras, aberto, onAlternar, onMu
                                         <td className="p-2 text-zinc-200 whitespace-nowrap">{f.nome}<span className="text-zinc-500 text-xs"> · {cores(f.id)} cor(es)</span></td>
                                         {condicoes.map(c => (
                                             <td key={c.id} className="p-1 text-right">
-                                                <input className={`${CAMPO} w-24 text-right ${c.padrao ? 'text-amber-300' : ''}`} inputMode="decimal"
-                                                    aria-label={`Preço ${f.nome} ${c.nome}`} defaultValue={precoVigente(catalogo.precos, f.id, c.id, hoje)?.valor ?? ''}
+                                                {/* A chave leva o preço vigente: depois de um reajuste ou de outra aba salvar,
+                                                    a célula (não controlada) é refeita com o valor novo em vez de mostrar o velho. */}
+                                                <input key={`${f.id}-${c.id}-${precoVigente(catalogo.precos, f.id, c.id, hoje)?.valor ?? ''}`} className={`${CAMPO} w-24 text-right ${c.padrao ? 'text-amber-300' : ''}`} inputMode="decimal"
+                                                    aria-label={`Preço ${f.nome} ${c.nome}`} defaultValue={paraCampo(precoVigente(catalogo.precos, f.id, c.id, hoje)?.valor)}
                                                     onBlur={e => gravar(f.nome, f.id, c.id, e.target.value)} />
                                             </td>))}
                                         <td className="p-2 text-right text-white whitespace-nowrap" title={ref.pendencias.join(', ')}>

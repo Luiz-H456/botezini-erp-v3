@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { tabelaVerdadeRepository } from '@/repositories/tabelaVerdadeRepository';
-import { precoVigente, type TVCondicao, type TVFaixa, type TVPreco } from '@/utils/tabelaVerdade';
+import { precoVigente, paraCampo, type TVCondicao, type TVFaixa, type TVPreco } from '@/utils/tabelaVerdade';
 import { getTodayStr } from '@/utils/date';
 import { CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
@@ -12,7 +12,7 @@ export function ReajusteModal({ nomeTipo, faixas, condicoes, precos, onClose, on
     const hoje = getTodayStr();
     const [data, setData] = useState(hoje);
     const [grade, setGrade] = useState<Record<string, string>>(() => Object.fromEntries(faixas.flatMap(f => condicoes.map(c => [
-        `${f.id}|${c.id}`, String(precoVigente(precos, f.id, c.id, hoje)?.valor ?? '')]))));
+        `${f.id}|${c.id}`, paraCampo(precoVigente(precos, f.id, c.id, hoje)?.valor)]))));
     const [erro, setErro] = useState('');
     const [salvando, setSalvando] = useState(false);
     const salvar = async () => {
