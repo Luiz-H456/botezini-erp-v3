@@ -17,9 +17,20 @@ import { computePurchaseList } from '@/utils/purchaseList';
 import { entraNasCompras } from '@/utils/fabrica/compras';
 import { tecidosSemPrecoUsados } from '@/utils/fabrica/tecidosSemPreco';
 import type { PLInsumo, PLOrder } from '@/utils/purchaseList';
-import type { BlocoDaFila } from '@/utils/inicio/fila';
+import type { BlocoDaFila, LinhaDaFila } from '@/utils/inicio/fila';
+import { aplicarIgnorados, chaveDoAviso, podarIgnorados } from '@/utils/inicio/ignorados';
 
 const ZERADOS = contadoresDoMenu([]);
+
+// Avisos ignorados ficam no navegador: é preferência de quem olha, não dado da empresa.
+// Armazenamento bloqueado (aba anônima etc.) só faz o aviso voltar ao recarregar.
+const CHAVE_IGNORADOS = 'botezini.inicio.ignorados.v1';
+function lerIgnorados(): Set<string> {
+    try { return new Set(JSON.parse(localStorage.getItem(CHAVE_IGNORADOS) || '[]') as string[]); } catch { return new Set(); }
+}
+function gravarIgnorados(s: Set<string>) {
+    try { localStorage.setItem(CHAVE_IGNORADOS, JSON.stringify([...s])); } catch { /* sem armazenamento: vale só nesta sessão */ }
+}
 
 const carregarBase = () => Promise.all([
     storageService.getBudgets(),
@@ -117,6 +128,12 @@ export function useFilaDoInicio(ativo: boolean) {
     const [dados, setDados] = useState<Dados | null>(null);
     const [erro, setErro] = useState('');
     const [carregando, setCarregando] = useState(false);
+    const [ignorados, setIgnorados] = useState<Set<string>>(lerIgnorados);
+    const mudarIgnorados = useCallback((mudar: (s: Set<string>) => void) => setIgnorados(atual => {
+        const nova = new Set(atual); mudar(nova); gravarIgnorados(nova); return nova;
+    }), []);
+    const ignorar = useCallback((l: LinhaDaFila) => mudarIgnorados(s => s.add(chaveDoAviso(l))), [mudarIgnorados]);
+    const voltarAMostrar = useCallback((l: LinhaDaFila) => mudarIgnorados(s => s.delete(chaveDoAviso(l))), [mudarIgnorados]);
     // Contador de geração: toda recarga (ou desativação) invalida as respostas das anteriores,
     // então uma carga lenta nunca sobrescreve uma mais nova.
     const geracao = useRef(0);
@@ -205,16 +222,33 @@ export function useFilaDoInicio(ativo: boolean) {
             dinheiro: mostrar,
         });
         return {
-            blocos,
+            todos: blocos,
             resumo: { livre: numeros.livre, receberVencido: numeros.recortes.receber_vencido.total, emProducao: pedidosEmProducao(pedidos) },
-            contadores: contadoresDoMenu(blocos),
         };
     }, [dados, mostrar]);
 
+    // Aviso resolvido sai da lista de ignorados (se voltar um dia, volta visível). Só com a fila lida.
+    useEffect(() => {
+        if (!calculo) return;
+        setIgnorados(atual => {
+            const podada = podarIgnorados(atual, calculo.todos);
+            if (podada.size === atual.size) return atual;
+            gravarIgnorados(podada);
+            return podada;
+        });
+    }, [calculo]);
+
+    const filtrado = useMemo(
+        () => (calculo ? aplicarIgnorados(calculo.todos, ignorados) : { visiveis: [] as BlocoDaFila[], ignoradas: [] as LinhaDaFila[] }),
+        [calculo, ignorados]);
+
     return {
-        blocos: calculo?.blocos ?? ([] as BlocoDaFila[]),
+        blocos: filtrado.visiveis,
+        ignoradas: filtrado.ignoradas,
+        ignorar, voltarAMostrar,
         resumo: calculo?.resumo ?? null,
-        contadores: calculo?.contadores ?? ZERADOS,
+        // O menu conta o que está à vista: aviso ignorado não acende o contador.
+        contadores: calculo ? contadoresDoMenu(filtrado.visiveis) : ZERADOS,
         // Ativo, sem dados nem erro = ainda não leu: conta como carregando, nunca um "tudo certo" falso.
         carregando: carregando || (ativo && dados === null && !erro),
         erro, recarregar,
