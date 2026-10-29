@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { situacaoDaConta, diasDeAtraso } from './situacao.ts';
+import { situacaoDaConta, diasDeAtraso, quandoVence } from './situacao.ts';
 import type { ContaResumo } from './base.ts';
 
 const HOJE = '2026-10-06';
@@ -31,4 +31,15 @@ test('paga em parte e vencida é vencida; vence hoje é a vencer', () => {
 test('dias de atraso nunca é negativo', () => {
     assert.equal(diasDeAtraso(conta({ due_date: '2026-09-24' }), HOJE), 12);
     assert.equal(diasDeAtraso(conta({ due_date: '2026-10-20' }), HOJE), 0);
+});
+
+test('quando vence: o texto relativo sempre traz a data original junto', () => {
+    const c = (due_date: string) => conta({ due_date });
+    const dia = '2026-10-29';
+    assert.equal(quandoVence(c('2026-10-24'), dia), '24/10 · 5 dia(s) de atraso');
+    assert.equal(quandoVence(c('2026-10-29'), dia), 'hoje · 29/10');
+    assert.equal(quandoVence(c('2026-10-31'), dia), '31/10 · em 2 dia(s)');
+    assert.equal(quandoVence(c('2026-11-20'), dia), '20/11');
+    assert.equal(quandoVence(c('2025-12-20'), dia), '20/12/2025 · 313 dia(s) de atraso');
+    assert.equal(quandoVence(c('2027-01-05'), dia), '05/01/2027');
 });

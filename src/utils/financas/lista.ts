@@ -107,9 +107,12 @@ export function filtrarContas<T extends ContaResumo>(contas: T[], f: FiltrosDaLi
 
 export interface GrupoDaLista<T extends ContaResumo = ContaResumo> { titulo: string; contas: T[] }
 
+/** "qui 24/09", com o ano só quando não é o de hoje. */
+const diaPorExtenso = (dia: string, hoje: string): string =>
+    `${diaDaSemana(dia)} ${diaEMes(dia)}${dia.slice(0, 4) === hoje.slice(0, 4) ? '' : `/${dia.slice(0, 4)}`}`;
+
 export function tituloDoDia(dia: string, hoje: string): string {
-    const ano = dia.slice(0, 4) === hoje.slice(0, 4) ? '' : `/${dia.slice(0, 4)}`;
-    const base = `${diaDaSemana(dia)} ${diaEMes(dia)}${ano}`;
+    const base = diaPorExtenso(dia, hoje);
     if (dia === hoje) return `Hoje · ${base}`;
     if (dia === somarDias(hoje, 1)) return `Amanhã · ${base}`;
     return base;
@@ -118,13 +121,17 @@ export function tituloDoDia(dia: string, hoje: string): string {
 /** O valor que a linha mostra (e os subtotais somam): o que falta; paga, o valor original. */
 export const valorDaLinha = (c: ContaResumo): number => (c.remaining_amount > 0 ? c.remaining_amount : c.original_amount);
 
-const tituloDoAtraso = (dias: number): string => (dias === 1 ? 'venceu ontem' : `venceu há ${dias} dias`);
+/** "venceu há 12 dias · qui 24/09": o relativo com a data original junto (Luiz, 29/10). */
+const tituloDoAtraso = (dia: string, hoje: string): string => {
+    const dias = diasEntre(dia, hoje);
+    return `${dias === 1 ? 'venceu ontem' : `venceu há ${dias} dias`} · ${diaPorExtenso(dia, hoje)}`;
+};
 
 /** Agrupa contas JÁ ordenadas; grupos vizinhos com o mesmo título se juntam. */
 export function agruparParaLista<T extends ContaResumo>(contas: T[], hoje: string, porAtraso: boolean): GrupoDaLista<T>[] {
     const grupos: GrupoDaLista<T>[] = [];
     for (const c of contas) {
-        const titulo = porAtraso && c.due_date < hoje ? tituloDoAtraso(diasEntre(c.due_date, hoje)) : tituloDoDia(c.due_date, hoje);
+        const titulo = porAtraso && c.due_date < hoje ? tituloDoAtraso(c.due_date, hoje) : tituloDoDia(c.due_date, hoje);
         const ultimo = grupos[grupos.length - 1];
         if (ultimo && ultimo.titulo === titulo) ultimo.contas.push(c);
         else grupos.push({ titulo, contas: [c] });
