@@ -88,6 +88,8 @@ export function deveResugerir(mudou: 'insumo' | 'quantidade', partesEditadas: bo
 }
 
 /** Custo sugerido ao escolher o insumo: o médio dele ou vazio (nunca o custo do insumo anterior). */
-export function custoSugerido(custoMedio: number | null | undefined): string {
-    return custoMedio && custoMedio > 0 ? numero(custoMedio, 4) : '';
+/** O primeiro candidato positivo, na ordem dada (a tela passa: tabela verdade, custo médio). */
+export function custoSugerido(...candidatos: (number | null | undefined)[]): string {
+    const v = candidatos.find(c => c != null && c > 0);
+    return v ? numero(v, 4) : '';
 }

@@ -192,3 +192,14 @@ test('sem aliquota cadastrada: imposto zero e o aviso, nunca um imposto inventad
         assert.equal(r.resumo.semAliquota, true);
     }
 });
+
+test('tabela verdade entra entre o pago no pedido e a última compra', () => {
+    const so = [pedidos[0]];   // p1: 50 camisetas → 10 kg de malha + 50 linhas (linha só tem custo médio)
+    const comTabela = lucroPorPedido({ pedidos: so, contas, fichas, insumos, meses: ['2026-10'],
+        referencia: new Map([['malha', 60]]), ultimoPreco: new Map([['malha', 55]]) });
+    assert.equal(comTabela.linhas[0].material, 625);
+    assert.deepEqual(comTabela.linhas[0].origens, ['tabela', 'custo médio']);
+    const semTabela = lucroPorPedido({ pedidos: so, contas, fichas, insumos, meses: ['2026-10'], ultimoPreco: new Map([['malha', 55]]) });
+    assert.equal(semTabela.linhas[0].material, 575);
+    assert.deepEqual(semTabela.linhas[0].origens, ['última compra', 'custo médio']);
+});

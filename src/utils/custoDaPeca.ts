@@ -25,6 +25,8 @@
 
 export interface InsumoDeCusto {
     average_unit_cost?: number | null;
+    /** Custo de referência da tabela verdade (preço na condição padrão + frete). Vence o custo médio. */
+    custo_referencia?: number | null;
     unit?: string | null;
     /** Metros por kg. Só faz sentido para o que é comprado em peso. */
     rendimento?: number | null;
@@ -129,7 +131,7 @@ export function custoDoTecidoPorMetro(
 ): { valor: number | null; falta?: FaltaNoCusto } {
     if (!insumo) return { valor: null, falta: 'tecido-nao-escolhido' };
 
-    const custo = positivo(insumo.average_unit_cost);
+    const custo = positivo(insumo.custo_referencia) ?? positivo(insumo.average_unit_cost);
     if (custo === null) return { valor: null, falta: 'tecido-sem-custo' };
 
     const emPeso = (insumo.unit || '').trim().toLowerCase() === 'kg';

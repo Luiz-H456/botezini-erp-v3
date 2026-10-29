@@ -209,3 +209,9 @@ test('com custo parcial o piso continua valendo, e mais forte', () => {
 test('sem custo conhecido nada é declarado abaixo do piso', () => {
     assert.ok(!abaixoDoPiso(1, custoDaPeca({})));
 });
+
+test('tabela verdade: custo de referência vence o custo médio; sem ela, vale o médio', () => {
+    const base = { unit: 'kg', rendimento: 2, average_unit_cost: 20 };
+    assert.equal(custoDoTecidoPorMetro({ ...base, custo_referencia: 30 }).valor, 15);
+    assert.equal(custoDoTecidoPorMetro({ ...base, custo_referencia: null }).valor, 10);
+});

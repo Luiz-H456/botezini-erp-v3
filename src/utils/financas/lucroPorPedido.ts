@@ -16,6 +16,7 @@
  *                do tecido da ficha. No modelo de compras por pedido o que sobra volta ao estoque, então o
  *                consumido é o da ficha — para pedido novo e para o antigo.
  *                Preço, nesta ordem: o que ESTE pedido pagou (compras e usos do estoque vinculados a ele),
+ *                o custo de referência da tabela verdade (v3.1: tabela para prever, pago para apurar),
  *                o último preço pago pelo insumo, o custo médio. Compra vinculada não passa pelo estoque e
  *                não atualiza o custo médio: sem as duas primeiras, tecido comprado só para pedido nunca
  *                teria preço. Produto sem ficha com algo vinculado: o vinculado inteiro conta como gasto,
@@ -31,8 +32,8 @@ import { previstoDoPedido } from '../fabrica/compras.ts';
 import type { PLBomLine, PLInsumo, PLOrder } from '../purchaseList.ts';
 import type { CustoVinculado } from '../fabrica/vinculado.ts';
 
-/** De onde veio o preço do material (sugestões, 17/10): o que o pedido pagou, a última compra, o custo médio. */
-export type OrigemDoPreco = 'compra do pedido' | 'última compra' | 'custo médio';
+/** De onde veio o preço do material: o que o pedido pagou, a tabela verdade (v3.1), a última compra, o custo médio. */
+export type OrigemDoPreco = 'compra do pedido' | 'tabela' | 'última compra' | 'custo médio';
 
 /** Sem acento, minúsculo, espaços simples: "Folha - 13º" e "folha - 13o" são a mesma categoria. */
 const normalizar = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/º/g, 'o')
@@ -113,10 +114,12 @@ export function lucroPorPedido(e: {
     vinculado?: Map<string, Map<string, CustoVinculado>>;
     /** Por insumo: o último preço pago em compra (ultimoPrecoPorInsumo). */
     ultimoPreco?: Map<string, number>;
+    /** Por insumo: custo de referência da tabela verdade (mapaDeReferencia). Vem antes da última compra. */
+    referencia?: Map<string, number>;
     /** Alíquota sobre a venda, 0..1 (o perfil guarda em %: dividir por 100 antes). */
     aliquota?: number | null;
 }): { resumo: ResumoDoLucro; linhas: LinhaDeLucro[] } {
-    const ORDEM: OrigemDoPreco[] = ['compra do pedido', 'última compra', 'custo médio'];
+    const ORDEM: OrigemDoPreco[] = ['compra do pedido', 'tabela', 'última compra', 'custo médio'];
     const noPeriodo = new Set(e.meses);
     const entregues = e.pedidos.filter(p => p.status === 'Entregue' && noPeriodo.has((p.delivered_at ?? '').slice(0, 7)));
     const folha = folhaDoPeriodo(e.contas, e.meses);
@@ -147,6 +150,8 @@ export function lucroPorPedido(e: {
                 origens.add('compra do pedido');
             }
             if (resta <= 0) continue;
+            const tabela = e.referencia?.get(insumoId) ?? 0;
+            if (tabela > 0) { material += resta * tabela; origens.add('tabela'); continue; }
             const ultimo = e.ultimoPreco?.get(insumoId) ?? 0;
             const medio = Number(ins?.average_unit_cost) || 0;
             if (ultimo > 0) { material += resta * ultimo; origens.add('última compra'); continue; }

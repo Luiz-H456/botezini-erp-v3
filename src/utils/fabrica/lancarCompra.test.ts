@@ -79,3 +79,9 @@ test('custoSugerido: custo médio do insumo ou vazio, sem herdar o anterior', ()
     assert.equal(custoSugerido(0), '');
     assert.equal(custoSugerido(undefined), '');
 });
+
+test('custo sugerido: o primeiro candidato positivo (tabela antes do custo médio)', () => {
+    assert.equal(custoSugerido(29.15, 27), custoSugerido(29.15));
+    assert.equal(custoSugerido(undefined, 27), custoSugerido(27));
+    assert.equal(custoSugerido(null, 0), '');
+});
