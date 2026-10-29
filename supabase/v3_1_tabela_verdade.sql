@@ -459,7 +459,7 @@ BEGIN
     FROM insumos WHERE lower(btrim(fabric_family)) = r.chave
     ORDER BY (color_tier = 'Padrão') DESC, (canonical_insumo_id IS NULL) DESC, created_at LIMIT 1;
     INSERT INTO tecido_tipos (linha_id, nome, unidade, rendimento_m_por_kg)
-    VALUES (v_linha, r.familia, v_unid, CASE WHEN v_unid = 'kg' THEN coalesce(v_rend, 1) ELSE v_rend END)
+    VALUES (v_linha, r.familia, v_unid, CASE WHEN v_unid = 'kg' THEN coalesce(v_rend, 1) ELSE NULLIF(v_rend, 1) END)
     RETURNING id INTO v_tipo;
 
     v_ordem := 0;
@@ -496,6 +496,10 @@ BEGIN
     END LOOP;
   END LOOP;
 END $$;
+
+-- 7. Tecido em metro com rendimento 1: é o padrão antigo da coluna ("sem conversão"), não um
+--    rendimento medido. Deixá-lo faria o frete por kg virar preço por metro errado.
+UPDATE public.tecido_tipos SET rendimento_m_por_kg = NULL WHERE unidade = 'm' AND rendimento_m_por_kg = 1;
 
 -- DEPOIS (somente leitura) — todas as colunas "problemas_*" têm de dar 0.
 SELECT

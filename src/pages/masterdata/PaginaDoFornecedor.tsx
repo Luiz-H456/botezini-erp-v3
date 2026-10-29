@@ -3,12 +3,14 @@ import { ArrowLeft, Pencil } from 'lucide-react';
 import type { Supplier } from '@/types';
 import { useCatalogoDoFornecedor } from '@/hooks/useTabelaVerdade';
 import { ConfigComercial } from '@/components/tabelaVerdade/ConfigComercial';
+import { TabelaDePrecos } from '@/components/tabelaVerdade/TabelaDePrecos';
 import { BOTAO_SECUNDARIO, ROTULO_PEQUENO } from '@/components/finance/ui/estilo';
 
 type Aba = 'dados' | 'tabela' | 'compras';
 
 export function PaginaDoFornecedor({ fornecedor, onVoltar, onEditar }: { fornecedor: Supplier; onVoltar: () => void; onEditar: () => void }) {
     const [aba, setAba] = useState<Aba>('tabela');
+    const [editando, setEditando] = useState<{ linhaId: string; tipoId?: string } | null>(null);
     const { catalogo, erro, recarregar } = useCatalogoDoFornecedor(fornecedor.id);
     const ABAS: { id: Aba; rotulo: string }[] = [{ id: 'dados', rotulo: 'Dados' }, { id: 'tabela', rotulo: 'Tabela de preços' }, { id: 'compras', rotulo: 'Compras' }];
     return (
@@ -46,8 +48,12 @@ export function PaginaDoFornecedor({ fornecedor, onVoltar, onEditar }: { fornece
                     )}
                 </div>
             )}
-            {aba === 'tabela' && catalogo && <p className="text-sm text-zinc-500">Tabela de preços (Task 8).</p>}
+            {aba === 'tabela' && catalogo && (
+                <TabelaDePrecos fornecedorId={fornecedor.id} catalogo={catalogo} onMudou={recarregar}
+                    onEditarTipo={(linhaId, tipoId) => setEditando({ linhaId, tipoId })} />
+            )}
             {aba === 'compras' && <p className="text-sm text-zinc-500">Compras (Task 10).</p>}
+            {editando && <p className="text-sm text-zinc-500">Editor do tecido (Task 9).</p>}
         </div>
     );
 }
