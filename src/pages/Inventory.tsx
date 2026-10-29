@@ -3,7 +3,7 @@ import { useInsumos, useInsumosPaginated, useInventoryMutations } from '@/hooks/
 import { MesclarInsumo } from '@/components/inventory/MesclarInsumo';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { storageService } from '@/services/storage';
-import { Insumo, FabricColor, OrderStatus } from '@/types';
+import { Insumo, OrderStatus } from '@/types';
 import { formatCurrency } from '@/utils';
 import { ITENS_POR_PAGINA } from '@/utils/constants';
 import {
@@ -22,7 +22,7 @@ import SearchableSelect from '@/components/common/SearchableSelect';
 import { idService } from '@/services/idService';
 import PersonalizacaoTab from '@/components/inventory/PersonalizacaoTab';
 import InsumoDetalhe from '@/components/inventory/InsumoDetalhe';
-import NovoTecidoModal from '@/components/inventory/NovoTecidoModal';
+import { TecidosPorFornecedor } from '@/components/tabelaVerdade/TecidosPorFornecedor';
 import { SEM_CATEGORIA } from '@/repositories/inventoryRepository';
 import { MenuMais } from '@/components/common/MenuMais';
 import { CARTAO, CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula } from '@/components/finance/ui/estilo';
@@ -57,19 +57,16 @@ interface Props {
      */
     initialSearch?: string;
     clearSearch?: () => void;
+    /** Abre a página do fornecedor (tabela de preços, v3.1): é lá que tecido nasce e muda. */
+    onAbrirFornecedor?: (fornecedorId: string) => void;
 }
 
-const Inventory: React.FC<Props> = ({ initialSearch, clearSearch }) => {
+const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornecedor }) => {
     const [aba, setAba] = useState<AbaEstoque>('insumos');
 
     // ── Cadastro de tecido ────────────────────────────────────────────────
-    const [mostrarTecido, setMostrarTecido] = useState(false);
-    const [tecidoEmEdicao, setTecidoEmEdicao] = useState<string | undefined>();
-    const { data: fabricColors = [], refetch: recarregarCores } = useQuery<FabricColor[]>({
-        queryKey: ['fabric_colors'],
-        queryFn: () => storageService.getFabricColors(),
-        staleTime: 1000 * 60 * 10,
-    });
+    // Desde a v3.1 o tecido nasce na tabela de preços do fornecedor: escolher o fornecedor leva lá.
+    const [escolhendoFornecedor, setEscolhendoFornecedor] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [categoriaFiltro, setCategoriaFiltro] = useState('');
     const [soCriticos, setSoCriticos] = useState(false);
@@ -318,18 +315,21 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch }) => {
                     </div>
                     {editingId === null && (
                         <>
-                            {/* Tecido tem porta própria: não é um insumo, são até
-                                três (uma faixa de preço por grupo de cor) mais a
-                                cartela que liga cada cor à sua faixa. Cadastrar
-                                pelo formulário de insumo deixava o tecido sem
-                                cartela e sem faixa, e o orçamento sem seletor de cor. */}
-                            <button
-                                onClick={() => { setTecidoEmEdicao(undefined); setMostrarTecido(true); }}
-                                title="Cadastrar tecido com faixas de preço e cartela de cores"
-                                className={BOTAO_SUAVE}
-                            >
-                                <Layers size={14} /> Novo Tecido
-                            </button>
+                            {/* Tecido tem porta própria: não é um insumo, são até seis (uma faixa
+                                de preço por grupo de cor) mais a cartela. Desde a v3.1 ele nasce na
+                                tabela de preços do fornecedor, com o preço por condição de pagamento. */}
+                            {onAbrirFornecedor && (escolhendoFornecedor ? (
+                                <div className="w-64">
+                                    <SearchableSelect value="" placeholder="DE QUAL FORNECEDOR?"
+                                        onChange={(id) => { setEscolhendoFornecedor(false); if (id) onAbrirFornecedor(id); }}
+                                        options={[{ value: '', label: 'DE QUAL FORNECEDOR?' }, ...suppliers.map(s => ({ value: s.id, label: s.company_name }))]} />
+                                </div>
+                            ) : (
+                                <button onClick={() => setEscolhendoFornecedor(true)} title="O tecido nasce na tabela de preços do fornecedor"
+                                    className={BOTAO_SUAVE}>
+                                    <Layers size={14} /> Novo tecido no fornecedor…
+                                </button>
+                            ))}
                             <button onClick={startNew} className={BOTAO_PRINCIPAL}>
                                 <Plus size={14} /> Novo Insumo
                             </button>
@@ -437,6 +437,8 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch }) => {
                     </div>
                 </div>
             )}
+
+            <TecidosPorFornecedor insumos={allItems as Insumo[]} fornecedores={suppliers} onAbrirFornecedor={onAbrirFornecedor} />
 
             {/* Table */}
             <div className={`${CARTAO} overflow-hidden`}>
@@ -644,16 +646,6 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch }) => {
                 itemName={itemToDelete?.name || ''}
                 onConfirm={handleDelete}
                 onClose={() => setItemToDelete(null)}
-            />
-
-            <NovoTecidoModal
-                isOpen={mostrarTecido}
-                onClose={() => setMostrarTecido(false)}
-                onSuccess={() => { recarregarCores(); showToast('Tecido salvo com a cartela.', 'success'); }}
-                familiaExistente={tecidoEmEdicao}
-                insumos={allItems}
-                fabricColors={fabricColors}
-                suppliers={suppliers as any}
             />
 
             <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />

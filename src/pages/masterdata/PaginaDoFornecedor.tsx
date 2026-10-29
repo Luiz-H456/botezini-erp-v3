@@ -4,6 +4,7 @@ import type { Supplier } from '@/types';
 import { useCatalogoDoFornecedor } from '@/hooks/useTabelaVerdade';
 import { ConfigComercial } from '@/components/tabelaVerdade/ConfigComercial';
 import { TabelaDePrecos } from '@/components/tabelaVerdade/TabelaDePrecos';
+import { EditorDeTecido } from '@/components/tabelaVerdade/EditorDeTecido';
 import { BOTAO_SECUNDARIO, ROTULO_PEQUENO } from '@/components/finance/ui/estilo';
 
 type Aba = 'dados' | 'tabela' | 'compras';
@@ -53,7 +54,10 @@ export function PaginaDoFornecedor({ fornecedor, onVoltar, onEditar }: { fornece
                     onEditarTipo={(linhaId, tipoId) => setEditando({ linhaId, tipoId })} />
             )}
             {aba === 'compras' && <p className="text-sm text-zinc-500">Compras (Task 10).</p>}
-            {editando && <p className="text-sm text-zinc-500">Editor do tecido (Task 9).</p>}
+            {editando && catalogo && (
+                <EditorDeTecido linhaId={editando.linhaId} tipoId={editando.tipoId} catalogo={catalogo}
+                    onClose={() => setEditando(null)} onSalvou={() => { setEditando(null); recarregar(); }} />
+            )}
         </div>
     );
 }

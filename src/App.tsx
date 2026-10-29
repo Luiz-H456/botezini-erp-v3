@@ -239,7 +239,8 @@ const App: React.FC = () => {
           initialSearch={autoSearchTerm}
           clearSearch={() => setAutoSearchTerm('')}
         />;
-      case 'inventory': return <Inventory initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')} />;
+      case 'inventory': return <Inventory initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}
+        onAbrirFornecedor={(id) => { setAberturaFornecedores({ fornecedorId: id }); handleNavigate('fornecedores'); }} />;
       case 'itens-vendidos': return <ItensVendidos />;
       case 'finance': return <Finance initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}
           filtrosIniciais={filtrosParaContas ?? undefined} limparFiltros={() => setFiltrosParaContas(null)}
