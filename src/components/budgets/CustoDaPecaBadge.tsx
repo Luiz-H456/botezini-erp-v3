@@ -7,6 +7,7 @@ import {
 } from '@/utils/custoDaPeca';
 import type { FaltaNoCusto } from '@/utils/custoDaPeca';
 import type { Product, Insumo, CompanyProfile } from '@/types';
+import { useCustoDeReferencia } from '@/hooks/useTabelaVerdade';
 
 /**
  * Mesmas esperas do badge de histórico, pelo mesmo motivo e no mesmo lugar.
@@ -64,9 +65,15 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
     const esperaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const fechaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    // Tabela verdade (v3.1): o custo de referência do tecido vence o custo médio.
+    const referencia = useCustoDeReferencia();
+    const tecidoComTabela = useMemo(
+        () => (tecido ? { ...tecido, custo_referencia: referencia.get(tecido.id) ?? null } : tecido),
+        [tecido, referencia],
+    );
     const custo = useMemo(() => custoDaPeca({
         consumoM: produto?.fabric_consumption_m,
-        tecido,
+        tecido: tecidoComTabela,
         overheadPercent: produto?.overhead_percent,
         operarios: produto?.labor_workers,
         pecasPorDia: produto?.pieces_daily_capacity,
@@ -74,7 +81,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
         // ainda não diferenciou peça a peça.
         custoHora: produto?.labor_hourly_rate || companyProfile?.labor_cost_per_hour,
         aliquota: (companyProfile?.default_tax_rate || 0) / 100,
-    }), [produto, tecido, companyProfile]);
+    }), [produto, tecidoComTabela, companyProfile]);
 
     const margem = margemDoPreco(precoAtual, custo);
     const noVermelho = abaixoDoPiso(precoAtual, custo);

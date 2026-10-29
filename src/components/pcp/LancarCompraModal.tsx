@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Plus, Trash2 } from 'lucide-react';
 import type { Insumo, Supplier } from '@/types';
@@ -6,6 +6,7 @@ import type { PurchaseLine } from '@/utils/purchaseList';
 import type { PedidoAtivo } from '@/hooks/pcp/usePurchaseList';
 import { comprasRepository } from '@/repositories/comprasRepository';
 import { useEscFecha } from '@/hooks/useEscFecha';
+import { useCustoDeReferencia } from '@/hooks/useTabelaVerdade';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { parseBRL } from '@/utils/currency';
 import { numero } from '@/utils/numeros';
@@ -46,6 +47,15 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
         }));
         return base.length ? base : [{ key: 0, editadas: false, insumoId: '', quantidade: '', custo: '', partes: [] }];
     });
+    // Tabela verdade (v3.1): o preço de hoje do fornecedor vem antes do custo médio na sugestão.
+    // O mapa chega depois do primeiro desenho; aplica-se uma vez sobre os itens da Lista.
+    const referencia = useCustoDeReferencia();
+    const aplicouTabela = useRef(false);
+    useEffect(() => {
+        if (aplicouTabela.current || referencia.size === 0) return;
+        aplicouTabela.current = true;
+        setItens(prev => prev.map(it => (referencia.has(it.insumoId) ? { ...it, custo: custoSugerido(referencia.get(it.insumoId)) } : it)));
+    }, [referencia]);
     const [proxima, setProxima] = useState(() => Math.max(1, linhas.filter(l => l.is_shortage).length));
     const [fornecedorId, setFornecedorId] = useState('');
     const [fornecedorNome, setFornecedorNome] = useState('');
@@ -71,7 +81,7 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
 
     const escolherInsumo = (item: ItemUI, insumoId: string) => {
         mudar(item.key, {
-            insumoId, custo: custoSugerido(insumoPorId.get(insumoId)?.average_unit_cost),
+            insumoId, custo: custoSugerido(referencia.get(insumoId), insumoPorId.get(insumoId)?.average_unit_cost),
             editadas: false, partes: refazPartes(insumoId, item.quantidade),
         });
     };

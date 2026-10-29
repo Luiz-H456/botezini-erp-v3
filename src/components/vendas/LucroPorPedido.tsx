@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Users, Package, Hammer, TrendingUp } from 'lucide-react';
 import { storageService } from '@/services/storage';
 import { comprasRepository } from '@/repositories/comprasRepository';
+import { tabelaVerdadeRepository } from '@/repositories/tabelaVerdadeRepository';
+import { mapaDeReferencia } from '@/utils/tabelaVerdade';
 import { useMostrarValor } from '@/hooks/financas/useMostrarValor';
 import { getTodayStr } from '@/utils/date';
 import { mesAnterior, mesDe, nomeDoMes, nomeDoTrimestre, proximoMes, trimestreDe } from '@/utils/financas/base';
@@ -22,9 +24,13 @@ interface Dados {
     clientes: Map<string, string>;
     vinculado: Map<string, Map<string, CustoVinculado>>;
     ultimoPreco: Map<string, number>;
+    /** Custo de referência da tabela verdade por insumo (v3.1): entre o pago no pedido e a última compra. */
+    referencia: Map<string, number>;
     /** Alíquota sobre a venda, 0..1 (perfil da empresa guarda em %). null = não cadastrada. */
     aliquota: number | null;
 }
+
+const rotuloDaOrigem = (o: string) => (o === 'tabela' ? 'tabela de preços' : o);
 
 const th = `px-3 py-2.5 whitespace-nowrap ${ROTULO_PEQUENO}`;
 const td = 'px-3 py-2.5 text-xs whitespace-nowrap tabular-nums';
@@ -47,11 +53,13 @@ export function LucroPorPedido() {
             ]);
             const entregues = pedidos.filter(p => p.status === 'Entregue');
             // Ficha lida à risca: falha aqui lança, em vez de virar "produto sem ficha" e um lucro inventado.
-            const [fichas, vinculado, ultimoPreco] = await Promise.all([
+            const [fichas, vinculado, ultimoPreco, catalogo, comFaixa] = await Promise.all([
                 comprasRepository.fichasDoPedidoEstrito(entregues.flatMap(p => (p.items || []).map(i => i.product_id))),
                 // Preço que o pedido pagou e último preço de compra: compra vinculada não mexe no custo médio.
                 comprasRepository.custoVinculadoPorPedido(entregues.filter(p => !p.compras_legado).map(p => p.id)),
                 comprasRepository.ultimoPrecoPorInsumo(),
+                tabelaVerdadeRepository.catalogo(),
+                tabelaVerdadeRepository.insumosComFaixa(),
             ]);
             if (!vivo) return;
             setDados({
@@ -65,6 +73,7 @@ export function LucroPorPedido() {
                 clientes: new Map(clientes.map(c => [c.id, c.company_name])),
                 vinculado,
                 ultimoPreco,
+                referencia: mapaDeReferencia(catalogo, comFaixa, getTodayStr()),
                 aliquota: Number(perfil?.default_tax_rate) > 0 ? Number(perfil?.default_tax_rate) / 100 : null,
             });
         })().catch((e: unknown) => { if (vivo) setErro(e instanceof Error ? e.message : 'Não consegui calcular o lucro por pedido.'); });
@@ -149,9 +158,9 @@ export function LucroPorPedido() {
                                             <td className={`${td} text-right text-zinc-300`}>{numero(l.pecas, 0)}</td>
                                             <td className={`${td} text-right font-mono text-zinc-200`}>{mostrar(l.valor)}</td>
                                             <td className={`${td} text-right font-mono ${l.completo ? 'text-zinc-400' : 'text-amber-400'}`}
-                                                title={[l.origens.length ? `preço: ${l.origens.join(' · ')}` : '', ...l.faltas].filter(Boolean).join(' · ') || undefined}>
+                                                title={[l.origens.length ? `preço: ${l.origens.map(rotuloDaOrigem).join(' · ')}` : '', ...l.faltas].filter(Boolean).join(' · ') || undefined}>
                                                 {mostrar(l.material)}
-                                                {l.origens.some(o => o !== 'custo médio') && <span className="block text-[10px] font-bold text-zinc-600">{l.origens.filter(o => o !== 'custo médio').join(' · ')}</span>}
+                                                {l.origens.some(o => o !== 'custo médio') && <span className="block text-[10px] font-bold text-zinc-600">{l.origens.filter(o => o !== 'custo médio').map(rotuloDaOrigem).join(' · ')}</span>}
                                                 {!l.completo && <span className="block text-[10px] font-bold">{l.faltas.join(' · ')}</span>}
                                             </td>
                                             <td className={`${td} text-right font-mono text-zinc-400`}>{mostrar(l.maoDeObra)}</td>

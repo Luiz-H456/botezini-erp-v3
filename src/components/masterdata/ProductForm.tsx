@@ -12,6 +12,7 @@ import { useHistoricoDeProduto, useCurvaDeDesconto } from '@/hooks/useHistoricoD
 import { resumirProduto, medianaDeFechados } from '@/utils/historicoDeProduto';
 import { candidatosDeApelido, apelidosDe } from '@/utils/apelidosDeProduto';
 import { BOTAO_SECUNDARIO, ROTULO } from '@/components/finance/ui/estilo';
+import { useCustoDeReferencia } from '@/hooks/useTabelaVerdade';
 
 export interface ProductFormProps {
   data: Partial<Product>;
@@ -92,16 +93,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
   // na linha do item. Enquanto ela vivia aqui dentro, a tela onde o preço é
   // decidido não tinha como alcançá-la — e duas cópias da mesma conta é como as
   // duas telas passariam a discordar sobre quanto a peça custa.
+  // Tabela verdade (v3.1): o custo de referência do tecido vence o custo médio.
+  const referencia = useCustoDeReferencia();
+  const tecidoComTabela = useMemo(
+    () => (selectedFabric ? { ...selectedFabric, custo_referencia: referencia.get(selectedFabric.id) ?? null } : selectedFabric),
+    [selectedFabric, referencia],
+  );
   const custo = useMemo(() => custoDaPeca({
     consumoM: calcFabricM,
-    tecido: selectedFabric,
+    tecido: tecidoComTabela,
     overheadPercent: calcOverhead,
     operarios: calcWorkers,
     // O padrão de 50 peças/dia é visível: o campo está logo ali na calculadora.
     pecasPorDia: data.pieces_daily_capacity || 50,
     custoHora: calcLaborRate,
     aliquota: calcTaxRate / 100,
-  }), [calcFabricM, selectedFabric, calcOverhead, calcWorkers,
+  }), [calcFabricM, tecidoComTabela, calcOverhead, calcWorkers,
        data.pieces_daily_capacity, calcLaborRate, calcTaxRate]);
 
   // A calculadora exibe as parcelas em barras e percentuais, onde ausência e
