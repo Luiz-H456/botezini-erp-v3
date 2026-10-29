@@ -2,8 +2,8 @@ import { Repeat, Ban, ShieldCheck, Undo2, Paperclip, Pencil } from 'lucide-react
 import { ObligationSummary } from '@/types';
 import { formatCurrency } from '@/utils';
 import { getTodayStr } from '@/utils/date';
-import { situacaoDaConta, diasDeAtraso } from '@/utils/financas/situacao';
-import { diaEMes, diasEntre } from '@/utils/financas/base';
+import { situacaoDaConta, quandoVence } from '@/utils/financas/situacao';
+import { diasEntre } from '@/utils/financas/base';
 import { valorDaLinha } from '@/utils/financas/lista';
 import { ProgressBar } from './ui';
 import { ITEM, BOTAO_SUAVE, corDoTipo } from './ui/estilo';
@@ -33,8 +33,7 @@ export function ObligationCard({ ob, partyName, categoryLabel, isPrivacy, onBaix
     const naoConferida = !!ob.unreconciled_reason && !conferida;
     const valor = (n: number) => (isPrivacy ? '••••' : formatCurrency(n));
     const faltam = diasEntre(hoje, ob.due_date);
-    const quando = s === 'vencida' ? `${diasDeAtraso(ob, hoje)} dia(s) de atraso`
-        : faltam === 0 ? 'hoje' : faltam > 0 && faltam <= 7 ? `em ${faltam} dia(s)` : diaEMes(ob.due_date);
+    const quando = quandoVence(ob, hoje);
 
     return (
         <div className={`${ITEM} group relative grid gap-2 overflow-hidden py-3 pl-4 pr-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4 hover:border-zinc-700 ${s === 'cancelada' ? 'opacity-50' : ''}`}>

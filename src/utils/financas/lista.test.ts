@@ -53,7 +53,8 @@ test('pagas, não conferidas, canceladas, banco, categoria e tipo', () => {
 
 test('grupos por atraso e por dia', () => {
     const vencidas = filtrarContas(contas, { ...FILTROS_VAZIOS, rapido: 'vencidas' }, ctx);
-    assert.deepEqual(agruparParaLista(vencidas, HOJE, true).map(g => g.titulo), ['venceu há 12 dias', 'venceu ontem']);
+    // A data original vai junto: "há 12 dias" sozinho obrigava a contar no calendário (pedido do Luiz, 29/10).
+    assert.deepEqual(agruparParaLista(vencidas, HOJE, true).map(g => g.titulo), ['venceu há 12 dias · qui 24/09', 'venceu ontem · seg 05/10']);
     assert.equal(tituloDoDia(HOJE, HOJE), 'Hoje · ter 06/10');
     assert.equal(tituloDoDia('2026-10-07', HOJE), 'Amanhã · qua 07/10');
     assert.equal(tituloDoDia('2026-10-08', HOJE), 'qui 08/10');

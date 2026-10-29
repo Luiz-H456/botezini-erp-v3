@@ -32,6 +32,8 @@ export interface LinhaDaFila {
     quantidade: number;
     urgente: boolean;
     destino: DestinoDaFila;
+    /** O que distingue a situação além da quantidade (ver inicio/ignorados.ts). Ex.: a data do caixa negativo. */
+    assinatura?: string;
 }
 
 export interface BlocoDaFila { objetivo: ObjetivoDaFila; rotulo: string; linhas: LinhaDaFila[] }
@@ -118,7 +120,7 @@ export function montarFila(e: EntradaDaFila): BlocoDaFila[] {
 
     if (e.caixaNegativoEm) {
         const [, m, d] = e.caixaNegativoEm.data.split('-');
-        add({ objetivo: 'dinheiro', acao: 'Ver projeção', quantidade: 1, urgente: true,
+        add({ objetivo: 'dinheiro', acao: 'Ver projeção', quantidade: 1, urgente: true, assinatura: e.caixaNegativoEm.data,
             texto: `Caixa fica negativo em ${d}/${m} (${e.dinheiro(e.caixaNegativoEm.saldo)})`,
             destino: { view: 'saude-caixa', mes: e.caixaNegativoEm.data.slice(0, 7) } });
     }

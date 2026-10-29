@@ -19,7 +19,7 @@ import { JanelaDeBaixa } from '@/components/financas/JanelaDeBaixa';
 import { formatDate } from '@/utils';
 import type { BankAccount, ObligationPayment, ObligationSummary } from '@/types';
 import type { CashEnvelope } from '@/types/finance';
-import { centavos } from '@/utils/financas/base';
+import { centavos, diaEMes } from '@/utils/financas/base';
 import type { FiltrosDaLista } from '@/utils/financas/lista';
 
 interface EditPlanCtx {
@@ -162,7 +162,7 @@ export function ReceivablesControlPanel({ abrirContas, clienteInicial, limparCli
                                             <button type="button" onClick={() => setAberto(aberto === l.clienteId ? null : l.clienteId)} className="min-w-0 text-left" aria-expanded={aberto === l.clienteId}>
                                                 <span className="block truncate text-sm font-bold text-zinc-100">{nome}</span>
                                                 <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                                                    {l.diasDoMaisAntigo === null ? 'nada vencido' : <span className="text-rose-400">{l.diasDoMaisAntigo} dia(s) de atraso</span>} · {l.quantidade} parcela(s)
+                                                    {l.diasDoMaisAntigo === null ? 'nada vencido' : <span className="text-rose-400">desde {diaEMes(l.vencidas.reduce((m, c) => (c.due_date < m ? c.due_date : m), l.vencidas[0]?.due_date ?? ''))} · {l.diasDoMaisAntigo} dia(s) de atraso</span>} · {l.quantidade} parcela(s)
                                                 </span>
                                             </button>
                                             <Valor rotulo="Em aberto" valor={centavos(l.vencido + l.aVencer)} tom="text-zinc-100" mostrar={mostrar} />
