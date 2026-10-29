@@ -109,3 +109,13 @@ test('o teste acima sabe REPROVAR — provado contra um trecho falso', () => {
     assert.ok(!padrao.test(filtro),
         'o padrão casa com um filtro de leitura — reprovaria código correto');
 });
+
+test('tabela verdade só grava por RPC: nenhum insert/update/upsert/delete direto nas tabelas dela', () => {
+    const TABELAS = ['tecido_linhas', 'tecido_tipos', 'tecido_faixas', 'tecido_precos', 'fornecedor_condicoes', 'fornecedor_frete'];
+    const padrao = new RegExp(String.raw`from\(['"](${TABELAS.join('|')})['"]\)[\s\S]{0,200}?\.(insert|update|upsert|delete)\(`);
+    // Prova de que o padrão sabe reprovar (teste que varre texto precisa provar que casa).
+    assert.ok(padrao.test(`supabase.from('tecido_precos').upsert(x)`));
+    for (const f of arquivos) {
+        assert.ok(!padrao.test(semComentarios(fonte(f))), `${f} grava direto numa tabela da tabela verdade: use a RPC`);
+    }
+});
