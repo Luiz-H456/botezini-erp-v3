@@ -18,6 +18,7 @@ import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 import type { ObligationSummary } from '@/types';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     conta: ObligationSummary;
     /** Todas as contas carregadas — de onde saem as parcelas da mesma série. */
@@ -46,6 +47,8 @@ const MODOS: { valor: ModoDeReajuste; rotulo: string; dica: string; sufixo: stri
  * mudam?". Separar em duas telas obrigaria a repetir o valor em outro lugar.
  */
 export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onClose);
     const travada = motivoParaNaoEditar(conta as any);
 
     const [valor, setValor] = useState(
@@ -203,16 +206,16 @@ export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
         + (previaDeData?.linhas.filter(l => !previa?.linhas.some(v => v.id === l.id)).length || 0)
         + (mudouAConta ? 1 : 0);
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-sobreposto flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl flex flex-col max-h-[92vh] overflow-hidden" {...saida.aoMexer}>
 
                 <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
                     <div className="min-w-0">
                         <h2 className="text-sm font-black uppercase tracking-widest text-white">Corrigir conta</h2>
                         <p className="text-xs text-zinc-500 truncate mt-0.5">{conta.description}</p>
                     </div>
-                    <button onClick={onClose} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
+                    <button onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
                         <X size={18} />
                     </button>
                 </div>
@@ -526,7 +529,7 @@ export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
 
                 {!travada && (
                     <div className="p-6 border-t border-zinc-800 flex justify-end gap-2">
-                        <button onClick={onClose}
+                        <button onClick={saida.pedirParaFechar}
                             className="h-10 px-3 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900">
                             Cancelar
                         </button>
@@ -542,5 +545,5 @@ export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }

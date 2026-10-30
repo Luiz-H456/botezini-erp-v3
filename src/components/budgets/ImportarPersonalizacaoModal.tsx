@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useEscFecha } from '@/hooks/useEscFecha';
 import { X, Table2, Palette, Search, Plus, Info } from 'lucide-react';
 import { BudgetCustomization, TecnicaPersonalizacao } from '@/types';
 import { formatCurrency } from '@/utils';
 import { idService } from '@/services/idService';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 import {
     usePrecosPersonalizacao, useArtesBordado, useNotasPersonalizacao,
 } from '@/hooks/usePersonalizacao';
@@ -38,6 +39,10 @@ interface Props {
 const ImportarPersonalizacaoModal: React.FC<Props> = ({
     isOpen, onClose, quantidadeSugerida, onImportar,
 }) => {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onClose);
+    const { limpar } = saida;
+    useEffect(() => { if (!isOpen) limpar(); }, [isOpen, limpar]);
     const [origem, setOrigem] = useState<'tabela' | 'artes'>('tabela');
     const [busca, setBusca] = useState('');
 
@@ -62,7 +67,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
             a.cliente_nome?.toLowerCase().includes(q));
     }, [artes, busca]);
 
-    useEscFecha(isOpen, onClose);
+    useEscFecha(isOpen, saida.pedirParaFechar);
 
     if (!isOpen) return null;
 
@@ -100,11 +105,11 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
         onClose();
     };
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-sobreposto flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm ease-out animate-in fade-in duration-200"
-            onClick={onClose}>
+            onClick={saida.pedirParaFechar}>
             <div className="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-3xl max-h-full flex flex-col ease-out animate-in zoom-in-95 duration-200"
-                onClick={e => e.stopPropagation()}>
+                onClick={e => e.stopPropagation()} {...saida.aoMexer}>
                 <div className="shrink-0 flex items-center justify-between px-6 py-5 border-b border-zinc-800">
                     <div>
                         <h3 className="text-xs font-black text-white uppercase tracking-[0.2em]">Importar personalização</h3>
@@ -112,7 +117,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                             Preço para <b className="text-amber-500">{qtd}</b> peça{qtd > 1 ? 's' : ''} — a faixa da tabela é escolhida por essa quantidade.
                         </p>
                     </div>
-                    <button type="button" onClick={onClose} aria-label="Fechar" className="p-2 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-900 transition-all"><X size={18} /></button>
+                    <button type="button" onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-900 transition-all"><X size={18} /></button>
                 </div>
 
                 <div className="shrink-0 flex items-center gap-3 px-6 py-4 border-b border-zinc-800">
@@ -206,7 +211,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 };
 
 export default ImportarPersonalizacaoModal;

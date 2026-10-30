@@ -8,6 +8,7 @@ import { iniciais, corDoAvatar, rotuloDoCargo } from '@/utils/perfilDoUsuario';
 import type { UserProfile } from '@/types';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     perfil: UserProfile | null;
     onSalvo: () => void;
@@ -22,6 +23,8 @@ interface Props {
  * travado explica a regra, em vez de deixar a pessoa procurar onde muda.
  */
 export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onFechar);
     const [nome, setNome] = useState(perfil?.full_name || '');
     const [caminhoDaFoto, setCaminhoDaFoto] = useState(perfil?.avatar_url || '');
     const [salvando, setSalvando] = useState(false);
@@ -40,7 +43,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
     }, []);
 
     useEffect(() => {
-        const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onFechar(); };
+        const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') saida.pedirParaFechar(); };
         document.addEventListener('keydown', esc);
         return () => document.removeEventListener('keydown', esc);
     }, [onFechar]);
@@ -91,15 +94,15 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
 
     const previa = { ...perfil, full_name: nome } as UserProfile;
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-modal bg-zinc-950/85 backdrop-blur-md flex items-center justify-center p-4 ease-out animate-in fade-in duration-200"
-            onClick={onFechar}>
+            onClick={saida.pedirParaFechar}>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden ease-out animate-in zoom-in-95 duration-200"
-                onClick={e => e.stopPropagation()}>
+                onClick={e => e.stopPropagation()} {...saida.aoMexer}>
 
                 <div className="px-5 py-4 border-b border-zinc-800 bg-zinc-950/40 flex items-center justify-between">
                     <h2 className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Meu perfil</h2>
-                    <button onClick={onFechar} className="p-2 text-zinc-600 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
+                    <button onClick={saida.pedirParaFechar} className="p-2 text-zinc-600 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors">
                         <X size={16} />
                     </button>
                 </div>
@@ -181,7 +184,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
                 </div>
 
                 <div className="p-5 border-t border-zinc-800 bg-zinc-950/40 flex gap-2">
-                    <button onClick={onFechar} disabled={salvando}
+                    <button onClick={saida.pedirParaFechar} disabled={salvando}
                         className="px-5 py-3 rounded-xl bg-zinc-800 text-zinc-400 hover:text-white text-[10px] font-black uppercase tracking-widest transition-colors disabled:opacity-40">
                         Cancelar
                     </button>
@@ -194,5 +197,5 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }

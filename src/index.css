@@ -230,5 +230,5 @@ body {
     min-height: 44px;
   }
   /* Botão só de ícone precisa dos 44 nos dois sentidos. */
-  button:not(:has(> :not(svg))) { min-width: 44px; }
+  button:not(:has(> :not(svg))), a.botao:not(:has(> :not(svg))) { min-width: 44px; }
 }

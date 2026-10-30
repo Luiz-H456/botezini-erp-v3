@@ -169,3 +169,28 @@ Todos os 18 itens acima foram feitos, testados e verificados na tela. Diferença
   falhando. Agora volta ao login com aviso e, ao entrar, retoma a mesma tela.
 - [x] **S4.** Um atalho novo (N no Estoque) quebrava a tela por estar depois de um `return` — achado ao
   percorrer as 25 telas e corrigido antes de qualquer push. As 25 telas abrem.
+
+### Terceira passada — celular (375 px) e fábrica (30/10, à tarde)
+
+Medido no app local com o usuário de teste admin e com um de fábrica (`criar_usuario_teste.sh fabrica`):
+26 telas sem rolagem lateral; campos com 16 px no toque (o iPhone não dá zoom); alvos de 44 px (já
+vinham do `index.css`). A fábrica entra no Quadro, troca de coluna, move pedido de setor e volta, abre
+Ver pedido, Baixa parcial, Controle parcial e Rendimento do corte sem erro no console.
+
+- [x] **T1. Baixa parcial perdia a quantidade digitada** com um toque fora — é a janela que a fábrica
+  mais usa. Agora pergunta (inclusive depois de "Preencher o que falta"). Junto, as outras 12 janelas com
+  campo que ainda fechavam sem perguntar: plano de parcelas, conta bancária, editar conta, ficha de
+  entrega, reajuste, mover lead, importar personalização, meu perfil, setor, caixinha, transferência e
+  provisão. `janelasProtegidas.test.ts` lê o código e reprova janela nova que esquecer (dispensas com
+  motivo escrito: pagar em lote, prazo em lote, categoria rápida, sugerir nome, busca).
+- [x] **T2. Busca geral no celular** não tinha como fechar (sem Esc, e com o teclado aberto quase não
+  sobra "fora"): ganhou o X. A dica de teclado do rodapé some no celular.
+- [x] **T3. Prévia de "Mensagem"** num cartão perto do fim da tela abria para baixo, com "Copiar" e
+  "Enviar" fora da tela. Agora abre para cima quando não cabe.
+- [x] **T4. Alvos pequenos:** botão do WhatsApp (24×20) e lupa do topo (42 px) passam a 44 px no toque.
+
+**Fica como recomendação (não feito — muda o layout de uma tela inteira):**
+- **Editor de orçamento no celular:** os itens são uma tabela de 960 px numa faixa que rola para o
+  lado. Funciona, mas editar item no celular é ruim. Conserto: cartão por item abaixo de 768 px.
+  Esforço: grande. Só vale se orçamento for feito no celular de verdade.
+- **Fábrica vê o cliente e manda "Avisar andamento"** pelo WhatsApp — ligado à decisão 4.2 das pendências.

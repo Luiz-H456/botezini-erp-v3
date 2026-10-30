@@ -7,6 +7,7 @@ import type { SaldoItem } from '@/utils/baixaPorItem';
 import { ITEM, CAMPO, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 export interface Lancamento {
     qty_done: number;
     qty_expedited?: number;
@@ -56,6 +57,10 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
     const excedeAlgum = saldos.some(s => num(feito[s.chave]) > s.resta);
     const canConfirm = lancamentos.length > 0 && !busy;
 
+    // Quantidade digitada no chão de fábrica não se perde num toque fora (passada de celular e fábrica).
+    // "Preencher o que falta" não passa por onChange, por isso a comparação é pelo que vai ser lançado.
+    const saida = useSaidaProtegida(() => { if (!busy) onClose(); }, lancamentos.length > 0 || operation.trim() !== '');
+
     const confirm = async () => {
         if (!canConfirm) return;
         try { await onConfirm(lancamentos); }
@@ -69,8 +74,8 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
         setFeito(cheio);
     };
 
-    return createPortal(
-        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-modal flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={busy ? undefined : onClose}>
+    return <>{saida.confirmacao}{createPortal(
+        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-modal flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={busy ? undefined : saida.pedirParaFechar}>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800 shrink-0">
                     <div>
@@ -81,7 +86,7 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
                             {titulo}
                         </p>
                     </div>
-                    <button onClick={onClose} disabled={busy} aria-label="Fechar" title="Fechar" className={`${BOTAO_SECUNDARIO} w-10 px-0`}><X size={18} /></button>
+                    <button onClick={saida.pedirParaFechar} disabled={busy} aria-label="Fechar" title="Fechar" className={`${BOTAO_SECUNDARIO} w-10 px-0`}><X size={18} /></button>
                 </div>
 
                 <div className="p-5 space-y-4 overflow-y-auto">
@@ -181,7 +186,7 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
                 </div>
 
                 <div className="flex items-center gap-3 px-5 py-4 border-t border-zinc-800 shrink-0">
-                    <button onClick={onClose} disabled={busy} className={`${BOTAO_SECUNDARIO} flex-1`}>Cancelar</button>
+                    <button onClick={saida.pedirParaFechar} disabled={busy} className={`${BOTAO_SECUNDARIO} flex-1`}>Cancelar</button>
                     <button onClick={confirm} disabled={!canConfirm}
                         className={`${BOTAO_PRINCIPAL} flex-1`}>
                         {busy ? 'Lançando...' : lancamentos.length === 0 ? 'Informe uma quantidade'
@@ -191,5 +196,5 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
             </div>
         </div>,
         document.body
-    );
+    )}</>;
 }

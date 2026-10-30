@@ -59,7 +59,7 @@ const ATRASO_MS = 220;
  */
 export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnviar }: Props) {
     const [copiado, setCopiado] = useState(false);
-    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+    const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number } | null>(null);
     const ref = useRef<HTMLButtonElement>(null);
     const timer = useRef<number | null>(null);
 
@@ -75,8 +75,11 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
         const r = ref.current?.getBoundingClientRect();
         if (!r) return;
         const LARGURA = 340;
+        // Cartão perto do fim da tela (celular, kanban rolado): a prévia abre para cima,
+        // senão "Copiar" e "Enviar" ficam fora da tela. 360 ≈ altura máxima da prévia.
+        const cabeAbaixo = r.bottom + 8 + 360 <= window.innerHeight;
         setPos({
-            top: r.bottom + 8,
+            ...(cabeAbaixo ? { top: r.bottom + 8 } : { bottom: window.innerHeight - r.top + 8 }),
             // Não deixa a prévia sair pela direita da janela.
             left: Math.max(8, Math.min(r.left, window.innerWidth - LARGURA - 8)),
         });
@@ -126,7 +129,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
 
             {pos && createPortal(
                 <div
-                    style={{ position: 'fixed', top: pos.top, left: pos.left, width: 340, zIndex: 'var(--z-index-balao)' as unknown as number }}
+                    style={{ position: 'fixed', top: pos.top, bottom: pos.bottom, left: pos.left, width: 340, maxWidth: 'calc(100vw - 16px)', zIndex: 'var(--z-index-balao)' as unknown as number }}
                     onMouseEnter={cancelarFechamento}
                     onMouseLeave={fecharComAtraso}
                     className="bg-zinc-950 border border-zinc-700 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden ease-out animate-in fade-in zoom-in-95 duration-150"
@@ -152,7 +155,7 @@ export function BotaoMensagem({ texto, titulo, telefone, compacto, rotulo, onEnv
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => { e.stopPropagation(); onEnviar?.(); }}
-                                className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
+                                className="botao flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 transition-colors"
                             >
                                 <Send size={14} /> Enviar
                             </a>

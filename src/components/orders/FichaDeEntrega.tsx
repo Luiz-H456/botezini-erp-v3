@@ -11,6 +11,7 @@ import {
 import type { Order, OrderAddendum, Client } from '@/types';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     order: Order;
     client?: Client | null;
@@ -40,6 +41,8 @@ type LinhaDoAditivo = ItemDoAditivo & { preco_texto: string };
  * ancestral tem transform, filter ou backdrop-filter — e a tela de pedidos tem.
  */
 export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onClose);
     const [aditivos, setAditivos] = useState<OrderAddendum[]>([]);
     const [carregando, setCarregando] = useState(true);
     const [salvando, setSalvando] = useState(false);
@@ -129,9 +132,9 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
         }));
     };
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-modal bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden" {...saida.aoMexer}>
 
                 <header className="flex items-center justify-between gap-3 p-5 border-b border-zinc-800 shrink-0">
                     <div className="min-w-0">
@@ -142,7 +145,7 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
                             Pedido {order.order_number}{client?.company_name ? ` · ${client.company_name}` : ''}
                         </p>
                     </div>
-                    <button onClick={onClose} className="p-2 text-zinc-600 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
+                    <button onClick={saida.pedirParaFechar} className="p-2 text-zinc-600 hover:text-white hover:bg-zinc-800 rounded-lg transition-colors shrink-0">
                         <X size={18} />
                     </button>
                 </header>
@@ -360,7 +363,7 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }
 
 export default FichaDeEntrega;

@@ -8,6 +8,7 @@ import { capacidadeMensal } from '@/utils/capacityCalendar';
 import { getTodayStr } from '@/utils/date';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PRINCIPAL } from '@/components/finance/ui/estilo';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 const COLORS = ['#71717a', '#3b82f6', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#14b8a6'];
 
 export function CapacityPanel() {
@@ -149,6 +150,8 @@ function SectorForm({ initial, busy, onSave, onClose }: {
     initial: Partial<ProductionSector>; busy: boolean;
     onSave: (d: Partial<ProductionSector>) => Promise<void>; onClose: () => void;
 }) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica).
+    const saida = useSaidaProtegida(onClose);
     const [name, setName] = useState(initial.name || '');
     const [cap, setCap] = useState(String(initial.weekly_capacity_pieces ?? 350));
     const [order, setOrder] = useState(String(initial.sort_order ?? 0));
@@ -160,11 +163,12 @@ function SectorForm({ initial, busy, onSave, onClose }: {
     };
 
     return createPortal(
-        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-modal flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={onClose}>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-md ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-modal flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={saida.pedirParaFechar}>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-md ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()} {...saida.aoMexer}>
+                {saida.confirmacao}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
                     <h3 className="text-white font-black uppercase tracking-tight">{initial.id ? 'Editar' : 'Novo'} Setor</h3>
-                    <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
+                    <button onClick={saida.pedirParaFechar} className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
                 </div>
                 <div className="p-5 space-y-4">
                     <div>
@@ -196,7 +200,7 @@ function SectorForm({ initial, busy, onSave, onClose }: {
                     </div>
                 </div>
                 <div className="flex items-center gap-3 px-5 py-4 border-t border-zinc-800">
-                    <button onClick={onClose} className={`${BOTAO_SECUNDARIO} flex-1`}>Cancelar</button>
+                    <button onClick={saida.pedirParaFechar} className={`${BOTAO_SECUNDARIO} flex-1`}>Cancelar</button>
                     <button onClick={save} disabled={busy || !name.trim()}
                         className={`${BOTAO_PRINCIPAL} flex-1`}>Salvar</button>
                 </div>

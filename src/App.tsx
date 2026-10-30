@@ -434,7 +434,7 @@ const App: React.FC = () => {
               onClick={() => setBuscaAberta(true)}
               title="Buscar cliente, pedido, orçamento, fornecedor ou produto (Ctrl+K)"
               aria-label="Busca geral"
-              className="inline-flex h-11 items-center gap-2 rounded-xl px-3 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
+              className="inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-xl px-3 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
             >
               <Search size={18} /><span className="hidden md:inline text-xs text-zinc-600">Ctrl+K</span>
             </button>

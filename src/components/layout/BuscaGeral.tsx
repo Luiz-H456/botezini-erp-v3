@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, Users, Package, FileText, Truck, Shirt, Loader2 } from 'lucide-react';
+import { Search, Users, Package, FileText, Truck, Shirt, Loader2, X } from 'lucide-react';
 import { storageService } from '@/services/storage';
 import { buscarEmTudo, type DadosDaBusca, type ResultadoDaBusca, type TipoDoResultado } from '@/utils/buscaGeral';
 import { mensagemDeErro } from '@/utils/errorHandling';
@@ -57,6 +57,10 @@ export function BuscaGeral({ aberta, onFechar, onAbrir }: { aberta: boolean; onF
                         className="h-14 flex-1 min-w-0 bg-transparent text-base text-white outline-none placeholder:text-zinc-600" />
                     {!dados && !erro && <Loader2 size={16} className="text-zinc-500 animate-spin shrink-0" />}
                     <kbd className="hidden sm:inline text-[10px] text-zinc-500 border border-zinc-700 rounded px-1.5 py-0.5">Esc</kbd>
+                    {/* No celular não há Esc, e com o teclado aberto quase não sobra "fora" para tocar. */}
+                    <button type="button" onClick={onFechar} aria-label="Fechar a busca" className="sm:hidden -mr-2 inline-flex h-11 w-11 items-center justify-center text-zinc-500 hover:text-white">
+                        <X size={18} />
+                    </button>
                 </div>
                 <ul role="listbox" className="max-h-[50vh] overflow-y-auto py-2">
                     {erro && <li className="px-4 py-3 text-sm text-rose-400">{erro}</li>}
@@ -83,7 +87,7 @@ export function BuscaGeral({ aberta, onFechar, onAbrir }: { aberta: boolean; onF
                         );
                     })}
                 </ul>
-                <p className="border-t border-zinc-800 px-4 py-2 text-[11px] text-zinc-600">↑ ↓ para escolher · Enter abre · Ctrl+K ou / abre esta busca de qualquer tela</p>
+                <p className="hidden sm:block border-t border-zinc-800 px-4 py-2 text-[11px] text-zinc-600">↑ ↓ para escolher · Enter abre · Ctrl+K ou / abre esta busca de qualquer tela</p>
             </div>
         </div>,
         document.body,

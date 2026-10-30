@@ -5,10 +5,13 @@ import { precoVigente, paraCampo, type TVCondicao, type TVFaixa, type TVPreco } 
 import { getTodayStr } from '@/utils/date';
 import { CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 /** Reajuste: grade nova com data de vigência; a anterior fica no histórico. */
 export function ReajusteModal({ nomeTipo, faixas, condicoes, precos, onClose, onFeito }: {
     nomeTipo: string; faixas: TVFaixa[]; condicoes: TVCondicao[]; precos: TVPreco[]; onClose: () => void; onFeito: () => void;
 }) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onClose);
     const hoje = getTodayStr();
     const [data, setData] = useState(hoje);
     const [grade, setGrade] = useState<Record<string, string>>(() => Object.fromEntries(faixas.flatMap(f => condicoes.map(c => [
@@ -28,9 +31,9 @@ export function ReajusteModal({ nomeTipo, faixas, condicoes, precos, onClose, on
             onFeito();
         } catch (e) { setErro(e instanceof Error ? e.message : 'Não consegui reajustar.'); } finally { setSalvando(false); }
     };
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-sobreposto bg-zinc-950/85 backdrop-blur-md flex items-center justify-center p-4" role="dialog" aria-modal="true">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-5 space-y-4">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-5 space-y-4" {...saida.aoMexer}>
                 <h3 className="text-white font-black">Reajustar {nomeTipo}</h3>
                 <label className="block"><span className={ROTULO_PEQUENO}>Passa a valer em</span>
                     <input type="date" className={`${CAMPO} mt-1`} value={data} onChange={e => setData(e.target.value)} /></label>
@@ -48,9 +51,10 @@ export function ReajusteModal({ nomeTipo, faixas, condicoes, precos, onClose, on
                 <p className="text-xs text-zinc-500">Os preços de antes continuam guardados; compras antigas seguem comparadas com o preço da data delas.</p>
                 {erro && <p className="text-xs text-rose-400">{erro}</p>}
                 <div className="flex justify-end gap-2">
-                    <button type="button" className={BOTAO_SECUNDARIO} onClick={onClose}>Cancelar</button>
+                    <button type="button" className={BOTAO_SECUNDARIO} onClick={saida.pedirParaFechar}>Cancelar</button>
                     <button type="button" className={BOTAO_PRINCIPAL} disabled={salvando} onClick={salvar}>{salvando ? 'Salvando…' : 'Aplicar reajuste'}</button>
                 </div>
             </div>
-        </div>, document.body);
+        </div>, document.body,
+    )}</>;
 }

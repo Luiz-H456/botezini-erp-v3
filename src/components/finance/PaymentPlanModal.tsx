@@ -8,6 +8,7 @@ import { storageService } from '@/services/storage';
 import { SearchableSelect } from '@/components/common';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface LockedRow { label: string; amount: number; status: string; }
 
 interface Props {
@@ -37,6 +38,8 @@ interface Props {
 const PAYMENT_METHODS = ['PIX', 'Boleto', 'TED', 'DOC', 'Cartão', 'Dinheiro', 'Cheque', 'Outro'];
 
 export function PaymentPlanModal(props: Props) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(props.onClose);
     const today = props.hoje || getTodayStr();
     const [plan, setPlan] = useState<PlanInstallment[]>(() =>
         props.initialPlan && props.initialPlan.length > 0
@@ -106,9 +109,9 @@ export function PaymentPlanModal(props: Props) {
         }
     };
 
-    return createPortal(
-        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-sobreposto flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={props.onClose}>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+    return <>{saida.confirmacao}{createPortal(
+        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-sobreposto flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={saida.pedirParaFechar}>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()} {...saida.aoMexer}>
                 <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
                     <div>
                         <h3 className="text-white font-black uppercase tracking-tight">
@@ -120,7 +123,7 @@ export function PaymentPlanModal(props: Props) {
                             Total: {formatCurrency(props.total)}
                         </p>
                     </div>
-                    <button type="button" onClick={props.onClose} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
+                    <button type="button" onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-5 space-y-4">
@@ -214,7 +217,7 @@ export function PaymentPlanModal(props: Props) {
                 </div>
 
                 <div className="flex items-center gap-3 px-5 py-4 border-t border-zinc-800">
-                    <button onClick={props.onClose} className="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-400 hover:bg-zinc-700">Cancelar</button>
+                    <button onClick={saida.pedirParaFechar} className="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-400 hover:bg-zinc-700">Cancelar</button>
                     <button onClick={handleConfirm} disabled={!canConfirm}
                         className="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-40">
                         {saving ? 'Salvando...' : props.mode === 'create' ? 'Gerar Pedido' : props.mode === 'budget' ? 'Salvar no Orçamento' : 'Salvar Plano'}
@@ -222,6 +225,6 @@ export function PaymentPlanModal(props: Props) {
                 </div>
             </div>
         </div>,
-        document.body
-    );
+        document.body,
+    )}</>;
 }

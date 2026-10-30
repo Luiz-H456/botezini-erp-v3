@@ -11,6 +11,7 @@ import { CashEnvelope, EnvelopeMovement } from '@/types/finance';
 import { SearchableSelect, InfoTooltip, ConfirmDialog, MenuMais } from '@/components/common';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 const COLORS = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#14b8a6', '#f97316'];
 const PURPOSES = ['Impostos', 'Folha de pagamento', 'Fornecedores', 'Reserva de emergência', '13º / Férias', 'Investimento', 'Outro'];
 
@@ -190,6 +191,8 @@ function EnvelopeForm({ initial, busy, onSave, onClose }: {
     initial: Partial<CashEnvelope>; busy: boolean;
     onSave: (data: Partial<CashEnvelope>) => Promise<void>; onClose: () => void;
 }) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica).
+    const saida = useSaidaProtegida(onClose);
     const [name, setName] = useState(initial.name || '');
     const [color, setColor] = useState(initial.color || COLORS[0]);
     const [target, setTarget] = useState(String(initial.target_amount ?? 0));
@@ -214,9 +217,10 @@ function EnvelopeForm({ initial, busy, onSave, onClose }: {
     };
 
     return createPortal(
-        <div className={JANELA} onClick={onClose}>
-            <div className={`${CAIXA} max-w-md p-6 space-y-4`} onClick={e => e.stopPropagation()}>
-                <Cabecalho onClose={onClose}>{initial.id ? 'Editar caixinha' : 'Nova caixinha'}</Cabecalho>
+        <div className={JANELA} onClick={saida.pedirParaFechar}>
+            <div className={`${CAIXA} max-w-md p-6 space-y-4`} onClick={e => e.stopPropagation()} {...saida.aoMexer}>
+                {saida.confirmacao}
+                <Cabecalho onClose={saida.pedirParaFechar}>{initial.id ? 'Editar caixinha' : 'Nova caixinha'}</Cabecalho>
                 <div>
                     <Rotulo>Nome</Rotulo>
                     <input value={name} onChange={e => setName(e.target.value)} autoFocus className={CAMPO} />
@@ -266,7 +270,7 @@ function EnvelopeForm({ initial, busy, onSave, onClose }: {
                 </div>
                 {error && <p role="alert" className="text-sm text-rose-400">{error}</p>}
                 <div className="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onClick={onClose} className={BTN_SECUNDARIO}>Cancelar</button>
+                    <button type="button" onClick={saida.pedirParaFechar} className={BTN_SECUNDARIO}>Cancelar</button>
                     <button type="button" onClick={save} disabled={busy || !name.trim()} className={BTN_PRINCIPAL}>Salvar</button>
                 </div>
             </div>
@@ -337,6 +341,8 @@ function TransferModal({ from, others, busy, onConfirm, onClose }: {
     from: CashEnvelope; others: CashEnvelope[]; busy: boolean;
     onConfirm: (toId: string, amount: number) => Promise<void>; onClose: () => void;
 }) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica).
+    const saida = useSaidaProtegida(onClose);
     const { mostrar } = useMostrarValor();
     const [toId, setToId] = useState(others[0]?.id || '');
     const [amount, setAmount] = useState('');
@@ -351,9 +357,10 @@ function TransferModal({ from, others, busy, onConfirm, onClose }: {
     };
 
     return createPortal(
-        <div className={JANELA} onClick={onClose}>
-            <div className={`${CAIXA} max-w-sm p-6 space-y-4`} onClick={e => e.stopPropagation()}>
-                <Cabecalho onClose={onClose}>Transferir de {from.name}</Cabecalho>
+        <div className={JANELA} onClick={saida.pedirParaFechar}>
+            <div className={`${CAIXA} max-w-sm p-6 space-y-4`} onClick={e => e.stopPropagation()} {...saida.aoMexer}>
+                {saida.confirmacao}
+                <Cabecalho onClose={saida.pedirParaFechar}>Transferir de {from.name}</Cabecalho>
                 <p className="text-xs text-zinc-500">Disponível: {mostrar(from.balance)}</p>
                 <div>
                     <Rotulo>Para</Rotulo>
@@ -371,7 +378,7 @@ function TransferModal({ from, others, busy, onConfirm, onClose }: {
                 </div>
                 {error && <p role="alert" className="text-sm text-rose-400">{error}</p>}
                 <div className="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onClick={onClose} className={BTN_SECUNDARIO}>Cancelar</button>
+                    <button type="button" onClick={saida.pedirParaFechar} className={BTN_SECUNDARIO}>Cancelar</button>
                     <button type="button" onClick={confirm} disabled={!canConfirm} className={BTN_PRINCIPAL}>Transferir</button>
                 </div>
             </div>
@@ -384,6 +391,8 @@ function ProvisionModal({ envelopes, free, busy, onConfirm, onClose }: {
     envelopes: CashEnvelope[]; free: number; busy: boolean;
     onConfirm: (base: number) => Promise<void>; onClose: () => void;
 }) {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica).
+    const saida = useSaidaProtegida(onClose);
     const { mostrar } = useMostrarValor();
     const [amount, setAmount] = useState('');
     const [error, setError] = useState('');
@@ -413,9 +422,10 @@ function ProvisionModal({ envelopes, free, busy, onConfirm, onClose }: {
     };
 
     return createPortal(
-        <div className={JANELA} onClick={onClose}>
-            <div className={`${CAIXA} max-w-md p-6 space-y-4`} onClick={e => e.stopPropagation()}>
-                <Cabecalho onClose={onClose}>
+        <div className={JANELA} onClick={saida.pedirParaFechar}>
+            <div className={`${CAIXA} max-w-md p-6 space-y-4`} onClick={e => e.stopPropagation()} {...saida.aoMexer}>
+                {saida.confirmacao}
+                <Cabecalho onClose={saida.pedirParaFechar}>
                     <span className="inline-flex items-center gap-2">
                         Distribuir um valor
                         <InfoTooltip iconSize={13}>
@@ -467,7 +477,7 @@ function ProvisionModal({ envelopes, free, busy, onConfirm, onClose }: {
                 {error && <p role="alert" className="text-sm text-rose-400">{error}</p>}
 
                 <div className="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" onClick={onClose} className={BTN_SECUNDARIO}>Cancelar</button>
+                    <button type="button" onClick={saida.pedirParaFechar} className={BTN_SECUNDARIO}>Cancelar</button>
                     <button type="button" onClick={confirm} disabled={!canConfirm} className={BTN_PRINCIPAL}>
                         {busy ? 'Distribuindo…' : 'Distribuir'}
                     </button>

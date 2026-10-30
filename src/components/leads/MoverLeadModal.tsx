@@ -6,6 +6,7 @@ import type { Lead, EtapaDoLead } from '@/utils/funilDeLeads';
 import { CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     lead: Lead;
     destino: EtapaDoLead;
@@ -58,6 +59,8 @@ const Rotulo = `${ROTULO_PEQUENO} block mb-2`;
  * assume), e DESCARTAR troca a pergunta pelo motivo.
  */
 export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, onCancelar }) => {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onCancelar);
     const [acao, setAcao] = useState('');
     const [quando, setQuando] = useState(hojeMais(3));
     const [motivo, setMotivo] = useState('');
@@ -71,7 +74,7 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
     const sugestoes = useMemo(() => ACOES_SUGERIDAS[destino] || [], [destino]);
 
     useEffect(() => {
-        const aoTeclar = (e: KeyboardEvent) => { if (e.key === 'Escape') onCancelar(); };
+        const aoTeclar = (e: KeyboardEvent) => { if (e.key === 'Escape') saida.pedirParaFechar(); };
         window.addEventListener('keydown', aoTeclar);
         return () => window.removeEventListener('keydown', aoTeclar);
     }, [onCancelar]);
@@ -99,9 +102,9 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
         }
     };
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-sobreposto bg-black/70 flex items-center justify-center p-4 ease-out animate-in fade-in duration-150">
-            <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden ease-out animate-in zoom-in-95 duration-150">
+            <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden ease-out animate-in zoom-in-95 duration-150" {...saida.aoMexer}>
                 <header className="flex items-center justify-between gap-3 px-5 py-4 border-b border-zinc-800">
                     <div className="min-w-0">
                         <p className={ROTULO_PEQUENO}>
@@ -109,7 +112,7 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
                         </p>
                         <h3 className="text-sm font-black text-white truncate mt-0.5">{nomeDoLead(lead)}</h3>
                     </div>
-                    <button onClick={onCancelar} className={`${BOTAO_SECUNDARIO} w-10 px-0`} aria-label="Fechar">
+                    <button onClick={saida.pedirParaFechar} className={`${BOTAO_SECUNDARIO} w-10 px-0`} aria-label="Fechar">
                         <X size={18} />
                     </button>
                 </header>
@@ -211,7 +214,7 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
 
                 <footer className="flex items-center gap-2 px-5 py-4 border-t border-zinc-800">
                     <button
-                        onClick={onCancelar}
+                        onClick={saida.pedirParaFechar}
                         disabled={salvando}
                         className={BOTAO_SECUNDARIO}
                     >
@@ -228,7 +231,7 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 };
 
 export default MoverLeadModal;

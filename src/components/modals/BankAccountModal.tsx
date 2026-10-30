@@ -6,6 +6,7 @@ import SearchableSelect from '@/components/common/SearchableSelect';
 import { InfoTooltip } from '@/components/common';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     isOpen: boolean;
     onClose: () => void;
@@ -25,6 +26,10 @@ interface Props {
 }
 
 export const BankAccountModal: React.FC<Props> = ({ isOpen, onClose, onSave, onDelete, onSetBalance, account, camposNovos }) => {
+    // Fechar com algo digitado pergunta antes (passada de celular e fábrica: as janelas que faltavam).
+    const saida = useSaidaProtegida(onClose);
+    const { limpar } = saida;
+    useEffect(() => { if (!isOpen) limpar(); }, [isOpen, limpar]);
     const [data, setData] = useState<Partial<BankAccount>>({
         name: '',
         type: 'checking',
@@ -108,14 +113,14 @@ export const BankAccountModal: React.FC<Props> = ({ isOpen, onClose, onSave, onD
     const InputCls = 'w-full h-10 bg-zinc-950 border border-zinc-800 rounded-lg px-3 text-sm text-white outline-none focus:border-zinc-500 transition-colors placeholder:text-zinc-700';
     const LabelCls = 'text-xs text-zinc-500 block mb-1.5';
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-modal flex items-center justify-center bg-zinc-950/80 backdrop-blur-md p-4 ease-out animate-in fade-in duration-200">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] relative overflow-hidden">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] relative overflow-hidden" {...saida.aoMexer}>
                 <div className="flex items-center justify-between p-6 border-b border-zinc-800 shrink-0">
                     <h2 className="text-sm font-black uppercase tracking-widest text-white">
                         {account?.id ? 'Editar conta bancária' : 'Nova conta bancária'}
                     </h2>
-                    <button onClick={onClose} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg">
+                    <button onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg">
                         <X size={18} />
                     </button>
                 </div>
@@ -299,7 +304,7 @@ export const BankAccountModal: React.FC<Props> = ({ isOpen, onClose, onSave, onD
                     </div>
                     <div className="flex gap-2">
                         <button
-                            onClick={onClose}
+                            onClick={saida.pedirParaFechar}
                             className="h-10 px-3 rounded-lg border border-zinc-800 text-sm text-zinc-300 hover:bg-zinc-900"
                         >
                             Cancelar
@@ -316,5 +321,5 @@ export const BankAccountModal: React.FC<Props> = ({ isOpen, onClose, onSave, onD
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 };
