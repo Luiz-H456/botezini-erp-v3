@@ -46,6 +46,13 @@ Está no ramo `feat/v3.1-tabela-verdade`, testada no banco local. **Não vai par
   - Pode rodar mais de uma vez. **Conferir:** a última tabela (DEPOIS) mostra `bordado` com o mesmo número de
     artes da primeira (ANTES).
   - Sem ele, salvar uma estampa avisa "rode supabase/estampas_v3_d.sql" em vez de quebrar.
+- [ ] **1.8 Rodar `supabase/custos_personalizacao_v3_e.sql`** (parte E, 30/10), depois do 1.1.
+  - O que faz: cria as tabelas de custo de **silk** (grade tamanho × cores por estamparia) e **DTF** (metro
+    linear, largura do rolo, espaço entre artes e frete por estamparia). Só admin e gerente veem.
+  - O que assume: `is_admin_or_manager()`, que o 1.1 cria. Só cria tabelas novas; pode rodar de novo.
+  - **Conferir:** a última tabela mostra `custo_dtf` e `custo_silk` com `rls_ligado = t` e `politicas = 1`.
+  - Depois, em Tabelas de custo › Silk / DTF, cadastre as estamparias. Bordado usa as notas do bordado
+    (valor do milheiro, mínimo e programação da arte) em Personalização › Notas.
 
 ---
 

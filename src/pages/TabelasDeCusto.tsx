@@ -7,7 +7,7 @@ import { CompanyProfile, Insumo } from '@/types';
 import { ITENS_POR_PAGINA } from '@/utils/constants';
 import {
     Plus, Check, X, Package, Link2, Search,
-    ChevronRight, ChevronDown, StickyNote, Brush, Boxes, Layers, Shirt
+    ChevronRight, ChevronDown, StickyNote, Brush, Boxes, Layers, Shirt, PaintBucket, Printer, Scissors
 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { DefinirPrecoModal } from '@/components/modals/DefinirPrecoModal';
@@ -19,6 +19,7 @@ import PersonalizacaoTab from '@/components/inventory/PersonalizacaoTab';
 import InsumoDetalhe from '@/components/inventory/InsumoDetalhe';
 import { TecidosPorFornecedor } from '@/components/tabelaVerdade/TecidosPorFornecedor';
 import { PlanilhaDeProdutos } from '@/components/tabelas/PlanilhaDeProdutos';
+import { CustoSilk, CustoDtf, CustoBordado } from '@/components/tabelas/CustosDePersonalizacao';
 import { SEM_CATEGORIA } from '@/repositories/inventoryRepository';
 import { MenuMais } from '@/components/common/MenuMais';
 import { CARTAO, CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula } from '@/components/finance/ui/estilo';
@@ -37,12 +38,15 @@ import { useAtalho } from '@/hooks/useAtalho';
  * antigo Estoque é o que alimenta o custo: o preço de referência de cada tecido (na tabela do
  * fornecedor), de cada insumo, e a tabela de personalização.
  */
-type Aba = 'tecidos' | 'produtos' | 'insumos' | 'personalizacao';
+type Aba = 'tecidos' | 'produtos' | 'insumos' | 'silk' | 'dtf' | 'bordado' | 'personalizacao';
 
 const ABAS: { id: Aba; label: string; icon: React.ElementType }[] = [
     { id: 'tecidos', label: 'Tecidos', icon: Layers },
     { id: 'produtos', label: 'Produtos', icon: Shirt },
     { id: 'insumos', label: 'Insumos', icon: Boxes },
+    { id: 'silk', label: 'Silk', icon: PaintBucket },
+    { id: 'dtf', label: 'DTF', icon: Printer },
+    { id: 'bordado', label: 'Bordado', icon: Scissors },
     { id: 'personalizacao', label: 'Personalização', icon: Brush },
 ];
 
@@ -248,6 +252,9 @@ const TabelasDeCusto: React.FC<Props> = ({ initialSearch, clearSearch, semPrecoI
             {aba === 'personalizacao' && <PersonalizacaoTab />}
 
             {aba === 'produtos' && <PlanilhaDeProdutos companyProfile={companyProfile} onAbrirProduto={onAbrirProduto} />}
+            {aba === 'silk' && <CustoSilk />}
+            {aba === 'dtf' && <CustoDtf />}
+            {aba === 'bordado' && <CustoBordado />}
 
             {aba === 'tecidos' && (<>
                 <div className={`${CARTAO} flex flex-wrap justify-between items-center gap-3 p-4`}>
