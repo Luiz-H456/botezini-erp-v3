@@ -3,11 +3,11 @@ import { useInsumos, useInsumosPaginated, useInventoryMutations } from '@/hooks/
 import { MesclarInsumo } from '@/components/inventory/MesclarInsumo';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { storageService } from '@/services/storage';
-import { Insumo } from '@/types';
+import { CompanyProfile, Insumo } from '@/types';
 import { ITENS_POR_PAGINA } from '@/utils/constants';
 import {
     Plus, Check, X, Package, Link2, Search,
-    ChevronRight, ChevronDown, StickyNote, Brush, Boxes, Layers
+    ChevronRight, ChevronDown, StickyNote, Brush, Boxes, Layers, Shirt
 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { DefinirPrecoModal } from '@/components/modals/DefinirPrecoModal';
@@ -18,6 +18,7 @@ import { idService } from '@/services/idService';
 import PersonalizacaoTab from '@/components/inventory/PersonalizacaoTab';
 import InsumoDetalhe from '@/components/inventory/InsumoDetalhe';
 import { TecidosPorFornecedor } from '@/components/tabelaVerdade/TecidosPorFornecedor';
+import { PlanilhaDeProdutos } from '@/components/tabelas/PlanilhaDeProdutos';
 import { SEM_CATEGORIA } from '@/repositories/inventoryRepository';
 import { MenuMais } from '@/components/common/MenuMais';
 import { CARTAO, CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula } from '@/components/finance/ui/estilo';
@@ -36,10 +37,11 @@ import { useAtalho } from '@/hooks/useAtalho';
  * antigo Estoque é o que alimenta o custo: o preço de referência de cada tecido (na tabela do
  * fornecedor), de cada insumo, e a tabela de personalização.
  */
-type Aba = 'tecidos' | 'insumos' | 'personalizacao';
+type Aba = 'tecidos' | 'produtos' | 'insumos' | 'personalizacao';
 
 const ABAS: { id: Aba; label: string; icon: React.ElementType }[] = [
     { id: 'tecidos', label: 'Tecidos', icon: Layers },
+    { id: 'produtos', label: 'Produtos', icon: Shirt },
     { id: 'insumos', label: 'Insumos', icon: Boxes },
     { id: 'personalizacao', label: 'Personalização', icon: Brush },
 ];
@@ -68,9 +70,13 @@ interface Props {
     limparSemPreco?: () => void;
     /** Abre a página do fornecedor (tabela de preços, v3.1): é lá que tecido nasce e muda. */
     onAbrirFornecedor?: (fornecedorId: string) => void;
+    /** Abre o cadastro do produto (aviamentos da ficha, calculadora, fotos). */
+    onAbrirProduto?: (produtoId: string) => void;
+    /** Alíquota e custo/hora da casa, para o custo da peça na planilha de produtos. */
+    companyProfile?: CompanyProfile | null;
 }
 
-const TabelasDeCusto: React.FC<Props> = ({ initialSearch, clearSearch, semPrecoInicial, limparSemPreco, onAbrirFornecedor }) => {
+const TabelasDeCusto: React.FC<Props> = ({ initialSearch, clearSearch, semPrecoInicial, limparSemPreco, onAbrirFornecedor, onAbrirProduto, companyProfile }) => {
     const [aba, setAba] = useLembrado<Aba>('tabelas.aba', 'tecidos');
     const { mostrar } = useMostrarValor();
     const referencia = useCustoDeReferencia();
@@ -240,6 +246,8 @@ const TabelasDeCusto: React.FC<Props> = ({ initialSearch, clearSearch, semPrecoI
             </div>
 
             {aba === 'personalizacao' && <PersonalizacaoTab />}
+
+            {aba === 'produtos' && <PlanilhaDeProdutos companyProfile={companyProfile} onAbrirProduto={onAbrirProduto} />}
 
             {aba === 'tecidos' && (<>
                 <div className={`${CARTAO} flex flex-wrap justify-between items-center gap-3 p-4`}>

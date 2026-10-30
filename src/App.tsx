@@ -313,6 +313,7 @@ const App: React.FC = () => {
         />;
       case 'tabelas': return <TabelasDeCusto initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}
         semPrecoInicial={tabelasSemPreco} limparSemPreco={() => setTabelasSemPreco(false)}
+        companyProfile={companyProfile} onAbrirProduto={(id) => handleNavigate('produtos', id)}
         onAbrirFornecedor={(id) => { setAberturaFornecedores({ fornecedorId: id }); handleNavigate('fornecedores'); }} />;
       case 'itens-vendidos': return <ItensVendidos />;
       case 'finance': return <Finance initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}

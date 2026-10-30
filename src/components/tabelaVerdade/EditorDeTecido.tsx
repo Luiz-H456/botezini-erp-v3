@@ -169,8 +169,8 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
                                 onClick={() => setFaixas(prev => [...prev, { nome: '' }])}><Plus size={14} /> Faixa</button>
                         </div>
                         <p className="text-[10px] text-zinc-600 mb-3 leading-relaxed">
-                            De 1 a {MAX_FAIXAS}, como a tabela do fornecedor. Cada faixa tem o seu preço na grade e o seu saldo no estoque.
-                            Faixa já usada (saldo, compra, ficha ou orçamento) não pode sair.
+                            De 1 a {MAX_FAIXAS}, como a tabela do fornecedor. Cada faixa tem o seu preço na grade.
+                            Faixa já usada (compra, sobra registrada, ficha ou orçamento) não pode sair.
                         </p>
                         <div className="space-y-2">
                             {faixas.map((f, i) => (

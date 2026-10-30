@@ -125,7 +125,8 @@ export const storageService = {
   leadDoCliente: async (clientId: string) => leadRepository.porCliente(clientId),
 
   getFichaPorProduto: async (): Promise<Map<string, string[]>> => inventoryRepository.getFichaPorProduto(),
-  getProductInsumosByProducts: async (ids: string[]) => inventoryRepository.getProductInsumosByProducts(ids),
+  getProductInsumosByProducts: async (ids: string[], opcoes?: { estrito?: boolean }) => inventoryRepository.getProductInsumosByProducts(ids, opcoes),
+  atualizarValoresDoProduto: async (id: string, campos: Parameters<InventoryRepository['atualizarValoresDoProduto']>[1]) => inventoryRepository.atualizarValoresDoProduto(id, campos),
 
   // -- PERSONALIZAÇÃO (bordado / DTF / silk / sublimação) --
   personalizacaoMigrada: async (): Promise<boolean> => personalizacaoRepository.migracaoAplicada(),

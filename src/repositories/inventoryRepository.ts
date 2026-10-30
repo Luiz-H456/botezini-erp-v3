@@ -268,7 +268,29 @@ export class InventoryRepository {
      * Os ids vão em blocos porque o `.in()` viaja na URL, e uma lista muito
      * longa estoura o limite de tamanho da requisição.
      */
-    async getProductInsumosByProducts(productIds: string[]): Promise<Map<string, ProductInsumo[]>> {
+    /**
+     * Grava só os valores padrão que a planilha de produtos edita (Tabelas de custo). Lista os campos
+     * em vez de espalhar o produto: o produto inteiro carrega custo calculado pelo banco, e regravar o
+     * objeto de quando a planilha abriu é o padrão que já custou dinheiro duas vezes (CLAUDE.md).
+     */
+    async atualizarValoresDoProduto(id: string, campos: {
+        default_fabric_insumo_id?: string | null; fabric_consumption_m?: number | null;
+        price_tier1?: number; price_tier2?: number; price_tier3?: number;
+    }): Promise<void> {
+        if (!supabase) throw new Error("Supabase não configurado");
+        const PERMITIDOS = ['default_fabric_insumo_id', 'fabric_consumption_m', 'price_tier1', 'price_tier2', 'price_tier3'] as const;
+        const patch: Record<string, unknown> = { updated_at: getNow().toISOString() };
+        for (const k of PERMITIDOS) {
+            if (!(k in campos)) continue;
+            const v = campos[k];
+            patch[k] = k.startsWith('price_tier') ? round2(Number(v) || 0) : v;
+        }
+        const { data, error } = await supabase.from('products').update(patch).eq('id', id).select('id');
+        if (error) throw new Error(error.message);
+        if (!data || data.length === 0) throw new Error('Produto não encontrado (ou sem permissão para editar).');
+    }
+
+    async getProductInsumosByProducts(productIds: string[], { estrito = false } = {}): Promise<Map<string, ProductInsumo[]>> {
         const porProduto = new Map<string, ProductInsumo[]>();
         if (!supabase || productIds.length === 0) return porProduto;
 
@@ -278,7 +300,8 @@ export class InventoryRepository {
             const bloco = unicos.slice(i, i + TAMANHO_BLOCO);
             const { data, error } = await supabase
                 .from('product_insumos').select('*').in('product_id', bloco);
-            if (error) { console.error('getProductInsumosByProducts:', error.message); continue; }
+            // Estrito: quem decide o que gravar não pode tomar falha de leitura por "sem ficha" (criaria linha repetida).
+            if (error) { if (estrito) throw new Error(error.message); console.error('getProductInsumosByProducts:', error.message); continue; }
             for (const r of (data || []) as ProductInsumo[]) {
                 const lista = porProduto.get(r.product_id) || [];
                 lista.push(r);
