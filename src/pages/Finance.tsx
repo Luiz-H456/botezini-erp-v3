@@ -40,6 +40,7 @@ import { nomeDoMes, mesDe, mesAnterior, proximoMes } from '@/utils/financas/base
 import { mensagemDeErro } from '@/utils/errorHandling';
 import { PagarEmLoteModal } from '@/components/finance/PagarEmLoteModal';
 import { montarLote } from '@/utils/financas/loteDePagamento';
+import { lerLembrado, gravarLembrado } from '@/hooks/useLembrado';
 interface FinanceProps {
     initialSearch?: string;
     clearSearch?: () => void;
@@ -143,7 +144,14 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
     /** id da obrigação -> contas onde o dinheiro passou. Alimenta o filtro por conta. */
     const [contasPorObrigacao, setContasPorObrigacao] = useState<Record<string, string[]>>({});
 
-    const [filtros, setFiltros] = useState<FiltrosDaLista>({ ...FILTROS_VAZIOS, ...(filtrosIniciais ?? {}) });
+    // Filtro que chega por link (Início, Resultado) vence o lembrado; sem link, volta como você deixou (R7).
+    // Mês, busca, recorte e cliente não são lembrados: são filtros de uma consulta, não preferência.
+    const [filtros, setFiltros] = useState<FiltrosDaLista>(() => filtrosIniciais
+        ? { ...FILTROS_VAZIOS, ...filtrosIniciais }
+        : { ...lerLembrado('contas.filtros', FILTROS_VAZIOS), mes: null, busca: '', recorte: null, clienteId: null });
+    useEffect(() => {
+        gravarLembrado('contas.filtros', { rapido: filtros.rapido, tipo: filtros.tipo, bancoId: filtros.bancoId, categoriaId: filtros.categoriaId });
+    }, [filtros.rapido, filtros.tipo, filtros.bancoId, filtros.categoriaId]);
     const [emColunas, setEmColunas] = useState(false);
     const [painelAberto, setPainelAberto] = useState(false);
     const searchInputRef = useRef<HTMLInputElement>(null);

@@ -11,6 +11,7 @@ import {
 import { getTodayStr, isDateInPeriod, isBudgetExpired } from '../utils';
 import { documentoCasa, indexarClientes } from '@/utils/buscaDeDocumentos';
 
+import { useLembrado } from '@/hooks/useLembrado';
 export function useBudgetController(
   initialSearch?: string,
   clearSearch?: () => void
@@ -23,10 +24,9 @@ export function useBudgetController(
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterClient, setFilterClient] = useState('ALL');
-  const [filterStatus, setFilterStatus] = useState('ALL');
-  const [filterPeriod, setFilterPeriod] = useState<
-    'ALL' | 'DAY' | 'WEEK' | 'MONTH'
-  >('ALL');
+  // Lembrados neste aparelho (auditoria R7).
+  const [filterStatus, setFilterStatus] = useLembrado('orcamentos.status', 'ALL');
+  const [filterPeriod, setFilterPeriod] = useLembrado<'ALL' | 'DAY' | 'WEEK' | 'MONTH'>('orcamentos.periodo', 'ALL');
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
 
   const loadData = async () => {

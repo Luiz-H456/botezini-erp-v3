@@ -30,6 +30,7 @@ import { numero } from '@/utils/numeros';
 import { semCamposDoEstoque } from '@/utils/fabrica/semCamposDoEstoque';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useLembrado } from '@/hooks/useLembrado';
 type AbaEstoque = 'insumos' | 'personalizacao';
 
 const ABAS: { id: AbaEstoque; label: string; icon: React.ElementType }[] = [
@@ -62,13 +63,13 @@ interface Props {
 }
 
 const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornecedor }) => {
-    const [aba, setAba] = useState<AbaEstoque>('insumos');
+    const [aba, setAba] = useLembrado<AbaEstoque>('estoque.aba', 'insumos');
 
     // ── Cadastro de tecido ────────────────────────────────────────────────
     // Desde a v3.1 o tecido nasce na tabela de preços do fornecedor: escolher o fornecedor leva lá.
     const [escolhendoFornecedor, setEscolhendoFornecedor] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [categoriaFiltro, setCategoriaFiltro] = useState('');
+    const [categoriaFiltro, setCategoriaFiltro] = useLembrado('estoque.categoria', '');
     const [soCriticos, setSoCriticos] = useState(false);
     const [expandido, setExpandido] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);

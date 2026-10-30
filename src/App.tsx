@@ -165,6 +165,17 @@ const App: React.FC = () => {
     return () => window.removeEventListener('popstate', aoVoltar);
   }, [isAuthenticated, userProfile?.role]);
 
+  // Rodinha do mouse em cima de um campo de número focado mudava o valor (um preço, uma quantidade)
+  // sem a pessoa perceber, ao rolar a página. Tira o foco: a página rola e o número fica (auditoria R6).
+  useEffect(() => {
+    const aoRolar = (e: WheelEvent) => {
+      const el = document.activeElement;
+      if (el instanceof HTMLInputElement && el.type === 'number' && el === e.target) el.blur();
+    };
+    document.addEventListener('wheel', aoRolar, { passive: true });
+    return () => document.removeEventListener('wheel', aoRolar);
+  }, []);
+
   // Busca geral (auditoria R1/N2): Ctrl+K de qualquer lugar; "/" quando não se está digitando.
   const [buscaAberta, setBuscaAberta] = useState(false);
   useEffect(() => {
