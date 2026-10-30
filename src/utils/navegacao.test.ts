@@ -94,3 +94,21 @@ test('seção inexistente não quebra', () => {
     assert.equal(secaoPorId(null), null);
     assert.equal(secaoDaView('login'), null);
 });
+
+test('endereço por tela: toda tela do menu tem endereço próprio e volta para ela mesma', async () => {
+    const { enderecoDaView, viewDoEndereco, todasAsViewsDoMenu: menu } = await import('./navegacao.ts');
+    for (const v of [...menu(), 'clientes', 'fornecedores', 'produtos', 'bancos', 'setores', 'empresa', 'categorias', 'mensagens', 'leads'] as const) {
+        const end = enderecoDaView(v);
+        assert.match(end, /^#\/[a-z0-9-]+$/, v);
+        assert.equal(viewDoEndereco(end), v, end);
+    }
+});
+
+test('endereço: apelidos levam à tela real; desconhecido, vazio e login não abrem nada', async () => {
+    const { enderecoDaView, viewDoEndereco } = await import('./navegacao.ts');
+    assert.equal(enderecoDaView('pcp'), enderecoDaView('quadro'));
+    assert.equal(viewDoEndereco('#/nao-existe'), null);
+    assert.equal(viewDoEndereco(''), null);
+    assert.equal(viewDoEndereco('#/entrar'), null);
+    assert.equal(viewDoEndereco('#/contas?x=1'), 'finance');
+});

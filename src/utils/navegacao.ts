@@ -121,3 +121,33 @@ export const temPassos = (id: SecaoId | null | undefined): boolean =>
     viewsDaSecao(id).length > 1;
 
 export const todasAsViewsDoMenu = (): View[] => SECOES.flatMap(s => s.views);
+
+// ── Endereço por tela (auditoria de 29/10, C1) ──────────────────────────────
+//
+// Sem endereço, F5 voltava ao Início e o "voltar" do navegador saía do app. O endereço é
+// o rótulo da tela sem acento (`#/contas`, `#/lista-de-compras`): legível, e não muda se
+// o nome interno da view mudar. Apelidos (pcp, masterdata…) levam ao endereço da tela real.
+
+const semAcento = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+const slugDe = (rotulo: string) => semAcento(rotulo).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+const VIEW_POR_SLUG: Map<string, View> = (() => {
+    const m = new Map<string, View>();
+    for (const v of Object.keys(ROTULO_DA_VIEW) as View[]) {
+        if (v === 'login' || ALIAS_DE_VIEW[v]) continue;
+        const slug = v === 'board' ? 'notas' : slugDe(ROTULO_DA_VIEW[v]);
+        if (!m.has(slug)) m.set(slug, v);
+    }
+    return m;
+})();
+
+export function enderecoDaView(view: View): string {
+    const real = viewReal(view);
+    for (const [slug, v] of VIEW_POR_SLUG) if (v === real) return `#/${slug}`;
+    return '#/inicio';
+}
+
+export function viewDoEndereco(hash: string | null | undefined): View | null {
+    const slug = (hash || '').replace(/^#\/?/, '').split(/[?/]/)[0];
+    return slug ? VIEW_POR_SLUG.get(slug) ?? null : null;
+}

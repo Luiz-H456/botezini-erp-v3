@@ -26,7 +26,7 @@ import { authService } from '@/services/auth';
 import { storageService } from '@/services/storage';
 import { UserProfile, CompanyProfile } from '@/types';
 import type { View, SecaoId } from '@/utils/navegacao';
-import { secaoDaView, temPassos, viewInicialDaSecao, viewReal, ROTULO_DA_VIEW, secaoPorId } from '@/utils/navegacao';
+import { secaoDaView, temPassos, viewInicialDaSecao, viewReal, ROTULO_DA_VIEW, secaoPorId, enderecoDaView, viewDoEndereco } from '@/utils/navegacao';
 import { useFilaDoInicio } from '@/hooks/inicio/useFilaDoInicio';
 import type { DestinoDaFila } from '@/utils/inicio/fila';
 import { BarraDeTopo } from '@/components/layout/BarraDeTopo';
@@ -125,9 +125,11 @@ const App: React.FC = () => {
         setIsAuthenticated(true);
         // Só agora: há sessão, e a leitura passa pela RLS.
         loadCompanyProfile();
-        // Set initial view based on role
+        // Tela inicial: a do endereço (F5 e link voltam para onde estavam); sem endereço, a do papel.
+        // A fábrica tem layout fixo e sempre abre no Quadro.
         if (currentView === 'login') {
-          setCurrentView(profile.role === 'factory' ? 'quadro' : 'dashboard');
+          const doEndereco = profile.role === 'factory' ? null : viewDoEndereco(window.location.hash);
+          setCurrentView(doEndereco ?? (profile.role === 'factory' ? 'quadro' : 'dashboard'));
         }
       } else {
         setIsAuthenticated(false);
@@ -142,7 +144,27 @@ const App: React.FC = () => {
     }
   };
 
+  // Endereço por tela (auditoria C1): cada troca de tela vira uma entrada no histórico do
+  // navegador, então o "voltar" anda dentro do app em vez de sair dele, e o F5 reabre a tela.
+  useEffect(() => {
+    if (!isAuthenticated || currentView === 'login') return;
+    const alvo = enderecoDaView(currentView);
+    if (window.location.hash !== alvo) window.history.pushState(null, '', alvo);
+    document.title = `${ROTULO_DA_VIEW[viewReal(currentView)]} · Botezini`;
+  }, [currentView, isAuthenticated]);
+  useEffect(() => {
+    const aoVoltar = () => {
+      if (!isAuthenticated || userProfile?.role === 'factory') return;
+      const v = viewDoEndereco(window.location.hash);
+      if (v) setCurrentView(v);
+    };
+    window.addEventListener('popstate', aoVoltar);
+    return () => window.removeEventListener('popstate', aoVoltar);
+  }, [isAuthenticated, userProfile?.role]);
+
   const handleLogout = async () => {
+    window.history.replaceState(null, '', window.location.pathname);
+    document.title = 'Botezini ERP';
     await authService.signOut();
     setIsAuthenticated(false);
     setUserProfile(null);
