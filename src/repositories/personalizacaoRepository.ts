@@ -1,6 +1,7 @@
 import { supabase } from '@/services/supabase';
 import { idService } from '@/services/idService';
 import { getNow } from '@/utils';
+import { isColunaAusente } from '@/utils/postgrestErrors';
 import {
     PersonalizacaoPreco,
     PersonalizacaoHistorico,
@@ -89,6 +90,8 @@ export class PersonalizacaoRepository {
         return (data || []).map((a: any) => ({
             ...a,
             cliente_nome: a.clients?.company_name,
+            tecnica: a.tecnica ?? 'bordado',
+            arquivos: Array.isArray(a.arquivos) ? a.arquivos : [],
             pontos: a.pontos === null ? null : Number(a.pontos),
             tempo_minutos: a.tempo_minutos === null ? null : Number(a.tempo_minutos),
             clients: undefined,
@@ -101,7 +104,10 @@ export class PersonalizacaoRepository {
         if (!user) throw new Error('Usuário não autenticado');
 
         const now = getNow().toISOString();
-        const { cliente_nome, clients, ...rest } = arte as any;
+        // `arquivos` fica de fora: o formulário guarda a lista de quando abriu, e salvar depois de um
+        // upload apagaria o arquivo novo (o padrão "linha inteira" do CLAUDE.md). Arquivo só muda por
+        // definirArquivosDaEstampa.
+        const { cliente_nome, clients, arquivos, ...rest } = arte as any;
         const payload = {
             ...rest,
             id: arte.id || idService.generateUUID(),
@@ -111,12 +117,26 @@ export class PersonalizacaoRepository {
             tempo_minutos: inteiroOuNulo(arte.tempo_minutos),
             largura_mm: inteiroOuNulo(arte.largura_mm),
             altura_mm: inteiroOuNulo(arte.altura_mm),
+            numero_de_cores: inteiroOuNulo(arte.numero_de_cores),
             feita_em: arte.feita_em || null,
             updated_at: now,
             created_at: arte.created_at || now,
         };
         const { error } = await supabase.from('artes_bordado').upsert(payload);
+        if (error && (isColunaAusente(error, 'tecnica') || isColunaAusente(error, 'numero_de_cores'))) {
+            throw new Error('O banco ainda não tem a biblioteca de estampas: rode supabase/estampas_v3_d.sql.');
+        }
         if (error) throw new Error(error.message);
+    }
+
+    /** A lista inteira de arquivos de uma estampa, gravada sozinha (ver saveArte). */
+    async definirArquivosDaEstampa(id: string, arquivos: string[]): Promise<void> {
+        if (!supabase) throw new Error('Supabase não configurado');
+        const { data, error } = await supabase.from('artes_bordado')
+            .update({ arquivos, updated_at: getNow().toISOString() }).eq('id', id).select('id');
+        if (error && isColunaAusente(error, 'arquivos')) throw new Error('O banco ainda não tem a biblioteca de estampas: rode supabase/estampas_v3_d.sql.');
+        if (error) throw new Error(error.message);
+        if (!data || data.length === 0) throw new Error('Estampa não encontrada.');
     }
 
     async deleteArte(id: string): Promise<void> {

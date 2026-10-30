@@ -18,7 +18,7 @@ type SubAba = 'tabela' | 'artes' | 'historico' | 'notas';
 
 const SUBABAS: { id: SubAba; label: string; icon: React.ElementType }[] = [
     { id: 'tabela', label: 'Tabela de Preços', icon: Table2 },
-    { id: 'artes', label: 'Artes de Bordado', icon: Palette },
+    { id: 'artes', label: 'Estampas', icon: Palette },
     { id: 'historico', label: 'Histórico', icon: History },
     { id: 'notas', label: 'Notas', icon: StickyNote },
 ];

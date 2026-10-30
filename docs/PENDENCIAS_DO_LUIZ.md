@@ -35,7 +35,17 @@ Está no ramo `feat/v3.1-tabela-verdade`, testada no banco local. **Não vai par
   ainda se usa, crie o tecido em Fornecedor › Tabela de preços › "Novo tecido": DRY, TWO-WAY, BRIM SANTISTA, PRADA,
   TACTEL, MOLETOM, JEANS CEDRO 100% ALGODÃO, HELANCA PREMIUM, GABARDINE C/ LYCRA, GABARDINE MN, NAPA, OXFORD,
   MALHA PV JUMIRIM, Tecido Térmico Acolchoado, Lâmina PVC Impermeável.
-  (O insumo antigo continua no Estoque com o saldo; quando quiser, junte os dois pelo "Mesclar" do Estoque.)
+  (O insumo antigo continua em Tabelas de custo › Insumos; quando quiser, junte os dois pelo "Mesclar" dele.)
+
+### 1b. Estampas com arquivos (parte D, 30/10) — depois do 1.1
+
+- [ ] **1.7 Rodar `supabase/estampas_v3_d.sql`** no mesmo SQL Editor.
+  - O que faz: as artes de bordado viram a biblioteca de **Estampas** (bordado, silk, DTF, sublimação) e cada uma
+    ganha a lista de arquivos (PDF, foto, .cdr, .dst). Só acrescenta colunas; as artes de hoje ficam como bordado.
+  - O que assume: `supabase/personalizacao_precos_e_artes.sql` já aplicado.
+  - Pode rodar mais de uma vez. **Conferir:** a última tabela (DEPOIS) mostra `bordado` com o mesmo número de
+    artes da primeira (ANTES).
+  - Sem ele, salvar uma estampa avisa "rode supabase/estampas_v3_d.sql" em vez de quebrar.
 
 ---
 

@@ -146,7 +146,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                     )}
                     {origem === 'artes' && artesVisiveis.length === 0 && (
                         <p className="p-12 text-center text-zinc-500 text-sm">
-                            Nenhuma arte cadastrada. Cadastre em <b className="text-zinc-300">Tabelas de custo → Personalização → Artes de Bordado</b>.
+                            Nenhuma arte cadastrada. Cadastre em <b className="text-zinc-300">Tabelas de custo → Personalização → Estampas</b>.
                         </p>
                     )}
 

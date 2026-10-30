@@ -243,8 +243,15 @@ export interface PersonalizacaoPreco extends DbEntity {
 }
 
 /** Cadastro próprio da arte — o mesmo logo serve vários pedidos por anos. */
+/** Estampa de qualquer técnica (parte D, 30/10). O nome do tipo é histórico: começou só com bordado. */
 export interface ArteBordado extends DbEntity {
   nome: string;
+  /** Ausente = bordado (o padrão do banco; artes de antes da parte D). */
+  tecnica?: TecnicaPersonalizacao;
+  /** Caminhos no bucket (PDF, foto, .cdr, .dst). Só definirArquivosDaEstampa grava. */
+  arquivos?: string[];
+  /** Silk: cada cor é uma tela. */
+  numero_de_cores?: number | null;
   cliente_id?: string | null;
   cliente_nome?: string;   // denormalizado na leitura
   pontos?: number | null;

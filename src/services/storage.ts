@@ -136,6 +136,7 @@ export const storageService = {
   getArtesBordado: async (): Promise<ArteBordado[]> => personalizacaoRepository.getArtes(),
   saveArteBordado: async (a: Partial<ArteBordado>) => personalizacaoRepository.saveArte(a),
   deleteArteBordado: async (id: string) => personalizacaoRepository.deleteArte(id),
+  definirArquivosDaEstampa: async (id: string, arquivos: string[]) => personalizacaoRepository.definirArquivosDaEstampa(id, arquivos),
   getPersonalizacaoHistorico: async (): Promise<PersonalizacaoHistorico[]> => personalizacaoRepository.getHistorico(),
   savePersonalizacaoHistorico: async (h: Partial<PersonalizacaoHistorico>) => personalizacaoRepository.saveHistorico(h),
   deletePersonalizacaoHistorico: async (id: string) => personalizacaoRepository.deleteHistorico(id),

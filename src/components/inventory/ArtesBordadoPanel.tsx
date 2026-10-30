@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Check, X, Pencil, Trash2, Palette, Search, FolderOpen, Clock, Info } from 'lucide-react';
-import { ArteBordado, PersonalizacaoNotas } from '@/types';
+import { ArteBordado, PersonalizacaoNotas, TecnicaPersonalizacao } from '@/types';
+import { ArquivosDaEstampa } from './ArquivosDaEstampa';
 import { formatCurrency } from '@/utils';
 import { storageService } from '@/services/storage';
 import { coresDaArte, ritmoDeBordado, estimarTempo, sugerirPrecoBordado } from '@/utils/personalizacao';
@@ -9,12 +10,17 @@ import { usePersonalizacaoMutations } from '@/hooks/usePersonalizacao';
 import { useToast } from '@/hooks/useToast';
 import { DeleteConfirmModal } from '@/components/modals/DeleteConfirmModal';
 import SearchableSelect from '@/components/common/SearchableSelect';
-import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
+import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO, pilula } from '@/components/finance/ui/estilo';
 
 const inputCls = `${CAMPO} w-full`;
 
-const vazia = (): Partial<ArteBordado> => ({
-    nome: '', cliente_id: null, pontos: null, cores_linha: '', tempo_minutos: null,
+const TECNICAS: { v: TecnicaPersonalizacao; l: string }[] = [
+    { v: 'bordado', l: 'Bordado' }, { v: 'silk', l: 'Silk' }, { v: 'dtf', l: 'DTF' }, { v: 'sublimacao', l: 'Sublimação' },
+];
+const rotuloDaTecnica = (t?: TecnicaPersonalizacao) => TECNICAS.find(x => x.v === (t ?? 'bordado'))?.l ?? 'Bordado';
+
+const vazia = (tecnica: TecnicaPersonalizacao = 'bordado'): Partial<ArteBordado> => ({
+    nome: '', tecnica, numero_de_cores: null, cliente_id: null, pontos: null, cores_linha: '', tempo_minutos: null,
     local_do_arquivo: '', largura_mm: null, altura_mm: null, observacoes: '',
     feita_em: new Date().toISOString().slice(0, 10), is_active: true,
 });
@@ -28,6 +34,9 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
     const [form, setForm] = useState<Partial<ArteBordado>>(vazia());
     const [busca, setBusca] = useState('');
     const [paraExcluir, setParaExcluir] = useState<ArteBordado | null>(null);
+    const [tecnicaFiltro, setTecnicaFiltro] = useState<TecnicaPersonalizacao | ''>('');
+    const qc = useQueryClient();
+    const recarregar = () => qc.invalidateQueries({ queryKey: ['personalizacao'] });
 
     const { data: clients = [] } = useQuery({
         queryKey: ['clients'],
@@ -40,29 +49,30 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
 
     const filtradas = useMemo(() => {
         const q = busca.trim().toLowerCase();
-        if (!q) return artes;
-        return artes.filter(a =>
+        const daTecnica = tecnicaFiltro ? artes.filter(a => (a.tecnica ?? 'bordado') === tecnicaFiltro) : artes;
+        if (!q) return daTecnica;
+        return daTecnica.filter(a =>
             a.nome?.toLowerCase().includes(q) ||
             a.cliente_nome?.toLowerCase().includes(q) ||
             a.cores_linha?.toLowerCase().includes(q) ||
             a.local_do_arquivo?.toLowerCase().includes(q));
-    }, [artes, busca]);
+    }, [artes, busca, tecnicaFiltro]);
 
     const sugestaoDoForm = sugerirPrecoBordado(form.pontos, notasBordado);
     const tempoEstimado = estimarTempo(form.pontos, ritmo);
 
     const salvar = async () => {
-        if (!form.nome?.trim()) { showToast('Dê um nome para a arte.', 'error'); return; }
+        if (!form.nome?.trim()) { showToast('Dê um nome para a estampa.', 'error'); return; }
         try {
             await saveArte.mutateAsync({ ...form, id: editando === 'nova' ? undefined : editando! });
-            showToast('Arte salva.', 'success');
+            showToast(editando === 'nova' ? 'Estampa salva. Os arquivos se anexam no cartão dela.' : 'Estampa salva.', 'success');
             setEditando(null); setForm(vazia());
         } catch (e: any) { showToast(e.message || 'Erro ao salvar', 'error'); }
     };
 
     const excluir = async () => {
         if (!paraExcluir) return;
-        try { await deleteArte.mutateAsync(paraExcluir.id); showToast('Arte removida.', 'success'); setParaExcluir(null); }
+        try { await deleteArte.mutateAsync(paraExcluir.id); showToast('Estampa removida.', 'success'); setParaExcluir(null); }
         catch (e: any) { showToast(e.message || 'Erro ao excluir', 'error'); }
     };
 
@@ -71,13 +81,13 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
             <div className={`flex flex-wrap gap-4 justify-between items-start ${CARTAO} p-5`}>
                 <div>
                     <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
-                        <Palette className="text-amber-500" size={18} /> Artes de Bordado
+                        <Palette className="text-amber-500" size={18} /> Estampas
                     </h3>
                     <p className={`${ROTULO} mt-2`}>
-                        Cadastro próprio: o mesmo logo serve vários pedidos por anos. Pontos, cores e tempo ficam guardados.
+                        O mesmo logo serve vários pedidos por anos: medidas, cores, pontos e os arquivos (PDF, foto, .cdr, .dst) ficam guardados.
                     </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                     {ritmo !== null && (
                         <span className={`text-[10px] text-zinc-500 uppercase tracking-widest font-bold ${ITEM} px-3 py-2 flex items-center gap-2`}
                             title="Média das artes que têm pontos E tempo cronometrado">
@@ -85,24 +95,41 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                         </span>
                     )}
                     <div className="relative">
-                        <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar arte..."
-                            className={`${CAMPO} pl-9 w-52`} />
+                        <input value={busca} onChange={e => setBusca(e.target.value)} placeholder="Buscar estampa..." aria-label="Buscar estampa"
+                            className={`${CAMPO} pl-9 w-52 max-w-full`} />
                         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
                     </div>
                     {editando === null && (
-                        <button onClick={() => { setForm(vazia()); setEditando('nova'); }}
+                        <button onClick={() => { setForm(vazia(tecnicaFiltro || 'bordado')); setEditando('nova'); }}
                             className={BOTAO_PRINCIPAL}>
-                            <Plus size={14} /> Nova Arte
+                            <Plus size={14} /> Nova estampa
                         </button>
                     )}
                 </div>
             </div>
 
+            <div className="flex flex-wrap items-center gap-1">
+                <button type="button" onClick={() => setTecnicaFiltro('')} className={pilula(tecnicaFiltro === '')}>Todas <span className="opacity-60">{artes.length}</span></button>
+                {TECNICAS.map(t => {
+                    const n = artes.filter(a => (a.tecnica ?? 'bordado') === t.v).length;
+                    return <button key={t.v} type="button" onClick={() => setTecnicaFiltro(tecnicaFiltro === t.v ? '' : t.v)} className={pilula(tecnicaFiltro === t.v)}>{t.l} <span className="opacity-60">{n}</span></button>;
+                })}
+            </div>
+
             {editando !== null && (
                 <div className="bg-zinc-900 border border-amber-500/30 rounded-2xl p-5 space-y-4 ease-out animate-in slide-in-from-top-2 duration-200">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="col-span-2 md:col-span-4">
+                            <span className={`${ROTULO_PEQUENO} block mb-1`}>Técnica</span>
+                            <div className="flex flex-wrap gap-1">
+                                {TECNICAS.map(t => (
+                                    <button key={t.v} type="button" aria-pressed={(form.tecnica ?? 'bordado') === t.v}
+                                        onClick={() => setForm(f => ({ ...f, tecnica: t.v }))} className={pilula((form.tecnica ?? 'bordado') === t.v)}>{t.l}</button>
+                                ))}
+                            </div>
+                        </div>
                         <div className="col-span-2">
-                            <label className={`${ROTULO_PEQUENO} block mb-1`}>Nome da arte*</label>
+                            <label className={`${ROTULO_PEQUENO} block mb-1`}>Nome da estampa*</label>
                             <input className={inputCls} placeholder="Ex: Logo Transportadora Silva — peito"
                                 value={form.nome || ''} onChange={e => setForm(f => ({ ...f, nome: e.target.value }))} />
                         </div>
@@ -123,6 +150,14 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                        {form.tecnica === 'silk' && (
+                            <div>
+                                <label className={`${ROTULO_PEQUENO} block mb-1`} title="Cada cor é uma tela">Nº de cores</label>
+                                <input type="number" min={1} className={`${inputCls} text-right font-mono`} placeholder="1"
+                                    value={form.numero_de_cores ?? ''} onChange={e => setForm(f => ({ ...f, numero_de_cores: e.target.value === '' ? null : Number(e.target.value) }))} />
+                            </div>
+                        )}
+                        {(form.tecnica ?? 'bordado') === 'bordado' && (<>
                         <div>
                             <label className={`${ROTULO_PEQUENO} block mb-1`}>Pontos</label>
                             <input type="number" className={`${inputCls} text-right font-mono`} placeholder="0"
@@ -134,6 +169,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                 placeholder={tempoEstimado !== null ? `~${tempoEstimado}` : '—'}
                                 value={form.tempo_minutos ?? ''} onChange={e => setForm(f => ({ ...f, tempo_minutos: e.target.value === '' ? null : Number(e.target.value) }))} />
                         </div>
+                        </>)}
                         <div>
                             <label className={`${ROTULO_PEQUENO} block mb-1`}>Largura (mm)</label>
                             <input type="number" className={`${inputCls} text-right font-mono`}
@@ -145,7 +181,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                 value={form.altura_mm ?? ''} onChange={e => setForm(f => ({ ...f, altura_mm: e.target.value === '' ? null : Number(e.target.value) }))} />
                         </div>
                         <div>
-                            <label className={`${ROTULO_PEQUENO} block mb-1`}>Cores de linha</label>
+                            <label className={`${ROTULO_PEQUENO} block mb-1`}>{(form.tecnica ?? 'bordado') === 'bordado' ? 'Cores de linha' : 'Cores'}</label>
                             <input className={inputCls} placeholder="Branco, Azul Marinho, Dourado"
                                 value={form.cores_linha || ''} onChange={e => setForm(f => ({ ...f, cores_linha: e.target.value }))} />
                         </div>
@@ -163,7 +199,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                             value={form.observacoes || ''} onChange={e => setForm(f => ({ ...f, observacoes: e.target.value }))} />
                     </div>
 
-                    <p className={`text-[10px] text-zinc-500 ${ITEM} px-3 py-2 flex items-start gap-2`}>
+                    {(form.tecnica ?? 'bordado') === 'bordado' && <p className={`text-[10px] text-zinc-500 ${ITEM} px-3 py-2 flex items-start gap-2`}>
                         <Info size={12} className="text-amber-500 mt-0.5 shrink-0" />
                         <span>
                             <b className="text-zinc-400">Sugestão de preço:</b>{' '}
@@ -171,14 +207,15 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                             <span className="text-zinc-600">{sugestaoDoForm.memoria}</span>
                             {' '}É só uma referência — o preço final é sempre seu.
                         </span>
-                    </p>
+                    </p>}
+                    {editando === 'nova' && <p className="text-[10px] text-zinc-500">Os arquivos (PDF, foto, .cdr, .dst) se anexam no cartão, depois de salvar.</p>}
 
                     <div className="flex gap-3 justify-end pt-3 border-t border-zinc-800/50">
                         <button onClick={() => { setEditando(null); setForm(vazia()); }}
                             className={BOTAO_SECUNDARIO}><X size={14} /> Cancelar</button>
                         <button onClick={salvar} disabled={saveArte.isPending}
                             className={BOTAO_PRINCIPAL}>
-                            <Check size={14} /> Salvar Arte
+                            <Check size={14} /> Salvar estampa
                         </button>
                     </div>
                 </div>
@@ -187,8 +224,8 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
             {filtradas.length === 0 && editando === null ? (
                 <div className={`p-16 text-center ${CARTAO}`}>
                     <Palette size={40} className="mx-auto text-zinc-700 mb-4" />
-                    <p className="text-zinc-400 font-medium mb-1">{busca ? 'Nenhuma arte encontrada.' : 'Nenhuma arte cadastrada ainda.'}</p>
-                    {!busca && <p className="text-zinc-600 text-xs">Cadastre as artes que você mais repete — é o que evita redescobrir os pontos toda vez.</p>}
+                    <p className="text-zinc-400 font-medium mb-1">{busca || tecnicaFiltro ? 'Nenhuma estampa encontrada.' : 'Nenhuma estampa cadastrada ainda.'}</p>
+                    {!busca && !tecnicaFiltro && <p className="text-zinc-600 text-xs">Cadastre as estampas que você mais repete, com os arquivos: é o que evita procurar o .dst de novo.</p>}
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -200,9 +237,10 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="min-w-0">
                                         <p className="font-black text-white uppercase tracking-wide text-xs truncate">{a.nome}</p>
-                                        <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{a.cliente_nome || 'Arte genérica'}</p>
+                                        <p className="text-[10px] text-zinc-500 mt-0.5 truncate">{rotuloDaTecnica(a.tecnica)} · {a.cliente_nome || 'genérica'}{a.tecnica === 'silk' && a.numero_de_cores ? ` · ${a.numero_de_cores} cor(es)` : ''}</p>
                                     </div>
-                                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                                    {/* Some só onde há mouse: no toque não existe hover, e o botão escondido não existiria. */}
+                                    <div className="flex gap-2 transition-all shrink-0 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 focus-within:opacity-100">
                                         <button onClick={() => { setForm({ ...a }); setEditando(a.id); }} title="Editar" aria-label="Editar"
                                             className={`${BOTAO_SECUNDARIO} w-10 px-0`}><Pencil size={18} /></button>
                                         <button onClick={() => setParaExcluir(a)} title="Excluir" aria-label="Excluir"
@@ -210,7 +248,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-2 text-center">
+                                {(a.tecnica ?? 'bordado') === 'bordado' && <div className="grid grid-cols-3 gap-2 text-center">
                                     <div className="bg-zinc-950/50 rounded-xl py-2">
                                         <p className={ROTULO_PEQUENO}>Pontos</p>
                                         <p className="font-mono font-black text-white text-sm">{a.pontos ? a.pontos.toLocaleString('pt-BR') : '—'}</p>
@@ -229,7 +267,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                         <p className={ROTULO_PEQUENO} title="Sugestão pelo preço por mil pontos — não é preço fechado">Sugerido</p>
                                         <p className="font-mono font-black text-amber-500 text-sm">{sug.valor !== null ? formatCurrency(sug.valor) : '—'}</p>
                                     </div>
-                                </div>
+                                </div>}
 
                                 {(a.largura_mm || a.altura_mm) && (
                                     <p className="text-[10px] text-zinc-500">
@@ -258,6 +296,8 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                         Feita em {new Date(a.feita_em + 'T12:00:00').toLocaleDateString('pt-BR')}
                                     </p>
                                 )}
+
+                                <ArquivosDaEstampa estampaId={a.id} arquivos={a.arquivos ?? []} onMudou={recarregar} />
                             </div>
                         );
                     })}
