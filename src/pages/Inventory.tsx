@@ -31,6 +31,7 @@ import { semCamposDoEstoque } from '@/utils/fabrica/semCamposDoEstoque';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
 import { useLembrado } from '@/hooks/useLembrado';
+import { useAtalho } from '@/hooks/useAtalho';
 type AbaEstoque = 'insumos' | 'personalizacao';
 
 const ABAS: { id: AbaEstoque; label: string; icon: React.ElementType }[] = [
@@ -255,6 +256,9 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
             <p className="text-[10px] font-black uppercase tracking-widest">Sincronizando Almoxarifado...</p>
         </div>;
     }
+
+    // N abre um insumo novo (auditoria N2).
+    useAtalho({ novo: () => { if (aba === 'insumos' && editingId === null) startNew(); } });
 
     return (
         <div className="space-y-4 w-full">

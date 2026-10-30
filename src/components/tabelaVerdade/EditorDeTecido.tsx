@@ -13,6 +13,7 @@ import type { CorDaCartela } from '@/utils/nomeDeTecido';
 import { ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
 import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
+import { useAtalho } from '@/hooks/useAtalho';
 /**
  * O tecido da tabela verdade (v3.1): nome, unidade, rendimento, faixas de cor (1 a 6, livres)
  * e a cartela que liga cada cor a uma faixa. Salva tudo numa chamada (salvar_tecido_tipo), que
@@ -104,6 +105,8 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
             setSalvando(false);
         }
     };
+
+    useAtalho({ salvar: () => { if (!salvando) void salvar(); } });
 
     const opcoesDeFaixa = nomesDasFaixas.map(f => ({ value: f, label: f.toUpperCase() }));
 

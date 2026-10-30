@@ -20,6 +20,7 @@ import SearchableSelect from '@/components/common/SearchableSelect';
 import { SETOR } from '@/components/masterdata/setoresDeCategoria';
 import { AtalhosDeCategoria } from '@/components/masterdata/AtalhosDeCategoria';
 import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
+import { useAtalho } from '@/hooks/useAtalho';
 import {
     agruparPorCategoria, agruparPorTipo, opcoesDeCategoria, TIPO_DE_CONTA,
 } from '@/utils/opcoesAgrupadas';
@@ -147,6 +148,7 @@ export function ObligationForm({ type, clients, suppliers, bankAccounts, globalC
 
     // Fechar com alteração pergunta antes (auditoria C3): o clique fora perdia a conta digitada.
     const saida = useSaidaProtegida(onClose);
+    useAtalho({ salvar: () => (isAlreadyPaid && mode === 'once' ? setConfirmando(true) : handleSubmit()) });
     const fechar = saida.pedirParaFechar;
 
     return <>{saida.confirmacao}{createPortal(

@@ -41,6 +41,7 @@ import { mensagemDeErro } from '@/utils/errorHandling';
 import { PagarEmLoteModal } from '@/components/finance/PagarEmLoteModal';
 import { montarLote } from '@/utils/financas/loteDePagamento';
 import { lerLembrado, gravarLembrado } from '@/hooks/useLembrado';
+import { useAtalho } from '@/hooks/useAtalho';
 interface FinanceProps {
     initialSearch?: string;
     clearSearch?: () => void;
@@ -407,6 +408,9 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
     );
     const lote = montarLote(obligations, selecionadas);
     const somaDaLista = (contas: ObligationSummary[]) => contas.reduce((s, o) => s + valorDaLinha(o), 0);
+
+    // N abre uma conta a pagar nova (auditoria N2).
+    useAtalho({ novo: () => setShowForm('payable'), ativo: !showForm });
 
     return (
         <div className="min-h-screen min-h-svh bg-zinc-950 text-white">

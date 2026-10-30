@@ -31,6 +31,7 @@ import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SEC
 
 import { avisar } from '@/utils/avisos';
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useAtalho } from '@/hooks/useAtalho';
 interface Props {
     onNavigate?: (view: 'orders' | 'budgets', searchTerm?: string) => void;
     initialSearch?: string;
@@ -531,6 +532,9 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
         // ser desfeita", que e verdade sobre tudo e informacao sobre nada.
         setExcluindoOrcamento(budget);
     };
+
+    // N abre um orçamento novo (auditoria N2).
+    useAtalho({ novo: () => handleOpenEditor(), ativo: !isEditorOpen });
 
     return (
         <>
