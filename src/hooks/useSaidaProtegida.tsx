@@ -44,5 +44,8 @@ export function useSaidaProtegida(fechar: () => void, sujo?: boolean) {
     /** Espalhe no painel: `<div {...aoMexer}>`. */
     const aoMexer = { onChangeCapture: () => { if (!alteradoRef.current) setMexeu(true); } };
 
-    return { pedirParaFechar, confirmacao, aoMexer, alterado, marcarMexeu: () => setMexeu(true) };
+    /** Janela que fica montada entre aberturas: zere ao fechar, senão a próxima já nasce "alterada". */
+    const limpar = useCallback(() => { setMexeu(false); setPerguntando(false); }, []);
+
+    return { pedirParaFechar, confirmacao, aoMexer, alterado, limpar, marcarMexeu: () => setMexeu(true) };
 }

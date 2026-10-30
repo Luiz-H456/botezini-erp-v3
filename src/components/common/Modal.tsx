@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,13 +34,18 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   maxWidth = 'lg',
 }) => {
+  // O X com algo digitado pergunta antes (cadastro de cliente, produto, fornecedor… — auditoria C3).
+  const saida = useSaidaProtegida(onClose);
+  const { limpar } = saida;
+  useEffect(() => { if (!isOpen) limpar(); }, [isOpen, limpar]);
   if (!isOpen) return null;
 
   // Portal no body: o véu cobre menu lateral e cabeçalho mesmo quando o modal
   // é aberto de dentro do <main>.
   return createPortal(
     <div className="fixed inset-0 bg-zinc-950/80 z-modal flex items-center justify-center p-4 backdrop-blur-md ease-out animate-in fade-in duration-200">
-      <div
+      {saida.confirmacao}
+      <div {...saida.aoMexer}
         className={`bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl w-full backdrop-blur-xl relative overflow-hidden flex flex-col max-h-full ${MAX_WIDTH_CLASS[maxWidth]} ${className}`}
       >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"></div>
@@ -50,7 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
             </h2>
             <button
               type="button"
-              onClick={onClose}
+              onClick={saida.pedirParaFechar}
               aria-label="Fechar"
               className="p-2 text-zinc-600 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
             >

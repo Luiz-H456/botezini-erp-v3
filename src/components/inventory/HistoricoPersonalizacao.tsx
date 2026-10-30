@@ -16,6 +16,7 @@ import { ITENS_POR_PAGINA } from '@/utils/constants';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
+import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 const inputCls = `${CAMPO} w-full`;
 
 const vazio = (): Partial<PersonalizacaoHistorico> => ({
@@ -79,6 +80,8 @@ const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) 
         } catch (e: any) { showToast(e.message || 'Erro ao lançar', 'error'); }
     };
 
+    // Exclusão sem volta pergunta antes (achado da segunda passada da auditoria).
+    const [aExcluir, setAExcluir] = useState<string | null>(null);
     const excluir = async (id: string) => {
         try { await deleteHistorico.mutateAsync(id); showToast('Lançamento removido.', 'success'); }
         catch (e: any) { showToast(e.message || 'Erro ao excluir', 'error'); }
@@ -86,6 +89,8 @@ const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) 
 
     return (
         <div className="space-y-4">
+            {aExcluir && <ConfirmarOperacao operacaoId="excluir-lancamento-personalizacao" onCancelar={() => setAExcluir(null)}
+                onConfirmar={async () => { const id = aExcluir; setAExcluir(null); await excluir(id); }} />}
             {/* Resumo por técnica */}
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
                 {TECNICAS.map(t => {
@@ -274,7 +279,7 @@ const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) 
                                     <td className="p-4 text-right font-mono text-zinc-300 text-sm">{formatCurrency(h.valor_unitario)}</td>
                                     <td className="p-4 text-right font-mono font-black text-amber-500">{formatCurrency(h.quantidade * h.valor_unitario)}</td>
                                     <td className="p-4">
-                                        <button onClick={() => excluir(h.id)} title="Excluir" aria-label="Excluir"
+                                        <button onClick={() => setAExcluir(h.id)} title="Excluir" aria-label="Excluir"
                                             className={`${BOTAO_PERIGO} w-10 px-0 opacity-0 group-hover:opacity-100`}><Trash2 size={18} /></button>
                                     </td>
                                 </tr>

@@ -11,6 +11,7 @@ import { GlobalCategorySelect } from '@/components/masterdata/GlobalCategorySele
 import { GlobalCategoryQuickAdd } from './GlobalCategoryQuickAdd';
 import { InfoTooltip } from '@/components/common';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 type EntityType = 'client' | 'supplier' | 'product' | 'insumo';
 
 interface Props {
@@ -188,7 +189,10 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
     };
 
     // Com o painel de categoria aberto, o Esc é dele (ele trata e fecha só ele).
-    useEscFecha(isOpen && !showCategoryAdd, onClose);
+    const saida = useSaidaProtegida(onClose);
+    const { limpar } = saida;
+    useEffect(() => { if (!isOpen) limpar(); }, [isOpen, limpar]);
+    useEscFecha(isOpen && !showCategoryAdd, saida.pedirParaFechar);
 
     if (!isOpen) return null;
 
@@ -205,9 +209,9 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
         return <Package size={16} className="text-amber-500" />;
     };
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 bg-zinc-950/80 flex items-center justify-center z-sobreposto p-4 backdrop-blur-md ease-out animate-in fade-in duration-200">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-sm max-h-full flex flex-col overflow-hidden transform transition-all scale-100 backdrop-blur-xl relative">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl shadow-2xl w-full max-w-sm max-h-full flex flex-col overflow-hidden transform transition-all scale-100 backdrop-blur-xl relative" {...saida.aoMexer}>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"></div>
                 {/* Header */}
                 <div className="shrink-0 p-6 bg-zinc-950/50 border-b border-zinc-900 flex justify-between items-center">
@@ -217,7 +221,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                         </div>
                         <h3 className="font-black text-white text-[10px] uppercase tracking-[0.2em]">{getTitle()}</h3>
                     </div>
-                    <button type="button" onClick={onClose} aria-label="Fechar" className="p-2 text-zinc-600 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg">
+                    <button type="button" onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 text-zinc-600 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg">
                         <X size={18} />
                     </button>
                 </div>
@@ -509,7 +513,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
             )}
         </div>,
         document.body,
-    );
+    )}</>;
 };
 
 export default QuickCreateModal;

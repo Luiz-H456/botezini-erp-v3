@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/useToast';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
+import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 const inputCls = `${CAMPO} w-full`;
 
 const vazio = (): Partial<PersonalizacaoPreco> => ({
@@ -32,6 +33,8 @@ const TabelaDePrecos: React.FC<Props> = ({ precos }) => {
         } catch (e: any) { showToast(e.message || 'Erro ao salvar', 'error'); }
     };
 
+    // Exclusão sem volta pergunta antes (achado da segunda passada da auditoria).
+    const [aExcluir, setAExcluir] = useState<string | null>(null);
     const excluir = async (id: string) => {
         try { await deletePreco.mutateAsync(id); showToast('Linha removida.', 'success'); }
         catch (e: any) { showToast(e.message || 'Erro ao excluir', 'error'); }
@@ -107,6 +110,8 @@ const TabelaDePrecos: React.FC<Props> = ({ precos }) => {
 
     return (
         <div className="space-y-4">
+            {aExcluir && <ConfirmarOperacao operacaoId="excluir-preco-personalizacao" onCancelar={() => setAExcluir(null)}
+                onConfirmar={async () => { const id = aExcluir; setAExcluir(null); await excluir(id); }} />}
             <div className={`flex justify-between items-start ${CARTAO} p-5`}>
                 <div>
                     <h3 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-3">
@@ -154,7 +159,7 @@ const TabelaDePrecos: React.FC<Props> = ({ precos }) => {
                                                 </button>
                                                 <button onClick={() => { setForm({ ...p }); setEditando(p.id); }} title="Editar" aria-label="Editar"
                                                     className={`${BOTAO_SECUNDARIO} w-10 px-0`}><Pencil size={18} /></button>
-                                                <button onClick={() => excluir(p.id)} title="Excluir" aria-label="Excluir"
+                                                <button onClick={() => setAExcluir(p.id)} title="Excluir" aria-label="Excluir"
                                                     className={`${BOTAO_PERIGO} w-10 px-0`}><Trash2 size={18} /></button>
                                             </div>
                                         </td>

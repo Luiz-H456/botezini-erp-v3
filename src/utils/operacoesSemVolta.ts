@@ -222,6 +222,27 @@ export const OPERACOES: Record<string, DescricaoDaOperacao> = {
         perigo: true,
     },
 
+    'excluir-preco-personalizacao': {
+        id: 'excluir-preco-personalizacao',
+        titulo: 'Excluir esta linha da tabela de personalização?',
+        oQueFaz: 'Remove o preço de referência desta técnica e faixa de quantidade.',
+        consequencia: 'O orçamento deixa de sugerir este preço; os orçamentos já feitos não mudam.',
+        reversibilidade: 'sem-volta',
+        antesDeContinuar: 'Se só não vale agora, use "Desativar" (o olho): some das sugestões e dá para voltar.',
+        rotuloConfirmar: 'Excluir linha',
+        perigo: true,
+    },
+
+    'excluir-lancamento-personalizacao': {
+        id: 'excluir-lancamento-personalizacao',
+        titulo: 'Excluir este lançamento de personalização?',
+        oQueFaz: 'Remove o registro do serviço (quantidade e valor) do histórico.',
+        consequencia: 'O resumo por técnica e o histórico de preço praticado deixam de contá-lo.',
+        reversibilidade: 'sem-volta',
+        rotuloConfirmar: 'Excluir lançamento',
+        perigo: true,
+    },
+
     'descartar-alteracoes': {
         id: 'descartar-alteracoes',
         titulo: 'Sair sem salvar?',

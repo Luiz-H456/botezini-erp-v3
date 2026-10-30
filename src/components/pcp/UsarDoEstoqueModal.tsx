@@ -8,6 +8,7 @@ import { numero } from '@/utils/numeros';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     insumo: { id: string; name: string; unit: string; current_stock: number };
     pedidos: { id: string; order_number: string; falta?: number }[];
@@ -30,7 +31,8 @@ export function UsarDoEstoqueModal({ insumo, pedidos, onClose, onDone }: Props) 
     const q = parseBRL(quantidade);
     const podeUsar = !!pedidoId && q > 0 && !gravando;
 
-    const fechar = () => { if (!gravando) onClose(); };
+    const saida = useSaidaProtegida(() => { if (!gravando) onClose(); });
+    const fechar = saida.pedirParaFechar;
     useEscFecha(true, fechar);
 
     const usar = async () => {
@@ -45,11 +47,11 @@ export function UsarDoEstoqueModal({ insumo, pedidos, onClose, onDone }: Props) 
         }
     };
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-modal bg-zinc-950/70 flex items-center justify-center p-4" onClick={fechar}>
             <div role="dialog" aria-modal="true" aria-label="Usar do estoque"
                 className={`${CARTAO} max-w-md w-full max-h-[85vh] flex flex-col`}
-                onClick={e => e.stopPropagation()}>
+                onClick={e => e.stopPropagation()} {...saida.aoMexer}>
                 <div className="shrink-0 flex items-start gap-3 px-5 pt-5 pb-3">
                     <div className="flex-1 min-w-0">
                         <p className={ROTULO}>Usar do estoque</p>
@@ -99,5 +101,5 @@ export function UsarDoEstoqueModal({ insumo, pedidos, onClose, onDone }: Props) 
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }

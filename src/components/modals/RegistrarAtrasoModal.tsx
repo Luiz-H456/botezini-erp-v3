@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Clock, AlertTriangle } from 'lucide-react';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     orderNumber: string;
     clientName?: string;
@@ -55,9 +56,12 @@ export const RegistrarAtrasoModal: React.FC<Props> = ({ orderNumber, clientName,
         }
     };
 
-    return createPortal(
-        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-sobreposto flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={onClose}>
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-lg ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+    // Motivo digitado não se perde num clique fora (auditoria, segunda passada).
+    const saida = useSaidaProtegida(onClose);
+
+    return <>{saida.confirmacao}{createPortal(
+        <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-xl z-sobreposto flex items-center justify-center p-4 ease-out animate-in fade-in duration-200" onClick={saida.pedirParaFechar}>
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl shadow-2xl w-full max-w-lg ease-out animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()} {...saida.aoMexer}>
                 <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center">
@@ -70,7 +74,7 @@ export const RegistrarAtrasoModal: React.FC<Props> = ({ orderNumber, clientName,
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
+                    <button onClick={saida.pedirParaFechar} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white"><X size={18} /></button>
                 </div>
 
                 <div className="p-6 space-y-4">
@@ -125,7 +129,7 @@ export const RegistrarAtrasoModal: React.FC<Props> = ({ orderNumber, clientName,
                 </div>
 
                 <div className="flex items-center gap-3 px-6 py-4 border-t border-zinc-800">
-                    <button onClick={onClose} disabled={salvando}
+                    <button onClick={saida.pedirParaFechar} disabled={salvando}
                         className="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-zinc-800 text-zinc-400 hover:bg-zinc-700 disabled:opacity-40">
                         Cancelar
                     </button>
@@ -137,5 +141,5 @@ export const RegistrarAtrasoModal: React.FC<Props> = ({ orderNumber, clientName,
             </div>
         </div>,
         document.body
-    );
+    )}</>;
 };
