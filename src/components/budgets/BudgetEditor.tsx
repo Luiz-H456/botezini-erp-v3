@@ -65,6 +65,7 @@ import { mensagemDeErro } from '@/utils/errorHandling';
 import { assinatura, chaveDoRascunho, rascunhoParaOferecer, type Rascunho } from '@/utils/rascunho';
 import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 import { faltasDoOrcamento, type FaltaNoOrcamento } from '@/utils/vendas/faltasDoOrcamento';
+import { useOrdemDasFaixas } from '@/hooks/useTabelaVerdade';
 import {
   CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula,
 } from '@/components/finance/ui/estilo';
@@ -213,6 +214,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
   const [isSaving, setIsSaving] = useState(false);
   const [faltas, setFaltas] = useState<FaltaNoOrcamento[]>([]);
+  const ordemDasFaixas = useOrdemDasFaixas();
   const corpoRef = useRef<HTMLDivElement>(null);
   // Corrigiu o que faltava: a lista some sozinha, sem esperar o próximo "salvar".
   useEffect(() => {
@@ -809,8 +811,9 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
     if (cores.length === 0) return null;
 
     const opts: { value: string; label: string; swatch?: string; isHeader?: boolean }[] = [];
-    // As faixas na ordem da cartela (até 6, nomes livres desde a v3.1).
-    for (const tier of [...new Set(cores.map(c => c.color_tier))]) {
+    // As faixas na ordem da tabela de preços (1..6); faixa ainda sem tabela vai no fim, na ordem da cartela.
+    const posicao = (tier: string) => Math.min(...cores.filter(c => c.color_tier === tier).map(c => (c.faixa_id && ordemDasFaixas.get(c.faixa_id)) || 99));
+    for (const tier of [...new Set(cores.map(c => c.color_tier))].sort((a, b) => posicao(a) - posicao(b))) {
       const doTier = cores.filter(c => c.color_tier === tier);
       if (doTier.length === 0) continue;
       opts.push({ value: `__h_${tier}`, label: `Faixa ${tier}`, isHeader: true });

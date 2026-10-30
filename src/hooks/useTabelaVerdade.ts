@@ -51,3 +51,22 @@ export function useCustoDeReferencia(): Map<string, number> {
     }, []);
     return mapa;
 }
+
+/**
+ * Ordem das faixas de cada tecido (faixa_id → ordem 1..6), para o orçamento mostrar as faixas no
+ * seletor de cor na ordem da tabela, não na da cartela (pendência da v3.1, auditoria N5).
+ * Faixas são legíveis por qualquer usuário (sem preço); lido uma vez por sessão.
+ */
+let ordemCache: Promise<Map<string, number>> | null = null;
+export function useOrdemDasFaixas(): Map<string, number> {
+    const [ordem, setOrdem] = useState<Map<string, number>>(new Map());
+    useEffect(() => {
+        let vivo = true;
+        ordemCache ??= tabelaVerdadeRepository.catalogo()
+            .then(cat => new Map(cat.faixas.map(f => [f.id, f.ordem])))
+            .catch(() => { ordemCache = null; return new Map<string, number>(); });
+        ordemCache.then(m => { if (vivo) setOrdem(m); });
+        return () => { vivo = false; };
+    }, []);
+    return ordem;
+}

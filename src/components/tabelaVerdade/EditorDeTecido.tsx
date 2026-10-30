@@ -134,10 +134,10 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
                     <div>
                         <p className={`${ROTULO} mb-3`}>Identidade</p>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div><label className={Label}>Tipo *</label><input className={Input} placeholder="BRIM" value={partes.tipo || ''} onChange={e => mudarParte('tipo', e.target.value)} /></div>
-                            <div><label className={Label}>Composição</label><input className={Input} placeholder="LEVE 100% ALGODÃO" value={partes.composicao || ''} onChange={e => mudarParte('composicao', e.target.value)} /></div>
-                            <div><label className={Label}>Marca</label><input className={Input} placeholder="CEDRO" value={partes.marca || ''} onChange={e => mudarParte('marca', e.target.value)} /></div>
-                            <div><label className={Label}>Referência</label><input className={Input} placeholder="CEDROPAC" value={partes.referencia || ''} onChange={e => mudarParte('referencia', e.target.value)} /></div>
+                            <div><label htmlFor="tecido-tipo" className={Label}>Tipo *</label><input id="tecido-tipo" className={Input} placeholder="BRIM" value={partes.tipo || ''} onChange={e => mudarParte('tipo', e.target.value)} /></div>
+                            <div><label htmlFor="tecido-composicao" className={Label}>Composição</label><input id="tecido-composicao" className={Input} placeholder="LEVE 100% ALGODÃO" value={partes.composicao || ''} onChange={e => mudarParte('composicao', e.target.value)} /></div>
+                            <div><label htmlFor="tecido-marca" className={Label}>Marca</label><input id="tecido-marca" className={Input} placeholder="CEDRO" value={partes.marca || ''} onChange={e => mudarParte('marca', e.target.value)} /></div>
+                            <div><label htmlFor="tecido-referencia" className={Label}>Referência</label><input id="tecido-referencia" className={Input} placeholder="CEDROPAC" value={partes.referencia || ''} onChange={e => mudarParte('referencia', e.target.value)} /></div>
                         </div>
                         {nome && <p className="text-[10px] text-zinc-500 mt-2.5 ml-1">Vai ficar: <b className="text-amber-500 font-mono">{nome}</b></p>}
                     </div>
@@ -151,8 +151,8 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
                                     options={[{ value: 'm', label: 'METRO' }, { value: 'kg', label: 'QUILO' }]} />
                             </div>
                             <div>
-                                <label className={Label}>Rendimento (m/kg){unidade === 'kg' ? ' *' : ''}</label>
-                                <input inputMode="decimal" className={Input} placeholder="3,20" value={rendimento} onChange={e => setRendimento(e.target.value)} />
+                                <label htmlFor="tecido-rendimento" className={Label}>Rendimento (m/kg){unidade === 'kg' ? ' *' : ''}</label>
+                                <input id="tecido-rendimento" inputMode="decimal" className={Input} placeholder="3,20" value={rendimento} onChange={e => setRendimento(e.target.value)} />
                             </div>
                         </div>
                         <p className="text-[10px] text-zinc-600 mt-2 ml-1 leading-relaxed">
