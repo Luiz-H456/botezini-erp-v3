@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Loader2, Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Clock, AlertTriangle, Landmark, PieChart, PiggyBank, SlidersHorizontal, Search } from 'lucide-react';
+import { X, Loader2, Wallet, TrendingUp, ArrowDownLeft, ArrowUpRight, Clock, AlertTriangle, Landmark, PieChart, PiggyBank, SlidersHorizontal, Search, Download } from 'lucide-react';
 import { Indicador } from '../components/finance/ui/Indicador';
 import { CARTAO, ITEM, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, pilula } from '../components/finance/ui/estilo';
 import { storageService } from '../services/storage';
@@ -42,6 +42,7 @@ import { PagarEmLoteModal } from '@/components/finance/PagarEmLoteModal';
 import { montarLote } from '@/utils/financas/loteDePagamento';
 import { lerLembrado, gravarLembrado } from '@/hooks/useLembrado';
 import { useAtalho } from '@/hooks/useAtalho';
+import { planilhaDeContas } from '@/utils/financas/planilhaDeContas';
 interface FinanceProps {
     initialSearch?: string;
     clearSearch?: () => void;
@@ -169,6 +170,15 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
         if (initialSearch) { setFiltros({ ...FILTROS_VAZIOS, ...filtrosDaBusca(initialSearch) }); clearSearch?.(); }
     }, [initialSearch, clearSearch]);
 
+    // A lista que está na tela, como planilha para o contador (auditoria N4).
+    const exportarPlanilha = () => {
+        const csv = planilhaDeContas(lista, { nomeDaParte, nomeDaCategoria, hoje: getTodayStr() });
+        const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+        const a = document.createElement('a');
+        a.href = url; a.download = `contas-${getTodayStr()}.csv`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
     const { lista, grupos, numeros, projecao, nomeDaParte, nomeDaCategoria } = useFinanceFilters(
         obligations, clients, suppliers, globalCategories, filtros, contasPorObrigacao,
         { nosBancos: envelopeOverview.total_real, nasCaixinhas: envelopeOverview.allocated });
@@ -482,6 +492,8 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
                         <div className="grid grid-cols-2 gap-3">
                             <button type="button" onClick={() => setShowForm('receivable')} className={`${BOTAO_PRINCIPAL} h-11`}><ArrowDownLeft size={14} /> Novo a receber</button>
                             <button type="button" onClick={() => setShowForm('payable')} className={`${BOTAO_SECUNDARIO} h-11`}><ArrowUpRight size={14} /> Novo a pagar</button>
+                            <button type="button" onClick={exportarPlanilha} disabled={lista.length === 0} title="Baixa a lista que está na tela, com os filtros aplicados (abre no Excel)"
+                                className={`${BOTAO_SECUNDARIO} h-11`}><Download size={14} /> Planilha</button>
                         </div>
 
                         <section ref={listaRef} className="space-y-3">
