@@ -3,12 +3,10 @@ import { ImagePlus, Loader2, AlertTriangle } from 'lucide-react';
 import { storageService } from '@/services/storage';
 import { InfoTooltip } from '@/components/common';
 import { ConfirmModal } from '@/components/finance';
-import {
-    Miniatura, FotoAmpliada, TIPOS_DE_IMAGEM_ACEITOS, TAMANHO_MAX_MB_IMAGEM,
-} from '@/components/common/GaleriaDeFotos';
+import { Miniatura, FotoAmpliada, TAMANHO_MAX_MB_IMAGEM } from '@/components/common/GaleriaDeFotos';
 import { mensagemDaRemocao } from '@/utils/anexoCompartilhado';
-
-import { mensagemDeErro } from '@/utils/errorHandling';
+import { ehPdf, paginasDoPdf, removerComPaginas, TAMANHO_MAX_MB_PDF } from '@/utils/anexosDeReferencia';
+import { enviarAnexos, TIPOS_ACEITOS_COM_PDF } from '@/components/common/enviarAnexos';
 interface Props {
     /** Caminhos já salvos (não URLs — a URL assinada é buscada aqui). */
     photos: string[];
@@ -17,7 +15,8 @@ interface Props {
 }
 
 /**
- * Fotos do cliente: logo, arte aprovada, peça de amostra.
+ * Fotos e PDFs do cliente: logo, arte aprovada, peça de amostra. PDF (30/10) como no orçamento:
+ * o original fica salvo e cada página vira foto — o envio é o mesmo (enviarAnexos).
  *
  * Mesma peça visual de ReferencePhotos (orçamento), com o texto e o destino
  * certos para este contexto: aqui a foto vale para os PRÓXIMOS orçamentos, não
@@ -25,7 +24,8 @@ interface Props {
  * que ela chegou é arquivado.
  */
 export function FotosDoCliente({ photos, onChange, clientId }: Props) {
-    const [enviando, setEnviando] = useState(false);
+    /** Etapa em curso no botão ('Convertendo', 'Enviando'), ou false. */
+    const [enviando, setEnviando] = useState<string | false>(false);
     const [erro, setErro] = useState('');
     const [ampliada, setAmpliada] = useState<string | null>(null);
     /** Diz que o arquivo sobreviveu em outro registro — senão a pessoa acha que apagou. */
@@ -49,60 +49,50 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
         if (arquivos.length === 0) return;
 
         setErro('');
-        const recusados: string[] = [];
-        const aceitos = arquivos.filter(f => {
-            if (!TIPOS_DE_IMAGEM_ACEITOS.includes(f.type)) { recusados.push(`${f.name} (formato)`); return false; }
-            if (f.size > TAMANHO_MAX_MB_IMAGEM * 1024 * 1024) { recusados.push(`${f.name} (acima de ${TAMANHO_MAX_MB_IMAGEM} MB)`); return false; }
-            return true;
-        });
-        if (recusados.length > 0) setErro(`Não enviado: ${recusados.join(', ')}`);
-        if (aceitos.length === 0) return;
-
-        setEnviando(true);
         try {
-            // Sequencial de propósito: em upload paralelo, uma falha no meio deixa
-            // parte dos arquivos no bucket sem referência no cliente.
-            const novos: string[] = [];
-            for (const arquivo of aceitos) {
-                novos.push(await storageService.uploadAttachment(arquivo, `clients/${clientId}`));
-            }
-            onChange([...photos, ...novos]);
-        } catch (e: any) {
-            setErro(mensagemDeErro(e, 'Falha ao enviar a foto'));
+            const { novos, avisos } = await enviarAnexos(arquivos, `clients/${clientId}`, setEnviando);
+            if (novos.length > 0) onChange([...photos, ...novos]);
+            setErro(avisos.join(' · '));
         } finally {
             setEnviando(false);
         }
     };
 
     const remover = async (indice: number) => {
-        const caminho = photos[indice];
+        // Remover um PDF leva as páginas convertidas dele junto.
+        const { nova, removidos } = removerComPaginas(photos, indice);
         setConfirmarRemocao(null);
         setAviso('');
         // Tira da lista primeiro: se o arquivo já não existir no bucket, o
         // cliente não pode ficar preso a uma referência morta.
-        onChange(photos.filter((_, i) => i !== indice));
+        onChange(nova);
 
         // O ARQUIVO SÓ MORRE QUANDO NINGUÉM MAIS APONTA PARA ELE. "Guardar" na
         // página do cliente traz para cá o caminho de uma foto que continua no
         // orçamento. Apagar o arquivo daqui quebrava a foto lá.
-        try {
-            const outros = await storageService.contarOutrasReferencias(caminho, clientId);
-            if (outros > 0) {
-                setAviso(mensagemDaRemocao(
-                    { desvincular: true, apagarArquivo: false, outrosUsos: outros }, 'deste cadastro'));
-                return;
+        for (const caminho of removidos) {
+            try {
+                const outros = await storageService.contarOutrasReferencias(caminho, clientId);
+                if (outros > 0) {
+                    setAviso(mensagemDaRemocao(
+                        { desvincular: true, apagarArquivo: false, outrosUsos: outros }, 'deste cadastro'));
+                    continue;
+                }
+                await storageService.deleteAttachment(caminho);
+            } catch {
+                // Não deu para saber se alguém mais usa: NÃO apaga.
             }
-            await storageService.deleteAttachment(caminho);
-        } catch {
-            // Não deu para saber se alguém mais usa: NÃO apaga.
         }
     };
+
+    const alvoDaRemocao = confirmarRemocao !== null ? photos[confirmarRemocao] ?? '' : '';
+    const paginasDoAlvo = paginasDoPdf(alvoDaRemocao, photos).length;
 
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-1.5">
                 <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                    Fotos do cliente
+                    Fotos e PDFs do cliente
                 </label>
                 <InfoTooltip width={300}>
                     <p className="text-[11px] font-black text-white mb-1">Vale para os próximos orçamentos</p>
@@ -112,7 +102,8 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
                         que orçar para ele, a referência já está aqui.
                     </p>
                     <p className="text-[10px] text-zinc-500 leading-relaxed mt-1.5">
-                        JPG, PNG, WebP ou HEIC até {TAMANHO_MAX_MB_IMAGEM} MB cada.
+                        JPG, PNG, WebP ou HEIC até {TAMANHO_MAX_MB_IMAGEM} MB cada. PDF até {TAMANHO_MAX_MB_PDF} MB:
+                        o original fica salvo e cada página vira uma foto.
                     </p>
                 </InfoTooltip>
                 {photos.length > 0 && (
@@ -153,16 +144,16 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
                             ? <Loader2 size={16} className="text-amber-500 animate-spin" />
                             : <ImagePlus size={16} className="text-zinc-500" />}
                         <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
-                            {enviando ? 'Enviando' : 'Adicionar'}
+                            {enviando || 'Adicionar'}
                         </span>
                         <input
                             ref={inputRef}
                             type="file"
                             className="hidden"
                             multiple
-                            accept={TIPOS_DE_IMAGEM_ACEITOS.join(',')}
+                            accept={TIPOS_ACEITOS_COM_PDF.join(',')}
                             onChange={selecionar}
-                            disabled={enviando}
+                            disabled={!!enviando}
                         />
                     </label>
                 )}
@@ -184,9 +175,11 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
             {confirmarRemocao !== null && (
                 <ConfirmModal
                     isOpen
-                    title="Remover foto?"
-                    message="A foto sai do cadastro do cliente. Esta ação não tem desfazer."
-                    confirmLabel="Remover"
+                    title={ehPdf(alvoDaRemocao) ? 'Remover PDF?' : 'Remover foto?'}
+                    message={ehPdf(alvoDaRemocao)
+                        ? `O PDF${paginasDoAlvo ? ` e as ${paginasDoAlvo} página(s) convertidas dele saem` : ' sai'} do cadastro do cliente. Esta ação não tem desfazer.`
+                        : 'A foto sai do cadastro do cliente. Esta ação não tem desfazer.'}
+                    confirmLabel={ehPdf(alvoDaRemocao) ? 'Remover PDF' : 'Remover foto'}
                     isDanger
                     onConfirm={() => remover(confirmarRemocao)}
                     onClose={() => setConfirmarRemocao(null)}

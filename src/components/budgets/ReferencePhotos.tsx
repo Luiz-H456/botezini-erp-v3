@@ -3,17 +3,11 @@ import { ImagePlus, Loader2, AlertTriangle } from 'lucide-react';
 import { storageService } from '@/services/storage';
 import { InfoTooltip } from '@/components/common';
 import { ConfirmModal } from '@/components/finance';
-import {
-    Miniatura, FotoAmpliada, TIPOS_DE_IMAGEM_ACEITOS, TAMANHO_MAX_MB_IMAGEM,
-} from '@/components/common/GaleriaDeFotos';
+import { Miniatura, FotoAmpliada, TAMANHO_MAX_MB_IMAGEM } from '@/components/common/GaleriaDeFotos';
 import { mensagemDaRemocao } from '@/utils/anexoCompartilhado';
-import { mensagemDeErro } from '@/utils/errorHandling';
-import {
-    ehPdf, novaBase, nomeDaPagina, paginasDoPdf, removerComPaginas, TAMANHO_MAX_MB_PDF,
-} from '@/utils/anexosDeReferencia';
+import { ehPdf, paginasDoPdf, removerComPaginas, TAMANHO_MAX_MB_PDF } from '@/utils/anexosDeReferencia';
+import { enviarAnexos, TIPOS_ACEITOS_COM_PDF } from '@/components/common/enviarAnexos';
 
-const TIPO_PDF = 'application/pdf';
-const TIPOS_ACEITOS = [...TIPOS_DE_IMAGEM_ACEITOS, TIPO_PDF];
 const TAMANHO_MAX_MB = TAMANHO_MAX_MB_IMAGEM;
 
 interface Props {
@@ -64,54 +58,11 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
         if (arquivos.length === 0) return;
 
         setErro('');
-        const recusados: string[] = [];
-        const aceitos = arquivos.filter(f => {
-            if (!TIPOS_ACEITOS.includes(f.type)) { recusados.push(`${f.name} (formato)`); return false; }
-            const limite = f.type === TIPO_PDF ? TAMANHO_MAX_MB_PDF : TAMANHO_MAX_MB;
-            if (f.size > limite * 1024 * 1024) { recusados.push(`${f.name} (acima de ${limite} MB)`); return false; }
-            return true;
-        });
-        const avisos: string[] = recusados.length > 0 ? [`Não enviado: ${recusados.join(', ')}`] : [];
-        setErro(avisos.join(' · '));
-        if (aceitos.length === 0) return;
-
-        // Sequencial de propósito: em upload paralelo, uma falha no meio deixa
-        // parte dos arquivos no bucket sem referência no orçamento. E o que já
-        // subiu entra na lista mesmo se um seguinte falhar — senão vira órfão.
-        const pasta = `budgets/${folder}`;
-        const novos: string[] = [];
         try {
-            for (const arquivo of aceitos) {
-                if (arquivo.type !== TIPO_PDF) {
-                    setEnviando('Enviando');
-                    novos.push(await storageService.uploadAttachment(arquivo, pasta));
-                    continue;
-                }
-                // PDF: guarda o original e cada página como JPEG, com a mesma base no nome
-                // (`<base>.pdf`, `<base>_p01.jpg`…) — é como a remoção acha as páginas dele.
-                setEnviando('Convertendo');
-                let imagens: Blob[] = [];
-                try {
-                    const r = await (await import('@/services/pdfParaImagens')).pdfParaImagens(arquivo);
-                    imagens = r.imagens;
-                    if (r.deFora > 0) avisos.push(`${arquivo.name}: só as ${imagens.length} primeiras páginas viraram foto; as outras ${r.deFora} ficam só no PDF`);
-                } catch {
-                    avisos.push(`${arquivo.name}: não consegui ler as páginas (PDF protegido ou danificado). O PDF fica salvo, sem as fotos.`);
-                }
-                setEnviando('Enviando');
-                const base = novaBase();
-                novos.push(await storageService.uploadAttachment(arquivo, pasta, base));
-                for (let n = 1; n <= imagens.length; n++) {
-                    const nome = nomeDaPagina(base, n);
-                    const pagina = new File([imagens[n - 1]], `${nome}.jpg`, { type: 'image/jpeg' });
-                    novos.push(await storageService.uploadAttachment(pagina, pasta, nome));
-                }
-            }
-        } catch (e: any) {
-            avisos.push(mensagemDeErro(e, 'Falha ao enviar o arquivo'));
-        } finally {
+            const { novos, avisos } = await enviarAnexos(arquivos, `budgets/${folder}`, setEnviando);
             if (novos.length > 0) onChange([...photos, ...novos]);
             setErro(avisos.join(' · '));
+        } finally {
             setEnviando(false);
         }
     };
@@ -219,7 +170,7 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
                             type="file"
                             className="hidden"
                             multiple
-                            accept={TIPOS_ACEITOS.join(',')}
+                            accept={TIPOS_ACEITOS_COM_PDF.join(',')}
                             onChange={selecionar}
                             disabled={!!enviando}
                         />
