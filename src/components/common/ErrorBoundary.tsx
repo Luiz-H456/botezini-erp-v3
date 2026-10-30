@@ -45,12 +45,12 @@ export class ErrorBoundary extends Component<Props, State> {
                     <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">
                         ERRO AO RENDERIZAR COMPONENTE
                     </p>
-                    <p className="text-[9px] text-zinc-600 font-bold mb-4 max-w-[200px]">
+                    <p className="text-[10px] text-zinc-600 font-bold mb-4 max-w-[200px]">
                         {this.state.error?.message || 'Erro desconhecido'}
                     </p>
                     <button
                         onClick={this.handleRetry}
-                        className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-400 text-[9px] font-black uppercase rounded-lg hover:bg-zinc-700 hover:text-white transition-all"
+                        className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-400 text-[10px] font-black uppercase rounded-lg hover:bg-zinc-700 hover:text-white transition-all"
                     >
                         <RefreshCw size={12} /> Tentar novamente
                     </button>

@@ -52,7 +52,7 @@ export const MesclagemEGrupo: React.FC<Props> = ({ data, onChange, clientes }) =
             <div>
                 <div className="flex items-center gap-2 mb-2">
                     <Building2 size={12} className="text-amber-500 shrink-0" />
-                    <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
                         Grupo econômico
                     </span>
                 </div>
@@ -91,7 +91,7 @@ export const MesclagemEGrupo: React.FC<Props> = ({ data, onChange, clientes }) =
                 <div className="border-t border-zinc-800/70 pt-4">
                     <div className="flex items-center gap-2 mb-2">
                         <Link2 size={12} className="text-amber-500 shrink-0" />
-                        <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
                             Mesma empresa, cadastrada duas vezes
                         </span>
                     </div>
@@ -105,7 +105,7 @@ export const MesclagemEGrupo: React.FC<Props> = ({ data, onChange, clientes }) =
                             </p>
                             <button type="button"
                                 onClick={() => onChange({ ...data, canonical_client_id: null })}
-                                className="text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-rose-400 shrink-0 px-2 py-1">
+                                className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-rose-400 shrink-0 px-2 py-1">
                                 Desfazer
                             </button>
                         </div>
@@ -129,19 +129,19 @@ export const MesclagemEGrupo: React.FC<Props> = ({ data, onChange, clientes }) =
                                         <span className="text-[10px] font-bold text-zinc-300 truncate min-w-0">
                                             {c.cliente.company_name}
                                             {c.mesmoCnpj && (
-                                                <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500">
+                                                <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500">
                                                     mesmo CNPJ
                                                 </span>
                                             )}
                                             {!c.mesmoCnpj && c.mesmoNomeNormalizado && (
-                                                <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500/70">
+                                                <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500/70">
                                                     mesmo nome
                                                 </span>
                                             )}
                                         </span>
                                         <button type="button"
                                             onClick={() => onChange({ ...data, canonical_client_id: c.cliente.id })}
-                                            className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
+                                            className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
                                             É a mesma
                                         </button>
                                     </div>

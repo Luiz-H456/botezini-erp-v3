@@ -258,7 +258,7 @@ const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) 
                                         {h.data ? new Date(h.data + 'T12:00:00').toLocaleDateString('pt-BR') : '—'}
                                     </td>
                                     <td className="p-4">
-                                        <span className="text-[9px] uppercase font-black tracking-widest text-amber-500 bg-amber-950/30 border border-amber-900/40 px-2 py-1 rounded-full">
+                                        <span className="text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-950/30 border border-amber-900/40 px-2 py-1 rounded-full">
                                             {ROTULO_TECNICA[h.tecnica]}
                                         </span>
                                     </td>

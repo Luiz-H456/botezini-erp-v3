@@ -92,7 +92,7 @@ export function MenuDoUsuario({ perfil, onAbrirPerfil, onSair }: Props) {
                 </span>
                 <span className="hidden md:block text-left leading-tight min-w-0">
                     <span className="block text-[10px] font-black text-zinc-200 truncate max-w-[130px]">{nome}</span>
-                    <span className="block text-[8px] font-black text-zinc-600 uppercase tracking-[0.15em]">{cargo}</span>
+                    <span className="block text-[10px] font-black text-zinc-600 uppercase tracking-[0.15em]">{cargo}</span>
                 </span>
                 <ChevronDown size={13} className={`text-zinc-600 transition-transform ${aberto ? 'rotate-180' : ''}`} />
             </button>
@@ -115,8 +115,8 @@ export function MenuDoUsuario({ perfil, onAbrirPerfil, onSair }: Props) {
                         <Avatar tamanho={40} />
                         <div className="min-w-0">
                             <p className="text-[11px] font-black text-white truncate">{nome}</p>
-                            <p className="text-[9px] font-bold text-zinc-500 truncate">{perfil?.email}</p>
-                            <p className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mt-0.5">{cargo}</p>
+                            <p className="text-[10px] font-bold text-zinc-500 truncate">{perfil?.email}</p>
+                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mt-0.5">{cargo}</p>
                         </div>
                     </div>
 

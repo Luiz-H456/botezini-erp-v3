@@ -66,7 +66,7 @@ function Kpi({ label, value, sub, tone, icon: Icon }: { label: string; value: st
         <div className={`${CARTAO} p-4`}>
             <div className="flex items-center gap-2 mb-1"><Icon size={12} className="text-zinc-600" /><p className={ROTULO_PEQUENO}>{label}</p></div>
             <p className={`text-lg font-black tracking-tighter truncate ${color}`}>{value}</p>
-            {sub && <p className="text-[9px] text-zinc-600 font-bold font-mono">{sub}</p>}
+            {sub && <p className="text-[10px] text-zinc-600 font-bold font-mono">{sub}</p>}
         </div>
     );
 }
@@ -96,7 +96,7 @@ function OrderList({ title, icon: Icon, tone, orders, empty }: {
                             </span>
                         </div>
                     ))}
-                    {orders.length > 8 && <p className="text-[9px] text-zinc-600 font-bold pt-1">+{orders.length - 8} pedido(s)</p>}
+                    {orders.length > 8 && <p className="text-[10px] text-zinc-600 font-bold pt-1">+{orders.length - 8} pedido(s)</p>}
                 </div>
             )}
         </div>

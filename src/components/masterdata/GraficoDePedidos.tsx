@@ -84,7 +84,7 @@ export const GraficoDePedidos: React.FC<{ serie: MesDoCliente[] }> = ({ serie })
                     );
                 })}
             </div>
-            <div className="flex items-center justify-between text-[9px] font-black text-zinc-600 uppercase tracking-widest">
+            <div className="flex items-center justify-between text-[10px] font-black text-zinc-600 uppercase tracking-widest">
                 <span>{rotuloDoMes(dados[0].mes)}</span>
                 <span className="font-mono normal-case tracking-normal text-zinc-700">
                     pico {formatCurrency(maior)}

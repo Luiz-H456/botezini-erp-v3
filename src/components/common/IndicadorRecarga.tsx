@@ -10,7 +10,7 @@ import { RefreshCw } from 'lucide-react';
 export function IndicadorRecarga({ ativo }: { ativo?: boolean }) {
     if (!ativo) return null;
     return (
-        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
             <RefreshCw size={12} className="animate-spin" /> atualizando
         </span>
     );

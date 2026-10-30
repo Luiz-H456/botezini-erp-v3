@@ -62,7 +62,7 @@ export const BarraDeGrupo: React.FC<Props> = ({
                     {selecionados.length} empresa{selecionados.length === 1 ? '' : 's'} selecionada{selecionados.length === 1 ? '' : 's'}
                 </p>
                 <button onClick={onLimpar}
-                    className="text-[9px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
+                    className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-300 flex items-center gap-1">
                     <X size={14} /> Limpar seleção
                 </button>
             </div>
@@ -71,13 +71,13 @@ export const BarraDeGrupo: React.FC<Props> = ({
             <div className="flex flex-wrap gap-1.5">
                 {previa.map(({ cliente, papel }) => (
                     <span key={cliente.id}
-                        className={`text-[9px] font-bold px-2 py-1 rounded-lg border ${papel === 'matriz'
+                        className={`text-[10px] font-bold px-2 py-1 rounded-lg border ${papel === 'matriz'
                             ? 'text-amber-500 border-amber-500/40 bg-amber-500/10'
                             : papel === 'filial'
                                 ? 'text-zinc-400 border-zinc-700 bg-zinc-900'
                                 : 'text-sky-400/90 border-sky-500/30 bg-sky-500/10'}`}>
                         {cliente.company_name}
-                        <span className="ml-1.5 uppercase tracking-widest text-[8px] font-black opacity-80">
+                        <span className="ml-1.5 uppercase tracking-widest text-[10px] font-black opacity-80">
                             {ROTULO_DO_PAPEL[papel]}
                         </span>
                     </span>

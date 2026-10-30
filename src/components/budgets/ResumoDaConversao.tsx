@@ -66,7 +66,7 @@ export function ResumoDaConversao({ onConfirmar, onCancelar, onEditarPlano, ...d
         linhas: { o_que: string; detalhe: string; nota?: string }[];
     }) => (
         <div>
-            <p className={`flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] mb-2 ${cor}`}>
+            <p className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] mb-2 ${cor}`}>
                 <Icone size={12} /> {titulo}
             </p>
             <div className="bg-zinc-950/50 border border-zinc-800 rounded-xl divide-y divide-zinc-800/60">
@@ -109,7 +109,7 @@ export function ResumoDaConversao({ onConfirmar, onCancelar, onEditarPlano, ...d
                 <div className="p-5 overflow-y-auto space-y-4 custom-scrollbar">
 
                     <div className="text-center py-1">
-                        <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">
+                        <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">
                             Valor do pedido
                         </p>
                         <p className="text-3xl font-black font-mono text-amber-500">
@@ -124,7 +124,7 @@ export function ResumoDaConversao({ onConfirmar, onCancelar, onEditarPlano, ...d
                     {r.parcelas.length > 0 && (
                         <div className="bg-zinc-950/50 border border-zinc-800 rounded-xl overflow-hidden">
                             <div className="px-4 py-2 border-b border-zinc-800/60 flex items-center justify-between">
-                                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest flex items-center gap-1.5">
+                                <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest flex items-center gap-1.5">
                                     <Calendar size={12} /> Parcelas no financeiro
                                 </span>
                                 <span className="text-[10px] font-mono font-black text-zinc-300">

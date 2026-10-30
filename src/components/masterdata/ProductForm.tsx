@@ -24,7 +24,7 @@ export interface ProductFormProps {
 }
 
 const InputCls = 'w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-200 outline-none focus:border-amber-500/30 transition-all placeholder:text-zinc-700 hover:border-zinc-700';
-const LabelCls = 'text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ml-1';
+const LabelCls = 'text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ml-1';
 
 export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, categorySelect, companyProfile, productCategoryMetas, onApplyCalculator }) => {
   const hasMarginAlert = data.average_unit_cost && data.price_tier1 && (data.average_unit_cost / data.price_tier1) > 0.6;
@@ -207,7 +207,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
             <label className={`${LabelCls} mb-0`}>Nome *</label>
             <button type="button" onClick={() => setSugerindoNome(true)}
               title="Montar o nome no padrão da casa"
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
               <Wand2 size={14} /> Sugerir nome
             </button>
           </div>
@@ -232,7 +232,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
         <div className="bg-zinc-950/40 border border-zinc-800/80 p-4 rounded-2xl mt-4">
           <div className="flex items-center gap-2 mb-2.5">
             <Link2 size={12} className="text-amber-500 shrink-0" />
-            <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Mesma peça, nome diferente</span>
+            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Mesma peça, nome diferente</span>
           </div>
 
           {data.canonical_product_id ? (
@@ -244,7 +244,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
               </p>
               <button type="button"
                 onClick={() => onChange({ ...data, canonical_product_id: null })}
-                className="text-[9px] font-black uppercase tracking-widest text-zinc-400 hover:text-rose-400 shrink-0 px-2 py-1">
+                className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-rose-400 shrink-0 px-2 py-1">
                 Desfazer
               </button>
             </div>
@@ -256,7 +256,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
             </p>
           ) : (
             <>
-              <p className="text-[9px] text-zinc-600 uppercase tracking-widest font-black mb-2">
+              <p className="text-[10px] text-zinc-600 uppercase tracking-widest font-black mb-2">
                 Parecem ser a mesma peça
               </p>
               <div className="space-y-1.5">
@@ -265,12 +265,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
                     <span className="text-[10px] font-bold text-zinc-300 truncate min-w-0">
                       {c.produto.name}
                       {c.mesmoNomeNormalizado && (
-                        <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500/80">mesmo nome</span>
+                        <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500/80">mesmo nome</span>
                       )}
                     </span>
                     <button type="button"
                       onClick={() => onChange({ ...data, canonical_product_id: c.produto.id })}
-                      className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
+                      className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors shrink-0">
                       É a mesma
                     </button>
                   </div>
@@ -306,7 +306,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
       {/* ── CMV display + margin alert ── */}
       <div className="bg-zinc-950/40 border border-zinc-800/80 p-5 rounded-2xl flex items-center justify-between shadow-xl mt-4">
         <div>
-          <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-1 mb-2 ml-1">
+          <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-1 mb-2 ml-1">
             Custo de Produção (CMV)
           </label>
           <div className="flex items-center gap-4 mt-1">
@@ -356,7 +356,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
           <div className="flex gap-1 shrink-0">
             {([['valores', 'Valores'], ['notas', 'Notas']] as const).map(([id, rotulo]) => (
               <button key={id} type="button" onClick={() => setAbaDePreco(id)}
-                className={`text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border transition-all ${abaDePreco === id
+                className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border transition-all ${abaDePreco === id
                   ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40'
                   : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:text-zinc-300'}`}>
                 {rotulo}
@@ -371,18 +371,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
         {abaDePreco === 'valores' ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
-              <label className="text-[9px] font-black text-emerald-500 uppercase tracking-widest block mb-2 ml-1">Preço T1 (Principal)</label>
+              <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-2 ml-1">Preço T1 (Principal)</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-[10px] tracking-widest">R$</span>
                 <input type="number" step="0.01" className="w-full bg-zinc-950/80 border border-emerald-500/30 rounded-xl px-4 py-2.5 pl-10 text-[10px] text-emerald-400 font-black uppercase tracking-widest outline-none focus:border-emerald-400 transition-all placeholder:text-emerald-900/50" value={data.price_tier1 ?? ''} onChange={(e) => onChange({ ...data, price_tier1: parseFloat(e.target.value) || 0 })} />
               </div>
-              <p className="text-[8px] font-black uppercase tracking-widest text-emerald-600/60 mt-2 ml-1">Venda direta / Varejo</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600/60 mt-2 ml-1">Venda direta / Varejo</p>
               {/* O T1 é a régua de toda a análise de desconto: cada "% da
                   tabela" é preço ÷ T1. Um T1 acima de tudo que já foi cobrado
                   faz todo orçamento parecer um desconto enorme — foi o que
                   produziu sugestão de baixar preço que já era o piso. */}
               {resumoDoHistorico && (Number(data.price_tier1) || 0) > resumoDoHistorico.maior && (
-                <p className="text-[9px] text-amber-500/90 leading-snug mt-2 ml-1">
+                <p className="text-[10px] text-amber-500/90 leading-snug mt-2 ml-1">
                   Este T1 está acima de tudo que você já cobrou (máximo {formatCurrency(resumoDoHistorico.maior)}).
                   Como toda a leitura de desconto é preço ÷ T1, um T1 que ninguém paga distorce a análise.
                 </p>
@@ -391,12 +391,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
             <div className="p-2 border border-transparent">
               <label className={LabelCls}>Preço T2</label>
               <input type="number" step="0.01" className={InputCls} value={data.price_tier2 ?? ''} onChange={(e) => onChange({ ...data, price_tier2: parseFloat(e.target.value) || 0 })} />
-              <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">Atacado 1 / Revenda</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">Atacado 1 / Revenda</p>
             </div>
             <div className="p-2 border border-transparent">
               <label className={LabelCls}>Preço T3</label>
               <input type="number" step="0.01" className={InputCls} value={data.price_tier3 ?? ''} onChange={(e) => onChange({ ...data, price_tier3: parseFloat(e.target.value) || 0 })} />
-              <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">Atacado 2 / Distr.</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">Atacado 2 / Distr.</p>
             </div>
           </div>
         ) : (
@@ -408,7 +408,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
               value={data.price_notes || ''}
               onChange={(e) => onChange({ ...data, price_notes: e.target.value })}
             />
-            <p className="text-[8px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mt-2 ml-1">
               Aparece no orçamento, ao lado do histórico do produto
             </p>
           </div>
@@ -433,7 +433,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
               </div>
               Preço praticado neste produto
               {resumoDoHistorico && (
-                <span className="text-[9px] text-zinc-500 ml-2 tracking-widest normal-case">
+                <span className="text-[10px] text-zinc-500 ml-2 tracking-widest normal-case">
                   ({formatCurrency(resumoDoHistorico.menor)} – {formatCurrency(resumoDoHistorico.maior)} ·{' '}
                   {resumoDoHistorico.fechados} de {resumoDoHistorico.ocorrencias} fechados)
                 </span>
@@ -461,17 +461,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
           o CMV e a alíquota da calculadora, que já estão calculados aqui. */}
       <div className="bg-zinc-950/40 border border-zinc-800/80 p-5 rounded-2xl mt-4 space-y-2">
         {praticado === null ? (
-          <p className="text-[9px] text-zinc-600 leading-snug">
+          <p className="text-[10px] text-zinc-600 leading-snug">
             Sem venda fechada ainda — não há preço praticado para confrontar com a projeção.
           </p>
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500 font-black text-[9px] uppercase tracking-widest">Praticado (mediana):</span>
+              <span className="text-zinc-500 font-black text-[10px] uppercase tracking-widest">Praticado (mediana):</span>
               <span className="text-amber-500 font-mono font-bold text-sm">{formatCurrency(praticado)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-zinc-500 font-black text-[9px] uppercase tracking-widest">Margem nessa mediana:</span>
+              <span className="text-zinc-500 font-black text-[10px] uppercase tracking-widest">Margem nessa mediana:</span>
               <span className={`font-mono font-bold text-sm ${praticado > pontoDeEquilibrio ? 'text-emerald-400' : 'text-rose-400'}`}>
                 {/* Margem sobre a receita, descontando o imposto que
                     ela gera — não sobre o custo, que daria um número
@@ -482,7 +482,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
             </div>
 
             {praticado <= pontoDeEquilibrio && (
-              <p className="text-[9px] text-rose-400 leading-snug font-bold">
+              <p className="text-[10px] text-rose-400 leading-snug font-bold">
                 A mediana praticada está no prejuízo: cada peça vendida a {formatCurrency(praticado)} não
                 cobre {formatCurrency(pontoDeEquilibrio)} de custo mais imposto.
               </p>
@@ -491,7 +491,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
             <button
               type="button"
               onClick={() => onChange({ ...data, price_tier1: parseFloat(praticado.toFixed(2)) })}
-              className="w-full mt-1 px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
+              className="w-full mt-1 px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-500 border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
               title="O T1 é a régua de toda a análise de desconto — um T1 que ninguém paga distorce tudo"
             >
               Usar {formatCurrency(praticado)} como T1
@@ -529,7 +529,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
           const CardCls = "bg-zinc-950/40 border border-zinc-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-xl";
           const TitleCls = "text-zinc-200 font-black text-[10px] uppercase tracking-widest";
           const InnerInputCls = "w-full bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-zinc-200 outline-none focus:border-amber-500/30 transition-all placeholder:text-zinc-700 hover:border-zinc-700";
-          const InnerLabelCls = "text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block ml-1";
+          const InnerLabelCls = "text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1.5 block ml-1";
 
           return (
             <div className="bg-black/50 p-4 rounded-b-lg border-t border-zinc-800">
@@ -663,28 +663,28 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
                     {/* Progress Bars */}
                     <div className="space-y-4 mt-4">
                       <div className="flex items-center gap-3">
-                        <span className="w-14 text-[9px] font-black uppercase tracking-widest text-zinc-500">Tecido</span>
+                        <span className="w-14 text-[10px] font-black uppercase tracking-widest text-zinc-500">Tecido</span>
                         <div className="flex-1 h-3 bg-zinc-900 rounded-full overflow-hidden">
                           <div className="h-full bg-amber-500 transition-all duration-500" style={{ width: `${pctFabric}%` }}></div>
                         </div>
                         <span className="w-8 text-right text-[10px] text-zinc-400 font-mono">{pctFabric.toFixed(0)}%</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="w-14 text-[9px] font-black uppercase tracking-widest text-zinc-500">Insumos</span>
+                        <span className="w-14 text-[10px] font-black uppercase tracking-widest text-zinc-500">Insumos</span>
                         <div className="flex-1 h-3 bg-zinc-900 rounded-full overflow-hidden">
                           <div className="h-full bg-amber-600 transition-all duration-500" style={{ width: `${pctOverhead}%` }}></div>
                         </div>
                         <span className="w-8 text-right text-[10px] text-zinc-400 font-mono">{pctOverhead.toFixed(0)}%</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="w-14 text-[9px] font-black uppercase tracking-widest text-zinc-500">M.O.</span>
+                        <span className="w-14 text-[10px] font-black uppercase tracking-widest text-zinc-500">M.O.</span>
                         <div className="flex-1 h-3 bg-zinc-900 rounded-full overflow-hidden">
                           <div className="h-full bg-amber-700 transition-all duration-500" style={{ width: `${pctLabor}%` }}></div>
                         </div>
                         <span className="w-8 text-right text-[10px] text-zinc-400 font-mono">{pctLabor.toFixed(0)}%</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="w-14 text-[9px] font-black uppercase tracking-widest text-zinc-500">Imposto</span>
+                        <span className="w-14 text-[10px] font-black uppercase tracking-widest text-zinc-500">Imposto</span>
                         <div className="flex-1 h-3 bg-zinc-900 rounded-full overflow-hidden">
                           <div className="h-full bg-amber-900 transition-all duration-500" style={{ width: `${pctTax}%` }}></div>
                         </div>
@@ -725,14 +725,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ data, onChange, catego
                         do qual a peça dá prejuízo. */}
                     <div className="border-t border-zinc-800/80 pt-3 mb-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-zinc-500 font-black text-[9px] uppercase tracking-widest">Ponto de Equilíbrio:</span>
+                        <span className="text-zinc-500 font-black text-[10px] uppercase tracking-widest">Ponto de Equilíbrio:</span>
                         <span className="text-rose-400/90 font-mono font-bold text-sm">{formatCurrency(pontoDeEquilibrio)}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 mt-auto">
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-black text-[8px] tracking-widest">FATOR</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-black text-[10px] tracking-widest">FATOR</span>
                         <input
                           type="number"
                           step="0.1"

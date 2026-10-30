@@ -115,7 +115,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                         </h2>
                         <div className="flex items-center gap-3 mt-1 flex-wrap text-[10px] font-bold text-zinc-500">
                             {cliente.category && (
-                                <span className="bg-zinc-950/50 border border-zinc-800 px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest">
+                                <span className="bg-zinc-950/50 border border-zinc-800 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest">
                                     {cliente.category}
                                 </span>
                             )}
@@ -209,7 +209,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                             {/* ── Ritmo de compra ── */}
                             <div className={`${CARTAO} p-5 space-y-4`}>
                                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                         <TrendingUp size={12} className="text-amber-500" /> Pedidos no tempo
                                     </p>
                                     {dossie.padrao.intervaloMedioDias !== null && (
@@ -226,23 +226,23 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                 {dossie.padrao.intervaloMedioDias !== null ? (
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                                         <div>
-                                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Intervalo típico</p>
+                                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Intervalo típico</p>
                                             <p className="text-sm font-black font-mono text-white mt-0.5">{dossie.padrao.intervaloMedioDias}d</p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Faixa observada</p>
+                                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Faixa observada</p>
                                             <p className="text-sm font-black font-mono text-zinc-400 mt-0.5">
                                                 {dossie.padrao.menorIntervalo}–{dossie.padrao.maiorIntervalo}d
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Próximo estimado</p>
+                                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Próximo estimado</p>
                                             <p className={`text-sm font-black font-mono mt-0.5 ${dossie.padrao.atrasado ? 'text-amber-500' : 'text-white'}`}>
                                                 {dossie.padrao.proximoPedidoEstimado ? formatDate(dossie.padrao.proximoPedidoEstimado) : '—'}
                                             </p>
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Base do cálculo</p>
+                                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Base do cálculo</p>
                                             <p className="text-sm font-black font-mono text-zinc-500 mt-0.5">
                                                 {dossie.padrao.baseDeCalculo} intervalo{dossie.padrao.baseDeCalculo > 1 ? 's' : ''}
                                             </p>
@@ -316,7 +316,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                     <tr key={pc.produto} className="hover:bg-zinc-800/40 transition-colors">
                                                         <td className="p-4 font-black text-zinc-200 uppercase tracking-tight">
                                                             {pc.produto}
-                                                            <span className="block text-[9px] font-bold text-zinc-600 normal-case tracking-normal mt-0.5">
+                                                            <span className="block text-[10px] font-bold text-zinc-600 normal-case tracking-normal mt-0.5">
                                                                 em {pc.aparicoes} orçamento{pc.aparicoes > 1 ? 's' : ''}
                                                             </span>
                                                         </td>
@@ -326,7 +326,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                         <td className="p-4 font-mono text-zinc-400">
                                                             {formatCurrency(pc.ultimoPreco)}
                                                             {pc.ultimaData && (
-                                                                <span className="block text-[9px] text-zinc-600">{formatDate(pc.ultimaData)}</span>
+                                                                <span className="block text-[10px] text-zinc-600">{formatDate(pc.ultimaData)}</span>
                                                             )}
                                                         </td>
                                                     </tr>
@@ -335,7 +335,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                         </table>
                                     )}
                                     {dossie.pecas.length > 0 && (
-                                        <p className="px-4 py-3 text-[9px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
+                                        <p className="px-4 py-3 text-[10px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
                                             Preço médio ponderado pela quantidade — o pedido grande é que define o
                                             preço que a relação pratica.
                                         </p>
@@ -373,7 +373,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                             <td className="p-4 text-zinc-400">{o.date ? formatDate(o.date) : '—'}</td>
                                                             <td className="p-4 font-mono text-zinc-300">{formatCurrency(o.total_amount || 0)}</td>
                                                             <td className="p-4">
-                                                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${fechado
+                                                                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${fechado
                                                                     ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
                                                                     : 'text-zinc-500 border-zinc-800 bg-zinc-950'}`}>
                                                                     {ROTULO_STATUS[o.status || ''] || o.status}
@@ -411,7 +411,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                         <td className="p-4 text-zinc-400">{p.created_at ? formatDate(p.created_at) : '—'}</td>
                                                         <td className="p-4 text-zinc-400">{p.deadline ? formatDate(p.deadline) : '—'}</td>
                                                         <td className="p-4 font-mono text-zinc-300">{formatCurrency(p.total_amount || 0)}</td>
-                                                        <td className="p-4 text-[9px] font-black uppercase tracking-widest text-zinc-400">{p.status || '—'}</td>
+                                                        <td className="p-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">{p.status || '—'}</td>
                                                         <td className="p-4 text-right">
                                                             {(() => {
                                                                 // O pedido nasce de um orcamento; e ele que
@@ -510,7 +510,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                     <tr key={c.id} className={`hover:bg-zinc-800/40 transition-colors ${cancelada ? 'opacity-40' : ''}`}>
                                                         <td className="p-4 text-zinc-300 font-bold">
                                                             {c.description}
-                                                            {cancelada && <span className="ml-2 text-[8px] font-black uppercase text-rose-500">cancelada</span>}
+                                                            {cancelada && <span className="ml-2 text-[10px] font-black uppercase text-rose-500">cancelada</span>}
                                                             {/* Pedido ainda não entregue: fora dos cartões de vencido e a receber. */}
                                                             {c.awaiting_delivery && <span className={`${ROTULO_PEQUENO} ml-2`}>em produção</span>}
                                                         </td>
@@ -560,7 +560,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                 return (
                                     <div className={`${CARTAO} p-5 space-y-3`}>
                                         <div className="flex items-center justify-between gap-3 flex-wrap">
-                                            <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                            <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                                 <ImagePlus size={12} className="text-amber-500" />
                                                 Fotos dos orçamentos deste cliente
                                             </p>
@@ -603,7 +603,7 @@ export function PaginaDoCliente({ cliente, onVoltar, onEditar, onSalvou, onAbrir
                                                                     salvar({ reference_photos: novas });
                                                                 }}
                                                                 disabled={salvando}
-                                                                className="w-20 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest bg-zinc-950/60 text-zinc-500 border border-zinc-800 hover:text-amber-500 hover:border-amber-500/30 transition-colors disabled:opacity-40">
+                                                                className="w-20 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-zinc-950/60 text-zinc-500 border border-zinc-800 hover:text-amber-500 hover:border-amber-500/30 transition-colors disabled:opacity-40">
                                                                 Guardar
                                                             </button>
                                                         </div>

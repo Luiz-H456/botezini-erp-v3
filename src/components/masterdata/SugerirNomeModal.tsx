@@ -180,13 +180,13 @@ export const SugerirNomeModal: React.FC<Props> = ({ tecidos, inicial, onClose, o
                     {/* Prévia — mostra exatamente o que vai ser gravado */}
                     <div className="bg-zinc-950/60 border border-zinc-800 rounded-xl p-4 space-y-2">
                         <div>
-                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Nome</p>
+                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">Nome</p>
                             <p className="text-sm font-black text-white break-words">
                                 {nome || <span className="text-zinc-700">escolha ao menos o tipo de peça</span>}
                             </p>
                         </div>
                         <div>
-                            <p className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">SKU sugerido</p>
+                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1">SKU sugerido</p>
                             <p className="text-sm font-mono font-bold text-amber-400 break-words">{sku || '—'}</p>
                             <p className="text-[10px] text-zinc-600 font-bold mt-0.5">
                                 só preenche se o campo SKU estiver vazio — não sobrescreve o que você já digitou

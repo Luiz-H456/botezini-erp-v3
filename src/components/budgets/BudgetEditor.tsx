@@ -1025,7 +1025,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
               <h2 className="text-lg font-black text-white uppercase tracking-tighter leading-none whitespace-nowrap">
                 {headerInfo.serial_number}
               </h2>
-              <span className="hidden sm:inline-block text-[9px] font-black uppercase tracking-widest bg-amber-500 text-black px-2 py-0.5 rounded-lg whitespace-nowrap">
+              <span className="hidden sm:inline-block text-[10px] font-black uppercase tracking-widest bg-amber-500 text-black px-2 py-0.5 rounded-lg whitespace-nowrap">
                 {budget?.id ? 'Editando proposta' : 'Nova proposta'}
               </span>
             </div>
@@ -1059,7 +1059,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
               <div className="flex items-center gap-2 px-3 border-r border-zinc-800/50 h-10">
                 <Calendar size={18} className="text-zinc-600" />
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Data de Emissão</span>
+                  <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Data de Emissão</span>
                   <input
                     type="date"
                     value={headerInfo.date}
@@ -1071,7 +1071,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
               <div className="flex items-center gap-2 px-3 h-10">
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Validade</span>
+                  <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Validade</span>
                   <div className="flex items-center gap-1.5">
                     {headerInfo.validity > 0 ? (
                       <>
@@ -1083,7 +1083,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           }
                           className="bg-transparent text-xs font-black text-amber-500 outline-none w-8 text-center border-b border-transparent focus:border-amber-500/30 transition-all"
                         />
-                        <span className="text-[9px] font-black text-zinc-600 uppercase">DIAS</span>
+                        <span className="text-[10px] font-black text-zinc-600 uppercase">DIAS</span>
                       </>
                     ) : (
                       <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest whitespace-nowrap">
@@ -1457,7 +1457,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                               >
                                 <Copy size={12} />
                               </button>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">CLONAR</span>
+                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">CLONAR</span>
                             </div>
                             <div className="relative group/btn flex justify-center">
                               <button
@@ -1470,7 +1470,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                               >
                                 <Paintbrush size={12} />
                               </button>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">COPIAR ESPEC.</span>
+                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">COPIAR ESPEC.</span>
                             </div>
                             <div className="relative group/btn flex justify-center">
                               <button
@@ -1483,7 +1483,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                               >
                                 <Rows3 size={12} />
                               </button>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">GRADE</span>
+                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">GRADE</span>
                             </div>
                             <div className="relative group/btn flex justify-center">
                               <button
@@ -1493,7 +1493,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                               >
                                 <Trash2 size={12} />
                               </button>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-root bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
+                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-root bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
                             </div>
                           </div>
                         </div>
@@ -1632,7 +1632,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                                   <p className={`${ROTULO_PEQUENO} leading-none`}>
                                     Peças do conjunto
                                   </p>
-                                  <p className="text-[8px] text-zinc-700 uppercase tracking-widest mt-1 truncate">
+                                  <p className="text-[10px] text-zinc-700 uppercase tracking-widest mt-1 truncate">
                                     {(item.components?.length || 0) === 0
                                       ? 'peça única · usa o tecido e a cor da linha'
                                       : `${contar(item.components!.length, 'peça', 'peças')} · um preço só · um enfesto cada`}
@@ -1673,7 +1673,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
                                       {/* Identidade da peça */}
                                       <div className="flex items-center gap-2">
-                                        <span className="w-5 h-5 shrink-0 flex items-center justify-center rounded-md bg-zinc-800/60 text-[9px] font-black text-zinc-500">
+                                        <span className="w-5 h-5 shrink-0 flex items-center justify-center rounded-md bg-zinc-800/60 text-[10px] font-black text-zinc-500">
                                           {ci + 1}
                                         </span>
 
@@ -1933,7 +1933,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           >
                             <Trash2 size={12} />
                           </button>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
                         </div>
                       </div>
                     </div>
@@ -2027,7 +2027,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           >
                             <Trash2 size={12} />
                           </button>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[8px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-800 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">EXCLUIR</span>
                         </div>
                       </div>
                     </div>
@@ -2059,7 +2059,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         type="button"
                         onClick={() => setAbaDeObservacao(valor)}
                         title={dica}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] border transition-all ${ativa
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all ${ativa
                           ? valor === 'fabrica'
                             ? 'bg-sky-500/15 border-sky-500/40 text-sky-300'
                             : 'bg-amber-500/15 border-amber-500/40 text-amber-400'
@@ -2072,7 +2072,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                       </button>
                     );
                   })}
-                  <span className="text-[9px] font-bold text-zinc-600 ml-2 hidden sm:block truncate">
+                  <span className="text-[10px] font-bold text-zinc-600 ml-2 hidden sm:block truncate">
                     {abaDeObservacao === 'cliente'
                       ? 'Condições comerciais — o cliente lê isto'
                       : 'Recado interno — sai só na ficha de produção'}
@@ -2127,7 +2127,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                 <div className="flex items-center gap-4 px-4 border-r border-zinc-800/50 h-12">
                   <DollarSign size={20} className="text-zinc-600" />
                   <div className="flex flex-col">
-                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Desconto Especial</span>
+                    <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Desconto Especial</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -2136,14 +2136,14 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-12 bg-transparent text-xs font-black text-rose-500 border-b border-transparent focus:border-rose-500/30 outline-none transition-all text-right"
                         placeholder="0.00"
                       />
-                      <span className="text-[9px] font-black text-zinc-600 uppercase">%</span>
+                      <span className="text-[10px] font-black text-zinc-600 uppercase">%</span>
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 px-4 h-12">
                   <Truck size={20} className="text-zinc-600" />
                   <div className="flex flex-col">
-                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Prazo de Entrega</span>
+                    <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Prazo de Entrega</span>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -2151,7 +2151,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         onChange={(e) => setDeliveryTimeDays(parseInt(e.target.value) || 0)}
                         className="w-8 bg-transparent text-xs font-black text-white border-b border-transparent focus:border-amber-500/30 outline-none transition-all text-center"
                       />
-                      <span className="text-[9px] font-black text-zinc-600 uppercase">DIAS</span>
+                      <span className="text-[10px] font-black text-zinc-600 uppercase">DIAS</span>
                     </div>
                   </div>
                 </div>
@@ -2189,20 +2189,20 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                     // não tem por que refazer a conta de cabeça, e sem isto o erro
                     // só aparece no PDF que o cliente já recebeu.
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30 text-[9px] font-black uppercase tracking-widest text-rose-300">
+                      <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30 text-[10px] font-black uppercase tracking-widest text-rose-300">
                         <AlertTriangle size={12} />
                         Plano soma {formatCurrency(conferenciaDoPlano!.total)} · total {formatCurrency(totals.total_amount)}
                       </span>
                       <button
                         type="button"
                         onClick={ajustarPlanoAoTotal}
-                        className="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-rose-500 text-black hover:bg-rose-400 transition-colors"
+                        className="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-rose-500 text-black hover:bg-rose-400 transition-colors"
                       >
                         Ajustar ao total
                       </button>
                     </div>
                   ) : (
-                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">opcional · vai no PDF</span>
+                    <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">opcional · vai no PDF</span>
                   )}
                 </div>
                 {temPlano && (
@@ -2224,7 +2224,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
           {/* Os totais de sempre, no fim da tela. */}
           <div className="flex items-center justify-end gap-6 px-2">
             <div className="text-right flex flex-col items-end">
-              <span className="text-[9px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">
+              <span className="text-[10px] text-zinc-600 uppercase font-black tracking-widest leading-none mb-1">
                 SUBTOTAL BRUTO
               </span>
               <span className="text-sm text-zinc-400 font-black tracking-tighter">
@@ -2239,7 +2239,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
             <div className="text-right flex flex-col items-end group">
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-                <span className="text-[9px] text-emerald-500 uppercase font-black tracking-[0.2em] leading-none">
+                <span className="text-[10px] text-emerald-500 uppercase font-black tracking-[0.2em] leading-none">
                   VALOR CONSOLIDADO
                 </span>
               </div>

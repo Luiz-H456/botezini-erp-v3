@@ -121,13 +121,13 @@ export const QuadranteDeProdutos: React.FC<Props> = ({ margens }) => {
                     <div className="absolute inset-y-0 left-1/2 w-px bg-zinc-800" />
                     <div className="absolute inset-x-0 top-1/2 h-px bg-zinc-800" />
 
-                    <span className="absolute bottom-2 right-3 text-[9px] font-black uppercase tracking-widest text-rose-500/50">
+                    <span className="absolute bottom-2 right-3 text-[10px] font-black uppercase tracking-widest text-rose-500/50">
                         ocupa e não paga
                     </span>
-                    <span className="absolute top-2 right-3 text-[9px] font-black uppercase tracking-widest text-emerald-500/40">
+                    <span className="absolute top-2 right-3 text-[10px] font-black uppercase tracking-widest text-emerald-500/40">
                         carro-chefe
                     </span>
-                    <span className="absolute top-2 left-3 text-[9px] font-black uppercase tracking-widest text-sky-500/40">
+                    <span className="absolute top-2 left-3 text-[10px] font-black uppercase tracking-widest text-sky-500/40">
                         joia escondida
                     </span>
 
@@ -176,7 +176,7 @@ export const QuadranteDeProdutos: React.FC<Props> = ({ margens }) => {
                                 {emFoco.pecas.toLocaleString('pt-BR')} peças · margem {pct(emFoco.margemPct)} ·
                                 {' '}{formatCurrency(emFoco.contribuicaoTotal)} no total
                             </p>
-                            <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${TOM[emFoco.quadrante].texto}`}>
+                            <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${TOM[emFoco.quadrante].texto}`}>
                                 {ROTULO_DO_QUADRANTE[emFoco.quadrante]}
                             </p>
                         </div>

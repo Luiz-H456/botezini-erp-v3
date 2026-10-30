@@ -291,7 +291,7 @@ export default function SearchableSelect({
                             filteredOptions.map((opt) => {
                                 if (opt.isHeader) {
                                     return (
-                                        <div key={opt.label} className="px-4 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] bg-zinc-900/30 rounded-lg mb-1 mt-2 first:mt-0">
+                                        <div key={opt.label} className="px-4 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] bg-zinc-900/30 rounded-lg mb-1 mt-2 first:mt-0">
                                             {opt.label}
                                         </div>
                                     );

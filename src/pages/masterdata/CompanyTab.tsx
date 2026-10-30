@@ -230,7 +230,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-zinc-600 font-bold">%</span>
             </div>
-            <p className="text-[9px] text-zinc-600 mt-2 font-medium">Markup base para precificação.</p>
+            <p className="text-[10px] text-zinc-600 mt-2 font-medium">Markup base para precificação.</p>
           </div>
 
           <div className="space-y-1 sm:border-l sm:border-zinc-800 sm:pl-6">
@@ -238,7 +238,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({
               Custo Mão-de-Obra (R$/h)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[9px] text-zinc-600 font-black">R$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-zinc-600 font-black">R$</span>
               <input
                 type="number"
                 step="0.5"
@@ -249,7 +249,7 @@ export const CompanyTab: React.FC<CompanyTabProps> = ({
                 placeholder="Ex: 12.50"
               />
             </div>
-            <p className="text-[9px] text-zinc-600 mt-2 font-medium uppercase leading-tight">Valor base de remuneração (Salário/Hora).</p>
+            <p className="text-[10px] text-zinc-600 mt-2 font-medium uppercase leading-tight">Valor base de remuneração (Salário/Hora).</p>
           </div>
         </div>
         <p className={`${ROTULO_PEQUENO} mt-3`}>A capacidade mensal fica em Cadastros › Setores e capacidade.</p>

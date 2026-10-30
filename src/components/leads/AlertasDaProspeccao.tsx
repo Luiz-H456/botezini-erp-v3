@@ -101,12 +101,12 @@ export function AlertasDaProspeccao({ leads, onAbrir }: Props) {
                                     >
                                         {rede.principal.nome_fantasia || rede.principal.razao_social}
                                     </button>
-                                    <span className="shrink-0 text-[9px] font-black uppercase tracking-widest text-zinc-600">
+                                    <span className="shrink-0 text-[10px] font-black uppercase tracking-widest text-zinc-600">
                                         +{rede.filiais.length} {rede.filiais.length === 1 ? 'unidade' : 'unidades'}
                                     </span>
                                 </div>
                                 {rede.temCliente && (
-                                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-500/80 mt-1 pl-[19px]">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/80 mt-1 pl-[19px]">
                                         {/* Muda a abordagem por inteiro: não é
                                             prospecção fria, é expansão de conta. */}
                                         já há cliente nesta rede

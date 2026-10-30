@@ -133,7 +133,7 @@ function CartaoDeModelo({ m }: { m: Modelo }) {
             <div className="px-4 py-3 border-b border-zinc-800 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                        <span className="text-[8px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
                             {m.etapa}
                         </span>
                         <h3 className="text-xs font-black text-white truncate">{m.titulo}</h3>

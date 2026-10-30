@@ -101,7 +101,7 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
     return (
         <div className="space-y-2">
             <div className="flex items-center gap-1.5">
-                <label className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+                <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                     Fotos do cliente
                 </label>
                 <InfoTooltip width={300}>
@@ -116,7 +116,7 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
                     </p>
                 </InfoTooltip>
                 {photos.length > 0 && (
-                    <span className="text-[9px] font-bold text-zinc-600">
+                    <span className="text-[10px] font-bold text-zinc-600">
                         {photos.length} anexada{photos.length > 1 ? 's' : ''}
                     </span>
                 )}
@@ -152,7 +152,7 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
                         {enviando
                             ? <Loader2 size={16} className="text-amber-500 animate-spin" />
                             : <ImagePlus size={16} className="text-zinc-500" />}
-                        <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
                             {enviando ? 'Enviando' : 'Adicionar'}
                         </span>
                         <input

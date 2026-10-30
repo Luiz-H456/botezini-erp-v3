@@ -76,7 +76,7 @@ export const LinhaDeChips: React.FC<Props> = ({ itens, onEscolher }) => {
             {itens.map(it => (
                 <button key={it.chave} type="button" onClick={() => onEscolher(it.chave)}
                     title={it.titulo}
-                    className={`shrink-0 whitespace-nowrap px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-colors ${it.ativo
+                    className={`shrink-0 whitespace-nowrap px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors ${it.ativo
                         ? 'bg-amber-500 text-black border-amber-500'
                         : 'bg-zinc-950/60 text-zinc-500 border-zinc-800 hover:border-amber-500/30 hover:text-amber-500'}`}>
                     {it.rotulo}

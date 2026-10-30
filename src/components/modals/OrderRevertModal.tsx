@@ -31,7 +31,7 @@ export const OrderRevertModal: React.FC<OrderRevertModalProps> = ({
             </p>
           </div>
           <div className="bg-rose-500/5 border border-rose-500/10 p-4 rounded-lg">
-            <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest">Atenção:</p>
+            <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Atenção:</p>
             <p className="text-[10px] font-bold text-rose-200 uppercase tracking-wide mt-1">Todas as transações financeiras e registros de produção vinculados a este pedido serão eliminados.</p>
           </div>
         </div>

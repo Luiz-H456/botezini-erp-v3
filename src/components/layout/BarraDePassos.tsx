@@ -18,7 +18,7 @@ export function BarraDePassos({ secao, viewAtual, onNavegar }: Props) {
                         <button key={v} type="button" onClick={() => onNavegar(v)}
                             aria-current={v === viewAtual ? 'page' : undefined} className={pilula(v === viewAtual)}>
                             {numerado
-                                ? <span className="grid h-4 w-4 place-items-center rounded-full border border-current text-[9px]">{i + 1}</span>
+                                ? <span className="grid h-4 w-4 place-items-center rounded-full border border-current text-[10px]">{i + 1}</span>
                                 : <Icone size={13} />}
                             {ROTULO_DA_VIEW[v]}
                         </button>

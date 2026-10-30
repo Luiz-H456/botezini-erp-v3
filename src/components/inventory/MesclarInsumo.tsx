@@ -81,7 +81,7 @@ export const MesclarInsumo: React.FC<Props> = ({ data, onChange, insumos }) => {
                                     {consolidado.custoMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </p>
                             </div>
-                            <p className="text-[9px] text-zinc-600 font-bold leading-snug">
+                            <p className="text-[10px] text-zinc-600 font-bold leading-snug">
                                 ponderado pelo saldo de cada cadastro
                             </p>
                         </div>
@@ -100,21 +100,21 @@ export const MesclarInsumo: React.FC<Props> = ({ data, onChange, insumos }) => {
                             <div key={c.insumo.id} className="flex items-center justify-between gap-3">
                                 <span className="text-[10px] font-bold text-zinc-300 truncate min-w-0">
                                     {c.insumo.name}
-                                    <span className="ml-2 text-[9px] font-mono text-zinc-600">
+                                    <span className="ml-2 text-[10px] font-mono text-zinc-600">
                                         {c.insumo.current_stock ?? 0} {c.insumo.unit}
                                     </span>
                                     {c.mesmoNomeNormalizado && (
-                                        <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500">
+                                        <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500">
                                             mesmo nome
                                         </span>
                                     )}
                                     {!c.mesmoNomeNormalizado && c.mesmaFamilia && (
-                                        <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500/70">
+                                        <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500/70">
                                             mesma família
                                         </span>
                                     )}
                                     {c.unidadeDiferente && (
-                                        <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-rose-400/90">
+                                        <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-rose-400/90">
                                             <AlertTriangle size={12} className="inline mb-0.5 mr-0.5" />
                                             unidade diferente
                                         </span>
@@ -129,7 +129,7 @@ export const MesclarInsumo: React.FC<Props> = ({ data, onChange, insumos }) => {
                         ))}
                     </div>
                     {candidatos.some(c => c.unidadeDiferente) && (
-                        <p className="text-[9px] text-rose-400/80 font-bold mt-2 leading-relaxed">
+                        <p className="text-[10px] text-rose-400/80 font-bold mt-2 leading-relaxed">
                             Cadastro em unidade diferente soma metro com quilo — o saldo resultante
                             não significa nada. Só mescle se for de fato o mesmo material medido do
                             mesmo jeito.

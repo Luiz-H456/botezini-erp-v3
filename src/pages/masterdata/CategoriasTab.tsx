@@ -245,7 +245,7 @@ export const CategoriasTab: React.FC<Props> = ({ categories, onChanged }) => {
                 />
                 {!c.natureza && (
                     <span title="Ainda não revisada — está contando como variável"
-                        className="text-[9px] font-black uppercase tracking-widest text-amber-500/70">
+                        className="text-[10px] font-black uppercase tracking-widest text-amber-500/70">
                         novo
                     </span>
                 )}
@@ -430,7 +430,7 @@ export const CategoriasTab: React.FC<Props> = ({ categories, onChanged }) => {
                                         Dentro do grupo
                                     </label>
                                     <button onClick={() => setCriandoGrupo(true)}
-                                        className="text-[8px] font-black text-amber-500 hover:text-amber-400 uppercase flex items-center gap-1 transition-colors">
+                                        className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase flex items-center gap-1 transition-colors">
                                         <FolderPlus size={14} /> Novo grupo
                                     </button>
                                 </div>
@@ -514,7 +514,7 @@ export const CategoriasTab: React.FC<Props> = ({ categories, onChanged }) => {
                         {doDominio.filter(c => c.parent_id).length} categoria{doDominio.filter(c => c.parent_id).length === 1 ? '' : 's'}
                     </h4>
                     {naoRevisadas > 0 && (
-                        <span className="text-[9px] font-black uppercase tracking-widest text-amber-500">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-amber-500">
                             {naoRevisadas} nunca revisada{naoRevisadas > 1 ? 's' : ''}
                         </span>
                     )}
@@ -538,7 +538,7 @@ export const CategoriasTab: React.FC<Props> = ({ categories, onChanged }) => {
                                     <div className="flex items-center gap-2 min-w-0 flex-1">
                                         <FolderTree size={13} className="text-amber-500/70 shrink-0" />
                                         <NomeDaLinha c={pai} forte />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-600 shrink-0">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600 shrink-0">
                                             {filhas.length > 0
                                                 ? `${filhas.length} dentro`
                                                 : <span className="text-amber-500/80">vazio</span>}
@@ -585,7 +585,7 @@ export const CategoriasTab: React.FC<Props> = ({ categories, onChanged }) => {
                                 <span className="text-[10px] font-black text-amber-500 uppercase tracking-widest">
                                     Sem grupo válido
                                 </span>
-                                <span className="text-[9px] font-bold text-zinc-500">
+                                <span className="text-[10px] font-bold text-zinc-500">
                                     o grupo delas foi apagado ou está noutro setor — abra e escolha um
                                 </span>
                             </div>

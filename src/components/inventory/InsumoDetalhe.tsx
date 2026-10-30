@@ -182,7 +182,7 @@ function Indicador({ label, valor, sub, tom = 'zinc', destaque, icone: Icone }: 
                 {Icone && <Icone size={12} />} {label}
             </p>
             <p className={`text-base font-black font-mono tracking-tighter ${cor}`}>{valor}</p>
-            {sub && <p className="text-[9px] text-zinc-600 font-bold mt-0.5">{sub}</p>}
+            {sub && <p className="text-[10px] text-zinc-600 font-bold mt-0.5">{sub}</p>}
         </div>
     );
 }

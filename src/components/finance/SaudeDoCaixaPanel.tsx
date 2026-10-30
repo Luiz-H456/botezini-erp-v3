@@ -40,7 +40,7 @@ function Kpi({ label, valor, sub, tom, dica }: {
                 {dica && <InfoTooltip><p className="text-[11px] text-zinc-300 leading-relaxed">{dica}</p></InfoTooltip>}
             </div>
             <p className={`text-xl font-black font-mono tracking-tighter ${cor}`}>{valor}</p>
-            {sub && <p className="text-[9px] text-zinc-600 font-bold font-mono mt-0.5">{sub}</p>}
+            {sub && <p className="text-[10px] text-zinc-600 font-bold font-mono mt-0.5">{sub}</p>}
         </div>
     );
 }

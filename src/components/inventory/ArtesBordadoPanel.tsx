@@ -240,7 +240,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                 {cores.length > 0 && (
                                     <div className="flex flex-wrap gap-1.5">
                                         {cores.map((c, i) => (
-                                            <span key={i} className="text-[9px] uppercase font-bold tracking-wider text-zinc-400 bg-zinc-800/60 border border-zinc-700/50 px-2 py-0.5 rounded-full">{c}</span>
+                                            <span key={i} className="text-[10px] uppercase font-bold tracking-wider text-zinc-400 bg-zinc-800/60 border border-zinc-700/50 px-2 py-0.5 rounded-full">{c}</span>
                                         ))}
                                     </div>
                                 )}
@@ -254,7 +254,7 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
                                 {a.observacoes && <p className="text-[10px] text-zinc-500 italic border-t border-zinc-800/50 pt-2">{a.observacoes}</p>}
 
                                 {a.feita_em && (
-                                    <p className="text-[9px] text-zinc-600 uppercase tracking-widest font-bold">
+                                    <p className="text-[10px] text-zinc-600 uppercase tracking-widest font-bold">
                                         Feita em {new Date(a.feita_em + 'T12:00:00').toLocaleDateString('pt-BR')}
                                     </p>
                                 )}

@@ -221,7 +221,7 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
                                         <p className="text-[11px] font-bold text-zinc-200 truncate">
                                             {a.items.map(i => `${i.quantity}× ${i.product_name}`).join(', ')}
                                         </p>
-                                        <p className="text-[9px] text-zinc-600 font-bold">
+                                        <p className="text-[10px] text-zinc-600 font-bold">
                                             {new Date(a.created_at).toLocaleDateString('pt-BR')}
                                             {a.reason ? ` · ${a.reason}` : ''}
                                             {a.obligation_id ? ' · cobrança gerada' : ' · sem cobrança à parte'}
@@ -279,12 +279,12 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
                                 className={`${Campo} w-full`} />
 
                             <div className="space-y-1">
-                                <label className="block text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+                                <label className="block text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                                     Vencimento da cobrança à parte
                                 </label>
                                 <input type="date" value={vencimento} onChange={e => setVencimento(e.target.value)}
                                     className={`${Campo} w-full`} />
-                                <p className="text-[9px] text-zinc-600 font-bold leading-snug">
+                                <p className="text-[10px] text-zinc-600 font-bold leading-snug">
                                     {/* Deixar em branco é uma escolha legítima, não um campo
                                         esquecido — o cliente que paga tudo no ato não precisa
                                         de um recebível separado. */}

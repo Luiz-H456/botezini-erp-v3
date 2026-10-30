@@ -224,7 +224,7 @@ export const ImportarLeads: React.FC<Props> = ({
                                     }`}
                                 >
                                     <p className="text-xl font-black tabular-nums">{n}</p>
-                                    <p className="text-[9px] font-black uppercase tracking-widest mt-0.5 leading-tight">
+                                    <p className="text-[10px] font-black uppercase tracking-widest mt-0.5 leading-tight">
                                         {ROTULO_DA_CATEGORIA[cat]}
                                     </p>
                                 </button>
@@ -245,7 +245,7 @@ export const ImportarLeads: React.FC<Props> = ({
                                             key={l.numero}
                                             className={`${ITEM} flex items-center gap-3 px-3 py-2`}
                                         >
-                                            <span className="text-[9px] font-mono text-zinc-700 w-8 shrink-0">
+                                            <span className="text-[10px] font-mono text-zinc-700 w-8 shrink-0">
                                                 {l.numero}
                                             </span>
                                             <span className="text-[11px] font-bold text-zinc-300 truncate flex-1">

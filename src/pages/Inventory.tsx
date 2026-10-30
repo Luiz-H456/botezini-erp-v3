@@ -250,6 +250,9 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
     const totalStockValue = allItems.reduce((s: number, i: Insumo) => s + (i.current_stock * i.average_unit_cost), 0);
     const lowStockCount = allItems.filter(ehCritico).length;
 
+    // N abre um insumo novo (auditoria N2). Antes do retorno de carregando: hook nunca depois de um return.
+    useAtalho({ novo: () => { if (aba === 'insumos' && editingId === null) startNew(); } });
+
     if (isLoading) {
         return <div className="p-12 text-center text-zinc-600 flex flex-col items-center justify-center gap-4">
             <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
@@ -257,8 +260,6 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
         </div>;
     }
 
-    // N abre um insumo novo (auditoria N2).
-    useAtalho({ novo: () => { if (aba === 'insumos' && editingId === null) startNew(); } });
 
     return (
         <div className="space-y-4 w-full">
@@ -398,7 +399,7 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
                                     onChange={e => setForm(f => ({ ...f, rendimento: parseFloat(e.target.value) || 1 }))}
                                     title="Quantos metros existem em 1 kg"
                                 />
-                                <p className="text-[9px] text-zinc-600 mt-0.5">m lineares por kg</p>
+                                <p className="text-[10px] text-zinc-600 mt-0.5">m lineares por kg</p>
                             </div>
                         )}
                         <div>

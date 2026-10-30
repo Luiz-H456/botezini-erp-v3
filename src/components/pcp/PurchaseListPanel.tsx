@@ -221,12 +221,12 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                         <table className="w-full">
                             <thead className="bg-zinc-900/60 border-b border-zinc-800">
                                 <tr>
-                                    <th className="text-left px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Insumo</th>
-                                    <th className="text-right px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Previsto</th>
-                                    <th className="text-right px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Já comprado</th>
-                                    <th className="text-right px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Falta</th>
-                                    <th className="text-right px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Em estoque</th>
-                                    <th className="text-left px-4 py-2.5 text-[9px] font-black text-zinc-500 uppercase tracking-widest">Pedidos</th>
+                                    <th className="text-left px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Insumo</th>
+                                    <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Previsto</th>
+                                    <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Já comprado</th>
+                                    <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Falta</th>
+                                    <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Em estoque</th>
+                                    <th className="text-left px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Pedidos</th>
                                     <th className="px-4 py-2.5" />
                                 </tr>
                             </thead>
@@ -336,7 +336,7 @@ function Kpi({ label, value, tone, icon: Icon, info }: { label: string; value: s
         <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4">
             <div className="flex items-center gap-1.5 mb-1">
                 <Icon size={12} className="text-zinc-600" />
-                <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{label}</p>
+                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{label}</p>
                 {info && <InfoTooltip>{info}</InfoTooltip>}
             </div>
             <p className={`text-xl font-black font-mono tracking-tighter ${color}`}>{value}</p>

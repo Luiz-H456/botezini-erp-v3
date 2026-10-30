@@ -119,7 +119,7 @@ export function Miniatura({ path, onOpen, onRemove, nomeParaBaixar }: {
                 >
                     <img src={url} alt="Referência" className="w-full h-full object-cover" />
                     <span className="absolute inset-0 flex items-end justify-center pb-1.5 bg-gradient-to-t from-zinc-950/85 via-zinc-950/10 to-transparent opacity-0 group-hover/foto:opacity-100 transition-opacity duration-150">
-                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white drop-shadow">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white drop-shadow">
                             Ampliar
                         </span>
                     </span>

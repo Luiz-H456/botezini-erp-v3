@@ -148,7 +148,7 @@ export const ClientesDormentes: React.FC<Props> = ({ clients, onAbrirCliente, ab
                         <span className="text-[11px] font-mono font-black text-zinc-400 tabular-nums shrink-0">
                             {formatCurrency(d.valorHistorico)}
                         </span>
-                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-400/70 tabular-nums shrink-0 w-10 text-right">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400/70 tabular-nums shrink-0 w-10 text-right">
                             {d.atraso.toFixed(1).replace('.', ',')}×
                         </span>
 

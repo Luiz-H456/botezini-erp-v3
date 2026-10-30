@@ -138,7 +138,7 @@ export function CronogramaPanel({ onIrPara }: { onIrPara?: (v: View) => void }) 
                                     return (
                                         <div key={o.id} className="flex items-center justify-between px-4 py-2 text-xs gap-3">
                                             <div className="flex items-start gap-2 min-w-0">
-                                                <span className="text-[9px] font-mono text-zinc-600 w-5 text-right mt-0.5">{o.sequence_index + 1}.</span>
+                                                <span className="text-[10px] font-mono text-zinc-600 w-5 text-right mt-0.5">{o.sequence_index + 1}.</span>
                                                 <div className="min-w-0">
                                                     <span className="font-black text-zinc-200">#{o.order_number}</span>
                                                     <span className="text-zinc-400"> · {o.client_name || 'Cliente'}</span>
@@ -155,7 +155,7 @@ export function CronogramaPanel({ onIrPara }: { onIrPara?: (v: View) => void }) 
                                             </div>
                                             <div className="flex items-center gap-3 shrink-0">
                                                 <span className="font-mono text-zinc-500">{o.pieces} pç</span>
-                                                {o.late && <span className="text-[9px] font-black text-rose-400 uppercase">Atraso</span>}
+                                                {o.late && <span className="text-[10px] font-black text-rose-400 uppercase">Atraso</span>}
                                                 <button
                                                     onClick={() => setAlvo({ id: o.id, order_number: o.order_number, client_name: o.client_name })}
                                                     title="Registrar atraso neste pedido" aria-label="Registrar atraso neste pedido"
@@ -200,9 +200,9 @@ function Metric({ label, value, sub, tone, icon: Icon }: { label: string; value:
     const color = { zinc: 'text-zinc-200', emerald: 'text-emerald-400', rose: 'text-rose-400', amber: 'text-amber-400' }[tone];
     return (
         <div className={`${CARTAO} p-4`}>
-            <div className="flex items-center gap-1.5 mb-1"><Icon size={12} className="text-zinc-600" /><p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{label}</p></div>
+            <div className="flex items-center gap-1.5 mb-1"><Icon size={12} className="text-zinc-600" /><p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{label}</p></div>
             <p className={`text-xl font-black font-mono tracking-tighter ${color}`}>{value}</p>
-            {sub && <p className="text-[9px] text-zinc-600 font-bold font-mono">{sub}</p>}
+            {sub && <p className="text-[10px] text-zinc-600 font-bold font-mono">{sub}</p>}
         </div>
     );
 }

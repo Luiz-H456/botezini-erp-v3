@@ -88,7 +88,7 @@ const Linha: React.FC<{
                         {semGiro ? '—' : formatCurrency(linha.faturamento)}
                     </p>
                     {!semGiro && linha.fatia >= 0.01 && (
-                        <p className="text-[9px] font-black uppercase tracking-widest text-amber-500/70 mt-0.5">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500/70 mt-0.5">
                             {pct(linha.fatia)} do faturamento
                         </p>
                     )}
@@ -269,12 +269,12 @@ const Painel: React.FC<Omit<Props, 'destacar' | 'aoDestacar'>> = ({ onAbrirProdu
 
                     <div className="flex items-center gap-6 text-right">
                         <div>
-                            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Produtos sem ficha</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Produtos sem ficha</p>
                             <p className="text-2xl font-black text-zinc-300 tabular-nums">{c.produtosPendentes}</p>
                             <p className="text-[10px] text-zinc-600">de {totalDeProdutos}</p>
                         </div>
                         <div>
-                            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-600">Insumos sem custo</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Insumos sem custo</p>
                             <p className="text-2xl font-black text-zinc-300 tabular-nums">{c.insumosPendentes}</p>
                             <p className="text-[10px] text-zinc-600">de {totalDeInsumos}</p>
                         </div>

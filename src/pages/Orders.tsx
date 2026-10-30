@@ -351,7 +351,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
                                                     linha em vez de esperar alguém abrir a fatura. */}
                                                 {Math.abs(resumo.divergencia) >= 0.01 && (
                                                     <span
-                                                        className="flex items-center gap-1 px-2 py-0.5 text-[8px] font-black tracking-widest uppercase rounded-full border border-orange-700 bg-orange-950/40 text-orange-400"
+                                                        className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-black tracking-widest uppercase rounded-full border border-orange-700 bg-orange-950/40 text-orange-400"
                                                         title={`As contas somam ${formatCurrency(resumo.total)}, mas o pedido é de ${formatCurrency(order.total_amount)}. Revise o plano de pagamento.`}
                                                     >
                                                         <AlertTriangle size={12} /> DIVERGE {formatCurrency(Math.abs(resumo.divergencia))}
@@ -367,7 +367,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
                                     <span className="font-mono text-zinc-400 text-[11px] font-black">{formatCurrency(order.total_amount)}</span>
                                     {order.budget_serial_number && (
                                         <div
-                                            className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-amber-500 cursor-pointer hover:bg-amber-500/20 transition-all group/link"
+                                            className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-amber-500 cursor-pointer hover:bg-amber-500/20 transition-all group/link"
                                             onClick={() => onNavigate && onNavigate('budgets', order.budget_serial_number)}
                                         >
                                             <Link size={12} />

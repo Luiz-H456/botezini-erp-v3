@@ -119,7 +119,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                     <div className="flex gap-1">
                         {([['tabela', 'Tabela de preços', Table2], ['artes', 'Artes de bordado', Palette]] as const).map(([id, label, Icone]) => (
                             <button key={id} type="button" onClick={() => setOrigem(id)}
-                                className={`text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${origem === id
+                                className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl border flex items-center gap-2 transition-all ${origem === id
                                     ? 'bg-amber-500 text-black border-amber-500'
                                     : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white'}`}>
                                 <Icone size={13} /> {label}
@@ -151,7 +151,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                         return (
                             <button key={p.id} type="button" onClick={() => importarPreco(p.id)}
                                 className="w-full text-left px-6 py-4 hover:bg-zinc-900/60 transition-all flex items-center gap-4 group">
-                                <span className="text-[9px] uppercase font-black tracking-widest text-amber-500 bg-amber-950/30 border border-amber-900/40 px-2 py-1 rounded-full shrink-0">
+                                <span className="text-[10px] uppercase font-black tracking-widest text-amber-500 bg-amber-950/30 border border-amber-900/40 px-2 py-1 rounded-full shrink-0">
                                     {ROTULO_TECNICA[p.tecnica]}
                                 </span>
                                 <div className="min-w-0 flex-1">
@@ -187,7 +187,7 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                                     <span className="font-mono font-black text-amber-500 text-sm">
                                         {valor !== null ? formatCurrency(valor) : '—'}
                                     </span>
-                                    <p className="text-[9px] text-zinc-600 uppercase tracking-wider">
+                                    <p className="text-[10px] text-zinc-600 uppercase tracking-wider">
                                         {daTabela ? 'da tabela' : 'sugerido'}
                                     </p>
                                 </div>

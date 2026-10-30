@@ -144,7 +144,7 @@ export function PaymentPlanModal(props: Props) {
 
                     {/* Seed por condição */}
                     <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest shrink-0">Condição</span>
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest shrink-0">Condição</span>
                         <div className="w-56">
                             <SearchableSelect
                                 value={terms}
@@ -153,7 +153,7 @@ export function PaymentPlanModal(props: Props) {
                                 placeholder="CONDIÇÃO..."
                             />
                         </div>
-                        <span className="text-[9px] text-zinc-600 font-bold">— aplica um modelo; ajuste livremente abaixo</span>
+                        <span className="text-[10px] text-zinc-600 font-bold">— aplica um modelo; ajuste livremente abaixo</span>
                     </div>
 
                     {loading ? (
@@ -167,7 +167,7 @@ export function PaymentPlanModal(props: Props) {
                                 <div key={`lock-${i}`} className="flex items-center gap-2 bg-zinc-950/40 border border-zinc-800 rounded-xl px-3 py-2 opacity-70">
                                     <Lock size={13} className="text-emerald-500 shrink-0" />
                                     <span className="flex-1 text-xs text-zinc-400 truncate">{r.label}</span>
-                                    <span className="text-[9px] font-black text-emerald-500 uppercase">{r.status}</span>
+                                    <span className="text-[10px] font-black text-emerald-500 uppercase">{r.status}</span>
                                     <span className="text-xs font-mono font-bold text-zinc-300 w-24 text-right">{formatCurrency(r.amount)}</span>
                                 </div>
                             ))}

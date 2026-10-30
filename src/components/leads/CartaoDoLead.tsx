@@ -188,7 +188,7 @@ export const CartaoDoLead: React.FC<Props> = ({ lead, nomeDaCasa, onMover, onAbr
                 )}
 
                 {lead.client_id && (
-                    <span className="ml-auto flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-emerald-500/70">
+                    <span className="ml-auto flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-emerald-500/70">
                         <Building2 size={12} /> cliente
                     </span>
                 )}

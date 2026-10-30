@@ -209,7 +209,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
                                         Dentro do grupo
                                     </label>
                                     <button onClick={() => setIsCreatingParent(true)}
-                                        className="text-[8px] font-black text-amber-500 hover:text-amber-400 uppercase flex items-center gap-1 transition-colors">
+                                        className="text-[10px] font-black text-amber-500 hover:text-amber-400 uppercase flex items-center gap-1 transition-colors">
                                         <Plus size={14} /> Novo grupo
                                     </button>
                                 </div>
@@ -292,7 +292,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
 
                         {isCreatingParent && (
                             <button onClick={() => setIsCreatingParent(false)}
-                                className="w-full text-center py-2 text-[8px] font-black uppercase text-zinc-500 hover:text-zinc-300 transition-colors">
+                                className="w-full text-center py-2 text-[10px] font-black uppercase text-zinc-500 hover:text-zinc-300 transition-colors">
                                 Cancelar
                             </button>
                         )}
@@ -305,7 +305,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
                                 Já cadastradas
                             </h3>
                             {naoRevisadas > 0 && (
-                                <span className="text-[9px] font-black uppercase tracking-widest text-amber-500">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-amber-500">
                                     {naoRevisadas} nunca revisada{naoRevisadas > 1 ? 's' : ''}
                                 </span>
                             )}
@@ -326,7 +326,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
                                 return (
                                     <div key={g.id}>
                                         <div className="flex items-center justify-between gap-2 px-1 mb-1">
-                                            <span className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.15em] truncate">
+                                            <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.15em] truncate">
                                                 {g.name}
                                             </span>
                                             <button onClick={() => handleDelete(g.id)} title="Excluir grupo" aria-label="Excluir grupo"
@@ -336,7 +336,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
                                         </div>
 
                                         {filhas.length === 0 ? (
-                                            <p className="text-[9px] text-amber-500/70 font-bold ml-3 mb-1">
+                                            <p className="text-[10px] text-amber-500/70 font-bold ml-3 mb-1">
                                                 vazio — não aparece em nenhum cadastro
                                             </p>
                                         ) : filhas.map(c => (
@@ -373,7 +373,7 @@ export const GlobalCategoryQuickAdd: React.FC<Props> = ({ domain, isOpen, onClos
 
                                                     {ehFinanceiro && !c.natureza && (
                                                         <span title="Ainda não revisada — está contando como variável"
-                                                            className="text-[9px] font-black uppercase tracking-widest text-amber-500/70">
+                                                            className="text-[10px] font-black uppercase tracking-widest text-amber-500/70">
                                                             novo
                                                         </span>
                                                     )}

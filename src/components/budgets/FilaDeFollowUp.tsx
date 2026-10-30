@@ -104,7 +104,7 @@ export const FilaDeFollowUp: React.FC<Props> = ({ budgets, clients, hoje, onAbri
                             className={`${ITEM} flex items-center gap-2.5 px-3 py-2 flex-wrap`}
                         >
                             <span
-                                className={`px-2 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest shrink-0 ${TOM[item.urgencia]}`}
+                                className={`px-2 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest shrink-0 ${TOM[item.urgencia]}`}
                             >
                                 {ROTULO_DA_URGENCIA[item.urgencia]}
                             </span>

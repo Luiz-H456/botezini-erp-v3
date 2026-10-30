@@ -105,7 +105,7 @@ export const BotaoWhatsApp: React.FC<BotaoWhatsAppProps> = ({ telefone, texto, c
             onPointerDown={e => e.stopPropagation()}
             title={`Abrir conversa no WhatsApp — ${telefone}`}
             className={`inline-flex items-center gap-1 rounded-lg border border-emerald-500/25 bg-emerald-500/10 text-emerald-400 font-black uppercase tracking-widest hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-colors shrink-0 ${
-                compacto ? 'px-1.5 py-1 text-[9px]' : 'px-2.5 py-1.5 text-[10px]'
+                compacto ? 'px-1.5 py-1 text-[10px]' : 'px-2.5 py-1.5 text-[10px]'
             } ${className}`}
         >
             <MessageCircle size={compacto ? 10 : 11} />

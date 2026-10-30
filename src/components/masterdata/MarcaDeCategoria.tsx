@@ -57,7 +57,7 @@ export const MarcaCompacta: React.FC<{
             ? 'bg-amber-500 border-amber-500' : 'border-zinc-700'}`}>
             {marcado && <Check size={8} className="text-black" strokeWidth={4} />}
         </span>
-        <span className="text-[9px] font-black uppercase tracking-widest">{rotulo}</span>
+        <span className="text-[10px] font-black uppercase tracking-widest">{rotulo}</span>
     </button>
 );
 

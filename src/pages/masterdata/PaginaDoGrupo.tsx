@@ -128,7 +128,7 @@ export function PaginaDoGrupo({
     }, [membros]);
 
     const Origem = ({ id }: { id?: string }) => (
-        <span className="text-[9px] font-bold text-zinc-600 truncate">
+        <span className="text-[10px] font-bold text-zinc-600 truncate">
             {(id && nomePorId.get(id)) || '—'}
         </span>
     );
@@ -144,7 +144,7 @@ export function PaginaDoGrupo({
                         <ArrowLeft size={16} />
                     </button>
                     <div className="min-w-0">
-                        <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+                        <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
                             <Building2 size={12} /> Grupo econômico
                         </p>
                         <h2 className="text-xl font-black text-white uppercase tracking-tight truncate">{grupo}</h2>
@@ -206,7 +206,7 @@ export function PaginaDoGrupo({
 
                             <div className={`${CARTAO} p-5 space-y-4`}>
                                 <div className="flex items-center justify-between gap-3 flex-wrap">
-                                    <p className="text-[9px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                                    <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                                         <TrendingUp size={12} className="text-amber-500" /> Pedidos do grupo no tempo
                                     </p>
                                     {dossie.padrao.intervaloMedioDias !== null && (
@@ -218,7 +218,7 @@ export function PaginaDoGrupo({
                                     )}
                                 </div>
                                 <GraficoDePedidos serie={dossie.porMes} />
-                                <p className="text-[9px] text-zinc-600 font-bold leading-relaxed">
+                                <p className="text-[10px] text-zinc-600 font-bold leading-relaxed">
                                     O ritmo é do grupo somado — é o que mostra se o dono continua comprando
                                     mesmo quando uma filial some e outra cresce.
                                 </p>
@@ -252,7 +252,7 @@ export function PaginaDoGrupo({
                                                     </button>
                                                 </td>
                                                 <td className="p-4">
-                                                    <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${COR_DO_PAPEL[papel]}`}>
+                                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${COR_DO_PAPEL[papel]}`}>
                                                         {ROTULO_DO_PAPEL[papel]}
                                                     </span>
                                                 </td>
@@ -275,7 +275,7 @@ export function PaginaDoGrupo({
                                     })}
                                 </tbody>
                             </table>
-                            <p className="px-4 py-3 text-[9px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
+                            <p className="px-4 py-3 text-[10px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
                                 <b className="text-amber-500/80">Matriz</b> e <b className="text-zinc-400">filial</b> são
                                 deduzidas do próprio CNPJ — mesma raiz, sufixo /0001 é a matriz.
                                 <b className="text-sky-400/80"> Coligada</b> é empresa de CNPJ diferente que entra no
@@ -308,7 +308,7 @@ export function PaginaDoGrupo({
                                                     <tr key={pc.produto} className="hover:bg-zinc-800/40 transition-colors">
                                                         <td className="p-4 font-black text-zinc-200 uppercase tracking-tight">
                                                             {pc.produto}
-                                                            <span className="block text-[9px] font-bold text-zinc-600 normal-case tracking-normal mt-0.5">
+                                                            <span className="block text-[10px] font-bold text-zinc-600 normal-case tracking-normal mt-0.5">
                                                                 em {pc.aparicoes} orçamento{pc.aparicoes > 1 ? 's' : ''} do grupo
                                                             </span>
                                                         </td>
@@ -322,7 +322,7 @@ export function PaginaDoGrupo({
                                         </table>
                                     )}
                                     {dossie.pecas.length > 0 && (
-                                        <p className="px-4 py-3 text-[9px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
+                                        <p className="px-4 py-3 text-[10px] text-zinc-600 font-bold border-t border-zinc-900 leading-relaxed">
                                             Volume somado do grupo — é este número que sustenta pedir desconto de escala.
                                         </p>
                                     )}
@@ -362,7 +362,7 @@ export function PaginaDoGrupo({
                                                             <td className="p-4 text-zinc-400">{o.date ? formatDate(o.date) : '—'}</td>
                                                             <td className="p-4 font-mono text-zinc-300">{formatCurrency(o.total_amount || 0)}</td>
                                                             <td className="p-4">
-                                                                <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${fechado
+                                                                <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${fechado
                                                                     ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
                                                                     : 'text-zinc-500 border-zinc-800 bg-zinc-950'}`}>
                                                                     {ROTULO_STATUS[o.status || ''] || o.status}
@@ -405,7 +405,7 @@ export function PaginaDoGrupo({
                                                         <td className="p-4 text-zinc-400">{p.created_at ? formatDate(p.created_at) : '—'}</td>
                                                         <td className="p-4 text-zinc-400">{p.deadline ? formatDate(p.deadline) : '—'}</td>
                                                         <td className="p-4 font-mono text-zinc-300">{formatCurrency(p.total_amount || 0)}</td>
-                                                        <td className="p-4 text-[9px] font-black uppercase tracking-widest text-zinc-400">{p.status || '—'}</td>
+                                                        <td className="p-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">{p.status || '—'}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
@@ -443,7 +443,7 @@ export function PaginaDoGrupo({
                                                     <tr key={c.id} className={`hover:bg-zinc-800/40 transition-colors ${cancelada ? 'opacity-40' : ''}`}>
                                                         <td className="p-4 text-zinc-300 font-bold">
                                                             {c.description}
-                                                            {cancelada && <span className="ml-2 text-[8px] font-black uppercase text-rose-500">cancelada</span>}
+                                                            {cancelada && <span className="ml-2 text-[10px] font-black uppercase text-rose-500">cancelada</span>}
                                                             {/* Pedido ainda não entregue: fora dos cartões de vencido e a receber. */}
                                                             {c.awaiting_delivery && <span className={`${ROTULO_PEQUENO} ml-2`}>em produção</span>}
                                                         </td>

@@ -16,7 +16,7 @@ export interface ClientFormProps {
 }
 
 const InputCls = 'w-full bg-zinc-950/50 border border-zinc-800 rounded-xl px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-zinc-200 outline-none focus:border-amber-500/30 transition-all placeholder:text-zinc-700 hover:border-zinc-700';
-const LabelCls = 'text-[9px] font-black text-zinc-500 uppercase tracking-widest block mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ml-1';
+const LabelCls = 'text-[10px] font-black text-zinc-500 uppercase tracking-widest block mb-1.5 whitespace-nowrap overflow-hidden text-ellipsis ml-1';
 
 export const ClientForm: React.FC<ClientFormProps> = ({
   data,
@@ -27,7 +27,7 @@ export const ClientForm: React.FC<ClientFormProps> = ({
   <div className="space-y-4">
     {data.id && (
       <div className="flex items-center justify-between bg-zinc-950/40 border border-zinc-800 rounded-xl px-3 py-2">
-        <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Score de crédito</span>
+        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Score de crédito</span>
         <ClientScoreBadge clientId={data.id} />
       </div>
     )}

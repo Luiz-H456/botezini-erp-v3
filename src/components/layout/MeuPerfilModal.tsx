@@ -114,7 +114,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
                                     : iniciais(previa)}
                         </span>
                         <div className="flex flex-col gap-1.5">
-                            <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-colors ${migracaoOk === false
+                            <label className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border transition-colors ${migracaoOk === false
                                 ? 'border-zinc-800 text-zinc-700 cursor-not-allowed'
                                 : 'border-zinc-700 text-zinc-300 hover:border-amber-500/40 hover:text-amber-400 cursor-pointer'}`}>
                                 <Camera size={12} /> {foto ? 'Trocar foto' : 'Enviar foto'}
@@ -125,7 +125,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
                             </label>
                             {caminhoDaFoto && (
                                 <button onClick={() => setCaminhoDaFoto('')}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-zinc-600 hover:text-rose-400 transition-colors">
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-zinc-600 hover:text-rose-400 transition-colors">
                                     <Trash2 size={12} /> Remover
                                 </button>
                             )}
@@ -155,7 +155,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
                             autoFocus
                             className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-white text-[13px] font-bold outline-none focus:border-amber-500/50 placeholder-zinc-700 transition-colors"
                         />
-                        <p className="text-[9px] font-bold text-zinc-600 mt-1.5 ml-1">
+                        <p className="text-[10px] font-bold text-zinc-600 mt-1.5 ml-1">
                             Aparece no topo e nas telas que citam quem fez o lançamento.
                         </p>
                     </div>

@@ -189,7 +189,7 @@ export default function ItensVendidos() {
                                                 {l.caracteristicas.length === 0
                                                     ? <span className="text-zinc-700 text-xs">—</span>
                                                     : l.caracteristicas.map(c => (
-                                                        <span key={c} className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">{c}</span>
+                                                        <span key={c} className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">{c}</span>
                                                     ))}
                                             </div>
                                         </td>
@@ -272,7 +272,7 @@ function Metrica({ label, valor, sub, tom, icone: Icone, dica }: {
                 {dica && <InfoTooltip><p className="text-[11px] text-zinc-300 leading-relaxed">{dica}</p></InfoTooltip>}
             </div>
             <p className={`text-xl font-black font-mono tracking-tighter ${cor}`}>{valor}</p>
-            {sub && <p className="text-[9px] text-zinc-600 font-bold font-mono">{sub}</p>}
+            {sub && <p className="text-[10px] text-zinc-600 font-bold font-mono">{sub}</p>}
         </div>
     );
 }

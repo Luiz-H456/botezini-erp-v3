@@ -147,12 +147,12 @@ export function EntityListTab<T extends { id: string }>({
                   {mudouSetor && (
                     <tr className="bg-zinc-950/60">
                       <td colSpan={selecao ? 5 : 4} className="px-4 pt-4 pb-2 border-t border-zinc-800">
-                        <span className={`text-[9px] font-black uppercase tracking-widest ${secao.forasteira ? 'text-amber-500' : 'text-zinc-500'}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${secao.forasteira ? 'text-amber-500' : 'text-zinc-500'}`}>
                           {secao.forasteira && <AlertTriangle size={12} className="inline mb-0.5 mr-1.5" />}
                           {rotuloDaSecao(secao.setor, setorDaPagina, entityType)}
                         </span>
                         {secao.forasteira && (
-                          <span className="ml-2 text-[9px] font-bold text-zinc-600 normal-case tracking-normal">
+                          <span className="ml-2 text-[10px] font-bold text-zinc-600 normal-case tracking-normal">
                             — categoria de outro setor; abra Cadastros › Categorias para mover
                           </span>
                         )}
@@ -196,7 +196,7 @@ export function EntityListTab<T extends { id: string }>({
                             <button
                               onClick={(e) => { e.stopPropagation(); onAbrirGrupo?.(getGrupo!(item)!); }}
                               title={`Ver o grupo ${getGrupo!(item)}`}
-                              className="mt-1 inline-flex items-center gap-1 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500/90 border border-amber-500/25 hover:bg-amber-500/20 transition-colors"
+                              className="mt-1 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500/90 border border-amber-500/25 hover:bg-amber-500/20 transition-colors"
                             >
                               <Building2 size={12} /> {getGrupo!(item)}
                             </button>
@@ -210,7 +210,7 @@ export function EntityListTab<T extends { id: string }>({
                       )}
                     </td>
                     <td className="p-4 text-zinc-400 font-bold uppercase tracking-widest">
-                      <span className="bg-zinc-950/50 border border-zinc-800 text-[8px] px-2.5 py-1 rounded-full font-black uppercase tracking-[0.15em] text-zinc-400">
+                      <span className="bg-zinc-950/50 border border-zinc-800 text-[10px] px-2.5 py-1 rounded-full font-black uppercase tracking-[0.15em] text-zinc-400">
                         {getCategory(item) || 'Geral'}
                       </span>
                     </td>

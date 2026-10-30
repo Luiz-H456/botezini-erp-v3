@@ -29,7 +29,7 @@ export const OrderDeleteModal: React.FC<OrderDeleteModalProps> = ({
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Pedido <span className="text-white">#{order_number}</span> será removido permanentemente.</p>
           </div>
           <div className="space-y-2 border-t border-zinc-900 pt-4">
-            <p className="text-[9px] font-black text-rose-500 uppercase tracking-widest mb-2">Impactos da operação:</p>
+            <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Impactos da operação:</p>
             <ul className="space-y-1.5">
               <li className="text-[10px] font-bold text-zinc-400 uppercase tracking-wide flex items-center gap-2">
                 <div className="w-1 h-1 bg-zinc-800 rounded-full"></div> 1. Remoção total da lista de Produção

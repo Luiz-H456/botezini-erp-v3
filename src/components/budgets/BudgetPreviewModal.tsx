@@ -224,12 +224,12 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="bg-zinc-950/50 border-b border-zinc-800">
-                                                <th className="px-6 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest">PRODUTO / REFERÊNCIA</th>
-                                                <th className="px-4 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">ESPECIFICAÇÕES</th>
-                                                <th className="px-4 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest text-center">TAM</th>
-                                                <th className="px-4 py-4 text-[9px] font-black text-amber-500 uppercase tracking-widest text-center">QTD</th>
-                                                <th className="px-4 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest text-right">VALOR UNIT.</th>
-                                                <th className="px-6 py-4 text-[9px] font-black text-zinc-600 uppercase tracking-widest text-right">TOTAL ITEM</th>
+                                                <th className="px-6 py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest">PRODUTO / REFERÊNCIA</th>
+                                                <th className="px-4 py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center">ESPECIFICAÇÕES</th>
+                                                <th className="px-4 py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center">TAM</th>
+                                                <th className="px-4 py-4 text-[10px] font-black text-amber-500 uppercase tracking-widest text-center">QTD</th>
+                                                <th className="px-4 py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-right">VALOR UNIT.</th>
+                                                <th className="px-6 py-4 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-right">TOTAL ITEM</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-800/50">
@@ -244,7 +244,7 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-4 text-center">
-                                                        <span className="px-2 py-0.5 bg-zinc-950 border border-zinc-800 rounded text-[9px] font-black text-zinc-400 uppercase tracking-widest">
+                                                        <span className="px-2 py-0.5 bg-zinc-950 border border-zinc-800 rounded text-[10px] font-black text-zinc-400 uppercase tracking-widest">
                                                             {item.size}
                                                         </span>
                                                     </td>
@@ -273,11 +273,11 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="bg-zinc-950/20 border-b border-zinc-800">
-                                                <th className="px-6 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest">TÉCNICA</th>
-                                                <th className="px-4 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest">DESCRIÇÃO</th>
-                                                <th className="px-4 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest text-center">POSIÇÃO</th>
-                                                <th className="px-4 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest text-center">QTD</th>
-                                                <th className="px-6 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest text-right">SUBTOTAL</th>
+                                                <th className="px-6 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest">TÉCNICA</th>
+                                                <th className="px-4 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest">DESCRIÇÃO</th>
+                                                <th className="px-4 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center">POSIÇÃO</th>
+                                                <th className="px-4 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center">QTD</th>
+                                                <th className="px-6 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-right">SUBTOTAL</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-800/30">
@@ -314,9 +314,9 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                     <table className="w-full text-left border-collapse">
                                         <thead>
                                             <tr className="bg-zinc-950/20 border-b border-zinc-800">
-                                                <th className="px-6 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest">DESCRIÇÃO DO SERVIÇO</th>
-                                                <th className="px-4 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest text-center">QTD</th>
-                                                <th className="px-6 py-3 text-[8px] font-black text-zinc-600 uppercase tracking-widest text-right">SUBTOTAL</th>
+                                                <th className="px-6 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest">DESCRIÇÃO DO SERVIÇO</th>
+                                                <th className="px-4 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-center">QTD</th>
+                                                <th className="px-6 py-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-right">SUBTOTAL</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-800/30">
@@ -342,7 +342,7 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                 <div className="flex items-center gap-3 mb-4">
                                     <Camera size={16} className="text-amber-500" />
                                     <p className="text-[10px] font-black uppercase text-zinc-500 tracking-[0.2em]">Fotos de Referência</p>
-                                    <span className="text-[9px] font-bold text-zinc-600">
+                                    <span className="text-[10px] font-bold text-zinc-600">
                                         {fotos.length} anexada{fotos.length > 1 ? 's' : ''}
                                     </span>
                                 </div>
@@ -363,7 +363,7 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                         <Calendar size={18} />
                                     </div>
                                     <div className="flex flex-col">
-                                        <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Estimativa de Produção</span>
+                                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Estimativa de Produção</span>
                                         <span className="text-xs font-black text-white uppercase tracking-wider mt-1">
                                             {deliveryDays} dias úteis — <span className="text-amber-500">{formatDate(estimatedDate)}</span>
                                         </span>
@@ -405,7 +405,7 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                                 <div key={i} className="flex items-center justify-between gap-4 px-4 py-3">
                                                     <div className="min-w-0">
                                                         <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest truncate">{p.label}</p>
-                                                        <p className="text-[9px] font-bold text-zinc-600 mt-0.5">
+                                                        <p className="text-[10px] font-bold text-zinc-600 mt-0.5">
                                                             {p.naConfirmacao
                                                                 ? 'na confirmação'
                                                                 : (p.vencimento ? `até ${formatDate(p.vencimento)}` : 'na entrega')}
@@ -441,19 +441,19 @@ export const BudgetPreviewModal: React.FC<Props> = ({ budget, client, companyPro
                                         <div className="grid grid-cols-2 gap-y-3">
                                             {banco.bank_name && (
                                                 <div className="flex flex-col">
-                                                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Banco</span>
+                                                    <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Banco</span>
                                                     <span className="text-[11px] font-bold text-zinc-300">{banco.bank_name}</span>
                                                 </div>
                                             )}
                                             {(banco.agency || banco.account_number) && (
                                                 <div className="flex flex-col">
-                                                    <span className="text-[8px] font-black text-zinc-700 uppercase tracking-tighter">Agência / Conta</span>
+                                                    <span className="text-[10px] font-black text-zinc-700 uppercase tracking-tighter">Agência / Conta</span>
                                                     <span className="text-[11px] font-bold text-zinc-300">{banco.agency || '-'} / {banco.account_number || '-'}</span>
                                                 </div>
                                             )}
                                             {banco.pix_key && (
                                                 <div className="flex flex-col col-span-2 mt-2 pt-3 border-t border-emerald-500/10">
-                                                    <span className="text-[8px] font-black text-emerald-500/60 uppercase tracking-widest">Chave PIX Identificada</span>
+                                                    <span className="text-[10px] font-black text-emerald-500/60 uppercase tracking-widest">Chave PIX Identificada</span>
                                                     <span className="text-lg font-black text-emerald-500 tracking-tighter">{banco.pix_key}</span>
                                                 </div>
                                             )}

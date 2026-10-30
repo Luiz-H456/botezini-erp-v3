@@ -231,7 +231,7 @@ const HistoricoProdutoBadge: React.FC<Props> = ({
                 // fazê-lo esperar seria punir o gesto mais explícito. É também
                 // o único caminho no toque, onde hover não existe.
                 onClick={(e) => { e.preventDefault(); aberto ? setAberto(false) : manterAberto(); }}
-                className={`relative overflow-hidden mt-1 flex-1 min-w-0 flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all ${doGrupo ? '' : 'hover:border-amber-500/40'} ${corDaPosicao}`}
+                className={`relative overflow-hidden mt-1 flex-1 min-w-0 flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${doGrupo ? '' : 'hover:border-amber-500/40'} ${corDaPosicao}`}
                 title={doGrupo
                     ? `Preço já praticado neste produto dentro do grupo${nomeDoGrupo ? ` ${nomeDoGrupo}` : ''} — segure o mouse para ver`
                     : 'Faixa já praticada neste produto — segure o mouse para ver o histórico'}
@@ -280,13 +280,13 @@ const HistoricoProdutoBadge: React.FC<Props> = ({
                     className="bg-zinc-950/95 border border-zinc-800 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.7)] backdrop-blur-2xl overflow-y-auto custom-scrollbar ease-out animate-in fade-in zoom-in-95 duration-150"
                 >
                     <div className="px-4 py-2.5 border-b border-zinc-800/70 flex items-center justify-between sticky top-0 bg-zinc-950/95 backdrop-blur-2xl z-10">
-                        <p className={`text-[8px] font-black uppercase tracking-[0.2em] ${doGrupo ? 'text-sky-400' : 'text-zinc-500'}`}>
+                        <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${doGrupo ? 'text-sky-400' : 'text-zinc-500'}`}>
                             {doGrupo
                                 ? `Este produto no grupo${nomeDoGrupo ? ` · ${nomeDoGrupo}` : ''}`
                                 : 'Histórico deste produto'}
                         </p>
                         {resumo && (
-                            <p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">
+                            <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
                                 {resumo.ocorrencias} orçado{resumo.ocorrencias > 1 ? 's' : ''} · {resumo.fechados} fechado{resumo.fechados === 1 ? '' : 's'}
                             </p>
                         )}
@@ -334,7 +334,7 @@ const HistoricoProdutoBadge: React.FC<Props> = ({
                                             vazio="nada em aberto" cor="text-zinc-300" />
                                     </div>
 
-                                    <div className="px-4 py-2 border-b border-zinc-800/70 flex items-center gap-3 text-[9px] font-bold text-zinc-500">
+                                    <div className="px-4 py-2 border-b border-zinc-800/70 flex items-center gap-3 text-[10px] font-bold text-zinc-500">
                                         <span className="flex items-center gap-1"><Package size={12} className="text-zinc-600" />{resumo.quantidadeTotal.toLocaleString('pt-BR')} pçs</span>
                                         <span className="flex items-center gap-1"><Users size={12} className="text-zinc-600" />{resumo.clientes} cliente{resumo.clientes > 1 ? 's' : ''}</span>
                                         <span className="ml-auto text-zinc-600">mediana {formatCurrency(resumo.mediana)}</span>
@@ -345,8 +345,8 @@ const HistoricoProdutoBadge: React.FC<Props> = ({
                                             <p className="text-[7px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-1">Médio por cor</p>
                                             {resumo.cores.map(c => (
                                                 <div key={c.cor} className="flex items-center gap-2 py-0.5">
-                                                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 truncate flex-1 min-w-0">{c.cor}</span>
-                                                    <span className="text-[8px] font-bold text-zinc-600 shrink-0">{c.quantidade.toLocaleString('pt-BR')} pçs</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate flex-1 min-w-0">{c.cor}</span>
+                                                    <span className="text-[10px] font-bold text-zinc-600 shrink-0">{c.quantidade.toLocaleString('pt-BR')} pçs</span>
                                                     <span className="text-[10px] font-mono font-black text-amber-500/90 shrink-0 w-[62px] text-right">
                                                         {formatCurrency(c.valorMedio)}
                                                     </span>
@@ -374,9 +374,9 @@ const HistoricoProdutoBadge: React.FC<Props> = ({
                                         <div key={`${v.orcamentoId}-${i}`} className="px-4 py-1.5 flex items-center gap-2">
                                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${v.fechado ? 'bg-emerald-500' : 'bg-zinc-700'}`}
                                                 title={ROTULO_STATUS[v.status] || v.status} />
-                                            <span className="text-[9px] font-mono text-zinc-500 shrink-0 w-[52px]">{dataCurta(v.data)}</span>
+                                            <span className="text-[10px] font-mono text-zinc-500 shrink-0 w-[52px]">{dataCurta(v.data)}</span>
                                             <span className="text-[10px] font-bold text-zinc-300 truncate flex-1 min-w-0">{v.cliente}</span>
-                                            <span className="text-[8px] text-zinc-600 uppercase tracking-widest truncate shrink-0 max-w-[140px]">
+                                            <span className="text-[10px] text-zinc-600 uppercase tracking-widest truncate shrink-0 max-w-[140px]">
                                                 {v.quantidade.toLocaleString('pt-BR')} pçs{v.cor ? ` · ${v.cor}` : ''}{v.tamanho ? ` · ${v.tamanho}` : ''}
                                             </span>
                                             <span className="text-[10px] font-mono font-black text-amber-500 shrink-0 w-[68px] text-right">{formatCurrency(v.valorUnit)}</span>

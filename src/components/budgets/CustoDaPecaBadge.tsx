@@ -179,7 +179,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
                     posicionar();
                     setAberto(true);
                 }}
-                className={`relative overflow-hidden mt-1 flex-1 min-w-0 flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[9px] font-black uppercase tracking-widest transition-all ${tom}`}
+                className={`relative overflow-hidden mt-1 flex-1 min-w-0 flex items-center gap-1.5 px-2 py-1 rounded-lg border text-[10px] font-black uppercase tracking-widest transition-all ${tom}`}
                 title={noVermelho
                     ? `Este preço não cobre o custo. Piso: ${formatCurrency(custo.piso)}`
                     : 'Custo de produção da peça — segure o mouse para ver a conta'}
@@ -213,7 +213,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
                     style={{ top: pos.top, left: pos.left, width: Math.min(LARGURA, window.innerWidth - MARGEM_DA_JANELA * 2) }}
                     className="fixed z-balao bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl shadow-black/60 p-3.5 flex flex-col gap-2.5 ease-out animate-in fade-in duration-150"
                 >
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
                         Custo por peça
                     </p>
 
@@ -269,7 +269,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
 
                     {custo.faltas.length > 0 && (
                         <div className="flex flex-col gap-1.5 border-t border-zinc-900 pt-2">
-                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-500/70">
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-500/70">
                                 {custo.temAlgo ? 'A conta está incompleta' : 'Sem dado para calcular'}
                             </p>
                             {custo.faltas.map(f => (

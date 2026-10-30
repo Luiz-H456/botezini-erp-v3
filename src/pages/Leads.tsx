@@ -175,7 +175,7 @@ export default function Leads({ onNavigate, companyProfile }: Props) {
                         >
                             <Icone size={14} /> {a.rotulo}
                             {a.id === 'hoje' && v.fila.length > 0 && (
-                                <span className="ml-0.5 px-1.5 py-0.5 rounded-md bg-amber-500 text-black text-[9px] tabular-nums">
+                                <span className="ml-0.5 px-1.5 py-0.5 rounded-md bg-amber-500 text-black text-[10px] tabular-nums">
                                     {v.fila.length}
                                 </span>
                             )}
@@ -220,7 +220,7 @@ export default function Leads({ onNavigate, companyProfile }: Props) {
                                     className={`w-32 shrink-0 rounded-xl border px-3 py-3 flex flex-col justify-center ${TOM_DO_MOTIVO[item.motivo]}`}
                                     title={ROTULO_DO_MOTIVO_NA_FILA[item.motivo]}
                                 >
-                                    <p className="text-[9px] font-black uppercase tracking-widest leading-tight">
+                                    <p className="text-[10px] font-black uppercase tracking-widest leading-tight">
                                         {ROTULO_DO_MOTIVO_NA_FILA[item.motivo]}
                                     </p>
                                     {item.diasDeAtraso > 0 && (
@@ -353,7 +353,7 @@ export default function Leads({ onNavigate, companyProfile }: Props) {
                                         {col.leads.length}
                                     </span>
                                 </div>
-                                <p className="text-[9px] text-zinc-600 mt-0.5 leading-tight">
+                                <p className="text-[10px] text-zinc-600 mt-0.5 leading-tight">
                                     {col.etapa.descricao}
                                     {col.etapa.bola === 'nossa' && (
                                         <span className="text-amber-500/70 font-black"> · a bola é sua</span>

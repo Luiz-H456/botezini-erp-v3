@@ -16,7 +16,7 @@ export function CategoryChip({ category }: CategoryChipProps) {
     if (!category) return null;
     const Icon = CATEGORY_ICONS_COMP[category] || LayoutList;
     return (
-        <span className="inline-flex items-center gap-1.5 text-[8px] font-bold text-zinc-500 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-md">
+        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-zinc-500 bg-zinc-800 border border-zinc-700 px-2 py-0.5 rounded-md">
             <Icon size={12} className="text-zinc-600" />
             <span className="truncate max-w-[80px]">{category}</span>
         </span>

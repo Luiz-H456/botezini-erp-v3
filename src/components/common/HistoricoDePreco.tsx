@@ -65,11 +65,11 @@ export function MediaPorStatus({ icone: Icone, rotulo, valor, contagem, vazio, c
                 <Icone size={12} /> {rotulo}
             </p>
             {valor === null ? (
-                <p className="text-[9px] font-bold text-zinc-700 italic">{vazio}</p>
+                <p className="text-[10px] font-bold text-zinc-700 italic">{vazio}</p>
             ) : (
                 <p className={`text-[11px] font-mono font-black tracking-tighter ${cor}`}>
                     {formatCurrency(valor)}
-                    <span className="text-[8px] text-zinc-600 font-bold ml-1.5">{contagem}×</span>
+                    <span className="text-[10px] text-zinc-600 font-bold ml-1.5">{contagem}×</span>
                 </p>
             )}
         </div>
@@ -97,10 +97,10 @@ export function LinhaDaCurva({ faixa, melhor }: { faixa: FaixaAvaliada; melhor: 
         : melhor ? 'text-amber-500' : 'text-zinc-500';
     return (
         <div className={`flex items-center gap-2 rounded-md px-1 py-0.5 -mx-1 ${melhor ? 'bg-amber-500/10' : ''}`}>
-            <span className={`w-[52px] text-[9px] font-mono font-bold shrink-0 whitespace-nowrap ${cor}`}>
+            <span className={`w-[52px] text-[10px] font-mono font-bold shrink-0 whitespace-nowrap ${cor}`}>
                 {faixaEmTexto(faixa)}
             </span>
-            <span className={`w-[58px] text-[9px] font-mono shrink-0 text-right ${cor}`}>
+            <span className={`w-[58px] text-[10px] font-mono shrink-0 text-right ${cor}`}>
                 {formatCurrency(faixa.preco)}
             </span>
             <div className="flex-1 flex items-center gap-1.5 min-w-0">
@@ -108,7 +108,7 @@ export function LinhaDaCurva({ faixa, melhor }: { faixa: FaixaAvaliada; melhor: 
                     <div className={`h-full rounded-full ${melhor ? 'bg-amber-500' : 'bg-zinc-700'}`}
                         style={{ width: `${Math.round(faixa.taxa * 100)}%` }} />
                 </div>
-                <span className="text-[8px] font-mono text-zinc-600 shrink-0 w-[44px]">
+                <span className="text-[10px] font-mono text-zinc-600 shrink-0 w-[44px]">
                     {faixa.fechados}/{faixa.linhas}
                 </span>
             </div>
@@ -143,7 +143,7 @@ export function Curva({ faixas, melhor, base }: {
             {/* De onde vem a taxa: da casa toda, não deste produto. É o que
                 permite ter amostra, e é a suposição que fica em aberto — a casa
                 desconta de forma parecida em produtos diferentes. */}
-            <p className="text-[8px] text-zinc-700 leading-snug pt-1.5">
+            <p className="text-[10px] text-zinc-700 leading-snug pt-1.5">
                 Taxa medida em {base ? `${base.toLocaleString('pt-BR')} orçamentos` : 'todos os orçamentos'} da casa,
                 normalizados pelo T1 de cada produto. Supõe que você desconta de forma parecida em produtos diferentes.
             </p>
@@ -174,10 +174,10 @@ export function BandaDePreco({ vendas, lista }: { vendas: VendaDoProduto[]; list
     return (
         <div className="px-4 py-3">
             <div className="flex items-center justify-between mb-2">
-                <p className="text-[8px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-1">
+                <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-1">
                     <BarChart3 size={12} /> Banda de preço realizado
                 </p>
-                <p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">
                     {b.base} venda{b.base > 1 ? 's' : ''} fechada{b.base > 1 ? 's' : ''}
                 </p>
             </div>
@@ -189,7 +189,7 @@ export function BandaDePreco({ vendas, lista }: { vendas: VendaDoProduto[]; list
                 <div className="absolute top-0.5 w-px h-6 bg-amber-500"
                     style={{ left: `${esc(b.mediana)}%` }} />
             </div>
-            <div className="flex justify-between text-[8px] font-mono text-zinc-600 mb-2">
+            <div className="flex justify-between text-[10px] font-mono text-zinc-600 mb-2">
                 <span>{p(b.p10)}</span>
                 <span className="text-amber-500 font-black">mediana {p(b.mediana)}</span>
                 <span>{p(b.p90)}</span>
@@ -226,10 +226,10 @@ export function BlocoDaSugestao({ s }: { s: SugestaoDePreco }) {
             <div className="flex items-center justify-between mb-2">
                 {/* "Espaço para subir" e não "melhor preço": a conta só opina
                     para cima. O ótimo abaixo do praticado vira aviso, não corte. */}
-                <p className="text-[8px] font-black text-amber-500/80 uppercase tracking-[0.2em] flex items-center gap-1">
+                <p className="text-[10px] font-black text-amber-500/80 uppercase tracking-[0.2em] flex items-center gap-1">
                     <Lightbulb size={12} /> Espaço para subir
                 </p>
-                <p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">{ROTULO_CONFIANCA[s.confianca]}</p>
+                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">{ROTULO_CONFIANCA[s.confianca]}</p>
             </div>
 
             <div className="flex items-baseline gap-2.5 mb-2">
@@ -282,7 +282,7 @@ export function SugestaoOuMotivo({ vendas, curva, referencia, onUsarPreco }: {
             <div className="flex items-start gap-2">
                 <Lightbulb size={12} className="text-zinc-700 mt-0.5 shrink-0" />
                 <div className="min-w-0">
-                    <p className="text-[8px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-1">Sem espaço de alta</p>
+                    <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-1">Sem espaço de alta</p>
                     <p className="text-[10px] text-zinc-500 leading-snug">{r.motivo}</p>
                 </div>
             </div>
@@ -350,12 +350,12 @@ export function TabelaDoCadastro({ produto, precoAtual, compacto }: {
                 </div>
             )}
             {preco > 0 && !igual && faixas.length > 0 && (
-                <p className="text-[8px] text-zinc-600 mt-1.5 leading-snug">
+                <p className="text-[10px] text-zinc-600 mt-1.5 leading-snug">
                     O valor da linha ({formatCurrency(preco)}) não é nenhuma das faixas cadastradas.
                 </p>
             )}
             {produto.price_notes && (
-                <p className="text-[9px] text-zinc-500 leading-snug mt-2 whitespace-pre-wrap break-words">
+                <p className="text-[10px] text-zinc-500 leading-snug mt-2 whitespace-pre-wrap break-words">
                     {produto.price_notes}
                 </p>
             )}
@@ -427,7 +427,7 @@ export function PainelHistoricoDePreco({ vendas, carregando, curva, referencia }
                         vazio="nada em aberto" cor="text-zinc-300" />
                 </div>
 
-                <div className="px-4 py-2 border-b border-zinc-800/70 flex items-center gap-3 text-[9px] font-bold text-zinc-500">
+                <div className="px-4 py-2 border-b border-zinc-800/70 flex items-center gap-3 text-[10px] font-bold text-zinc-500">
                     <span className="flex items-center gap-1"><Package size={12} className="text-zinc-600" />{resumo.quantidadeTotal.toLocaleString('pt-BR')} pçs</span>
                     <span className="flex items-center gap-1"><Users size={12} className="text-zinc-600" />{resumo.clientes} cliente{resumo.clientes > 1 ? 's' : ''}</span>
                     <span className="ml-auto text-zinc-600">mediana {formatCurrency(resumo.mediana)}</span>
@@ -439,8 +439,8 @@ export function PainelHistoricoDePreco({ vendas, carregando, curva, referencia }
                         <div className="max-h-[132px] overflow-y-auto custom-scrollbar">
                             {resumo.cores.map(c => (
                                 <div key={c.cor} className="flex items-center gap-2 py-0.5">
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 truncate flex-1 min-w-0">{c.cor}</span>
-                                    <span className="text-[8px] font-bold text-zinc-600 shrink-0">{c.quantidade.toLocaleString('pt-BR')} pçs</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400 truncate flex-1 min-w-0">{c.cor}</span>
+                                    <span className="text-[10px] font-bold text-zinc-600 shrink-0">{c.quantidade.toLocaleString('pt-BR')} pçs</span>
                                     <span className="text-[10px] font-mono font-black text-amber-500/90 shrink-0 w-[62px] text-right">
                                         {formatCurrency(c.valorMedio)}
                                     </span>
@@ -460,9 +460,9 @@ export function PainelHistoricoDePreco({ vendas, carregando, curva, referencia }
                         <div key={`${v.orcamentoId}-${i}`} className="px-4 py-1.5 flex items-center gap-2">
                             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${v.fechado ? 'bg-emerald-500' : 'bg-zinc-700'}`}
                                 title={ROTULO_STATUS[v.status] || v.status} />
-                            <span className="text-[9px] font-mono text-zinc-500 shrink-0 w-[52px]">{dataCurta(v.data)}</span>
+                            <span className="text-[10px] font-mono text-zinc-500 shrink-0 w-[52px]">{dataCurta(v.data)}</span>
                             <span className="text-[10px] font-bold text-zinc-300 truncate flex-1 min-w-0">{v.cliente}</span>
-                            <span className="text-[8px] text-zinc-600 uppercase tracking-widest truncate shrink-0 max-w-[180px]">
+                            <span className="text-[10px] text-zinc-600 uppercase tracking-widest truncate shrink-0 max-w-[180px]">
                                 {v.quantidade.toLocaleString('pt-BR')} pçs{v.cor ? ` · ${v.cor}` : ''}{v.tamanho ? ` · ${v.tamanho}` : ''}
                             </span>
                             <span className="text-[10px] font-mono font-black text-amber-500 shrink-0 w-[68px] text-right">{formatCurrency(v.valorUnit)}</span>

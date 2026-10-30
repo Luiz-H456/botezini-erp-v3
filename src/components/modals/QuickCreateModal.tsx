@@ -225,7 +225,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                 {/* Body */}
                 <div className="min-h-0 flex-1 overflow-y-auto p-6 space-y-5">
                     {errorMsg && (
-                        <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 p-4 rounded-2xl text-[9px] font-black uppercase tracking-widest flex items-center gap-3">
+                        <div className="bg-rose-500/10 border border-rose-500/20 text-rose-500 p-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
                             <AlertTriangle size={14} className="shrink-0" />
                             {errorMsg}
                         </div>
@@ -233,7 +233,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                     {/* Client/Supplier Name Field */}
                     {(type === 'client' || type === 'supplier') && (
                         <div className="space-y-2">
-                            <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Nome / Empresa <span className="text-amber-500">*</span></label>
+                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Nome / Empresa <span className="text-amber-500">*</span></label>
                             <input
                                 autoFocus
                                 value={name}
@@ -249,7 +249,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                         <>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Telefone / Whats</label>
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Telefone / Whats</label>
                                     <input
                                         value={phone}
                                         onChange={e => setPhone(e.target.value)}
@@ -258,7 +258,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Cidade / Estado</label>
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Cidade / Estado</label>
                                     <input
                                         value={city}
                                         onChange={e => setCity(e.target.value)}
@@ -267,7 +267,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1 flex items-center gap-1.5">
                                         Categoria CRM (Opcional)
                                         <InfoTooltip iconSize={11}>
                                             <p className="text-[11px] text-zinc-300 leading-relaxed mb-1.5">
@@ -290,7 +290,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Pessoa de Contato</label>
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Pessoa de Contato</label>
                                     <input
                                         value={contact}
                                         onChange={e => setContact(e.target.value)}
@@ -305,7 +305,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                     {(type === 'product' || type === 'insumo') && (
                         <div className="space-y-5">
                             <div className="space-y-2">
-                                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">
+                                <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">
                                     Nome do {type === 'insumo' ? 'Tecido/Insumo' : 'Produto'} <span className="text-amber-500">*</span>
                                 </label>
                                 <input
@@ -323,18 +323,18 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                 dois — e aí só resta ligar por apelido. */}
                             {type === 'product' && duplicados.length > 0 && (
                                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 space-y-1">
-                                    <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+                                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
                                         <AlertTriangle size={12} /> Já existe algo parecido
                                     </p>
                                     {duplicados.slice(0, 3).map((d: any) => (
                                         <p key={d.produto.id} className="text-[10px] text-zinc-300 font-bold truncate">
                                             {d.produto.name}
                                             {d.mesmoNomeNormalizado && (
-                                                <span className="ml-2 text-[8px] font-black uppercase tracking-widest text-amber-500/80">mesmo nome</span>
+                                                <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-amber-500/80">mesmo nome</span>
                                             )}
                                         </p>
                                     ))}
-                                    <p className="text-[9px] text-zinc-500 leading-snug pt-0.5">
+                                    <p className="text-[10px] text-zinc-500 leading-snug pt-0.5">
                                         Criar de novo divide o histórico de preço entre os dois cadastros.
                                     </p>
                                 </div>
@@ -342,7 +342,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
 
                             <div className={type === 'product' ? 'grid grid-cols-3 gap-3' : 'space-y-2'}>
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">
                                         {type === 'insumo' ? 'Custo unitário (R$)' : 'Preço T1 (R$)'}
                                     </label>
                                     <input
@@ -357,13 +357,13 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                 {type === 'product' && (
                                     <>
                                         <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">T2</label>
+                                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">T2</label>
                                             <input type="number" step="0.01" className={inputClasses + ' font-mono'}
                                                 placeholder="0.00" value={precoT2}
                                                 onChange={(e) => setPrecoT2(e.target.value)} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">T3</label>
+                                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">T3</label>
                                             <input type="number" step="0.01" className={inputClasses + ' font-mono'}
                                                 placeholder="0.00" value={precoT3}
                                                 onChange={(e) => setPrecoT3(e.target.value)} />
@@ -374,13 +374,13 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
 
                             {type === 'product' && (
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">
                                         Capacidade produtiva (peças/dia)
                                     </label>
                                     <input type="number" min="1" className={inputClasses + ' text-emerald-400'}
                                         placeholder="50" value={capacidade}
                                         onChange={(e) => setCapacidade(e.target.value)} />
-                                    <p className="text-[9px] text-zinc-600 leading-snug ml-1">
+                                    <p className="text-[10px] text-zinc-600 leading-snug ml-1">
                                         Alimenta o custo de mão de obra por peça. Em branco, entra 50.
                                     </p>
                                 </div>
@@ -392,7 +392,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                     {type === 'supplier' && (
                         <>
                             <div className="space-y-2">
-                                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1 flex items-center gap-1.5">
+                                <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1 flex items-center gap-1.5">
                                     Categoria Padrão (Opcional)
                                     <InfoTooltip iconSize={11}>
                                         <p className="text-[11px] text-zinc-300 leading-relaxed mb-1.5">
@@ -415,7 +415,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Contato</label>
+                                <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Contato</label>
                                 <input
                                     value={contact}
                                     onChange={e => setContact(e.target.value)}
@@ -431,7 +431,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                         <>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1">Tipo / Categoria <span className="text-zinc-700">(opcional)</span></label>
+                                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Tipo / Categoria <span className="text-zinc-700">(opcional)</span></label>
                                     <GlobalCategorySelect
                                         categories={globalCategories}
                                         domain="inventory"
@@ -444,12 +444,12 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
 
                                 {/* Ficha técnica semi-preenchida (opcional) — adianta o trabalho */}
                                 <div className="bg-zinc-950/40 border border-zinc-800/60 rounded-xl p-3 space-y-3">
-                                    <p className="text-[8px] font-black text-amber-500/70 uppercase tracking-[0.2em] flex items-center gap-1.5">
+                                    <p className="text-[10px] font-black text-amber-500/70 uppercase tracking-[0.2em] flex items-center gap-1.5">
                                         <ClipboardList size={12} /> Ficha técnica (opcional) — já adianta
                                     </p>
                                     <div className="grid grid-cols-[1fr,auto] gap-2">
                                         <div>
-                                            <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1 mb-1 block">Tecido principal</label>
+                                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1 mb-1 block">Tecido principal</label>
                                             <SearchableSelect
                                                 value={fabricId}
                                                 onChange={setFabricId}
@@ -458,7 +458,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                             />
                                         </div>
                                         <div className="w-24">
-                                            <label className="text-[9px] font-black text-zinc-600 uppercase tracking-widest ml-1 mb-1 block">m/peça</label>
+                                            <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1 mb-1 block">m/peça</label>
                                             <input
                                                 type="number" step="0.01" min="0"
                                                 value={fabricM}
@@ -468,7 +468,7 @@ const QuickCreateModal: React.FC<Props> = ({ type, isOpen, onClose, onSuccess, i
                                             />
                                         </div>
                                     </div>
-                                    <p className="text-[8px] text-zinc-600 font-bold leading-relaxed">
+                                    <p className="text-[10px] text-zinc-600 font-bold leading-relaxed">
                                         Cria a 1ª linha da ficha técnica (BOM). Você completa depois em Cadastros → Produtos.
                                     </p>
                                 </div>
