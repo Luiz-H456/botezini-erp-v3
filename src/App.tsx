@@ -44,6 +44,7 @@ import { usePrivacidade } from '@/hooks/usePrivacidade';
 import { CentralDeAvisos } from '@/components/common/CentralDeAvisos';
 import { BuscaGeral } from '@/components/layout/BuscaGeral';
 import type { ResultadoDaBusca } from '@/utils/buscaGeral';
+import { avisar } from '@/utils/avisos';
 // Lê a preferência salva antes do primeiro render, para não haver um piscar de
 // valores visíveis em quem deixou o modo privado ligado.
 carregarPreferenciaDePrivacidade();
@@ -197,7 +198,19 @@ const App: React.FC = () => {
     else handleNavigate('masterdata', r.chave);
   };
 
+  // Sessão que acaba sozinha (saiu em outra aba, token vencido): volta ao login com aviso, em vez
+  // de deixar a tela aberta com toda chamada falhando (segunda passada da auditoria).
+  const saindoRef = useRef(false);
+  useEffect(() => authService.aoSessaoTerminar(() => {
+    if (saindoRef.current) { saindoRef.current = false; return; }
+    setIsAuthenticated(false);
+    setUserProfile(null);
+    setCurrentView('login');
+    avisar('Sua sessão terminou. Entre de novo para continuar de onde parou.', 'info');
+  }), []);
+
   const handleLogout = async () => {
+    saindoRef.current = true;
     window.history.replaceState(null, '', window.location.pathname);
     document.title = 'Botezini ERP';
     await authService.signOut();
@@ -343,6 +356,8 @@ const App: React.FC = () => {
 
   if (!isAuthenticated || currentView === 'login') {
     return (
+      <>
+      <CentralDeAvisos />
       <Suspense fallback={
         <div className="h-screen h-svh w-screen bg-zinc-950 flex flex-col items-center justify-center gap-4 text-slate-200">
           <Hexagon className="text-amber-500 animate-pulse" size={48} />
@@ -351,6 +366,7 @@ const App: React.FC = () => {
       }>
         <Login onLoginSuccess={() => { checkSession(); loadCompanyProfile(); }} />
       </Suspense>
+      </>
     );
   }
 

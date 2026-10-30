@@ -16,6 +16,16 @@ export const authService = {
         return data;
     },
 
+    /**
+     * Avisa quando a sessão acaba sem a pessoa ter clicado em Sair (outra aba saiu, token revogado
+     * ou vencido sem renovar). Devolve a função que para de ouvir.
+     */
+    aoSessaoTerminar(fn: () => void): () => void {
+        if (!SUPABASE_ENABLED || !supabase) return () => {};
+        const { data } = supabase.auth.onAuthStateChange(evento => { if (evento === 'SIGNED_OUT') fn(); });
+        return () => data.subscription.unsubscribe();
+    },
+
     async signOut() {
         if (!SUPABASE_ENABLED || !supabase) {
             localStorage.clear();
