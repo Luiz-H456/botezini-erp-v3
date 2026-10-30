@@ -69,7 +69,7 @@ produção — **inclusive o banco**. A pasta `botezinipvd-1` continua sendo a p
   descartável" da regra acima.
 - Anexos antigos aparecem listados e não abrem: o dump traz o registro, não o arquivo.
 - **Depois de recarregar o dump**, reaplique as migrações da v3 em ordem
-  (`supabase/financeiro_v3_1_entrega.sql`, `supabase/financeiro_v3_2_conferencia_e_entrega.sql`, …) e recrie o usuário de teste com
+  (`supabase/financeiro_v3_1_entrega.sql`, `supabase/financeiro_v3_2_conferencia_e_entrega.sql`, …, `supabase/estampas_v3_d.sql`, `supabase/custos_personalizacao_v3_e.sql`) e recrie o usuário de teste com
   `sh scripts/v3/criar_usuario_teste.sh` — o reset apaga os dois.
 - **Usuário de teste** (`V3_TESTE_EMAIL`/`V3_TESTE_SENHA` em `.env.v3.local`) é admin e
   existe só no banco local. É ele que verifica as telas; a conta real do Luiz não.
