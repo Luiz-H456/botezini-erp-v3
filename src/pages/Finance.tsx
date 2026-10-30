@@ -38,6 +38,8 @@ import { normalizeCategoryName } from '@/utils/categoryResolver';
 import { nomeDoMes, mesDe, mesAnterior, proximoMes } from '@/utils/financas/base';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { PagarEmLoteModal } from '@/components/finance/PagarEmLoteModal';
+import { montarLote } from '@/utils/financas/loteDePagamento';
 interface FinanceProps {
     initialSearch?: string;
     clearSearch?: () => void;
@@ -106,6 +108,12 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
 
     /** Recebi/Paguei: a baixa rápida. "Mais opções" leva ao PaymentModal. */
     const [baixa, setBaixa] = useState<ObligationSummary | null>(null);
+    // Baixa em lote (auditoria R3): marcar várias contas e pagar/receber de uma vez.
+    const [selecionadas, setSelecionadas] = useState<Set<string>>(new Set());
+    const [loteAberto, setLoteAberto] = useState(false);
+    const alternarSelecao = (ob: ObligationSummary) => setSelecionadas(atual => {
+        const nova = new Set(atual); if (nova.has(ob.id)) nova.delete(ob.id); else nova.add(ob.id); return nova;
+    });
     const [payingOb, setPayingOb] = useState<ObligationSummary | null>(null);
     const [payingObPayments, setPayingObPayments] = useState<ObligationPayment[]>([]);
     /** Ativas e inativas, só para o histórico do PaymentModal nomear a conta (Contas carrega só as ativas). */
@@ -386,8 +394,10 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
             isPrivacy={isPrivacy} onBaixa={setBaixa} onDetail={handleOpenPay} onCancel={handleCancel}
             onReconcile={handleReconcile}
             onEdit={setContaEmEdicao}
+            selecionado={selecionadas.has(ob.id)} onSelecionar={alternarSelecao}
             onUndoReconcile={(ob) => { setReconciliationUndoTarget(ob); setUndoReason(''); }} />
     );
+    const lote = montarLote(obligations, selecionadas);
     const somaDaLista = (contas: ObligationSummary[]) => contas.reduce((s, o) => s + valorDaLinha(o), 0);
 
     return (
@@ -656,6 +666,25 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
                 dizia "conta removida" para uma conta que existe — inventando um
                 problema onde não havia nenhum. Por isso `todasAsContas`, e não
                 `bankAccounts` (que aqui é só das ativas). */}
+            {selecionadas.size > 0 && (
+                <div className="sticky bottom-3 z-20 mx-auto flex max-w-2xl flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-500/40 bg-zinc-900/95 px-4 py-3 shadow-2xl backdrop-blur">
+                    <p className="text-sm text-zinc-200">
+                        {selecionadas.size} selecionada(s){lote.tipo !== 'misto' && lote.aptas.length > 0 && <> · <b>{mostrar(lote.total)}</b></>}
+                        {lote.tipo === 'misto' && <span className="block text-xs text-amber-400">A pagar e a receber juntas não vão no mesmo lote: deixe só um tipo.</span>}
+                    </p>
+                    <div className="flex gap-2">
+                        <button type="button" onClick={() => setSelecionadas(new Set())} className={BOTAO_SECUNDARIO}>Limpar</button>
+                        <button type="button" disabled={lote.tipo === 'misto' || lote.aptas.length === 0} onClick={() => setLoteAberto(true)} className={BOTAO_PRINCIPAL}>
+                            {lote.tipo === 'receivable' ? 'Receber' : 'Pagar'} {lote.aptas.length}
+                        </button>
+                    </div>
+                </div>
+            )}
+            {loteAberto && lote.tipo && lote.tipo !== 'misto' && (
+                <PagarEmLoteModal lote={lote} bancos={bankAccounts} onClose={() => setLoteAberto(false)}
+                    onFeito={() => { setLoteAberto(false); setSelecionadas(new Set()); loadData(); }} />
+            )}
+
             {payingOb && (
                 <PaymentModal obligation={payingOb} bankAccounts={todasAsContas.length ? todasAsContas : bankAccounts} existingPayments={payingObPayments}
                     isPrivacy={isPrivacy} onClose={() => setPayingOb(null)}

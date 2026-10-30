@@ -20,11 +20,14 @@ interface ObligationCardProps {
     onUndoReconcile?: (ob: ObligationSummary) => void;
     /** Corrigir valor/vencimento. Só aparece enquanto nada foi pago. */
     onEdit?: (ob: ObligationSummary) => void;
+    /** Seleção para baixa em lote (auditoria R3). Sem `onSelecionar`, o cartão não mostra a caixa. */
+    selecionado?: boolean;
+    onSelecionar?: (ob: ObligationSummary) => void;
 }
 
 const icone = 'h-10 w-10 inline-flex items-center justify-center rounded-xl text-zinc-600 hover:text-white hover:bg-zinc-800';
 
-export function ObligationCard({ ob, partyName, categoryLabel, isPrivacy, onBaixa, onDetail, onCancel, onReconcile, onUndoReconcile, onEdit }: ObligationCardProps) {
+export function ObligationCard({ ob, partyName, categoryLabel, isPrivacy, onBaixa, onDetail, onCancel, onReconcile, onUndoReconcile, onEdit, selecionado, onSelecionar }: ObligationCardProps) {
     const hoje = getTodayStr();
     const s = situacaoDaConta(ob, hoje);
     const entra = ob.type === 'receivable';
@@ -36,7 +39,12 @@ export function ObligationCard({ ob, partyName, categoryLabel, isPrivacy, onBaix
     const quando = quandoVence(ob, hoje);
 
     return (
-        <div className={`${ITEM} group relative grid gap-2 overflow-hidden py-3 pl-4 pr-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4 hover:border-zinc-700 ${s === 'cancelada' ? 'opacity-50' : ''}`}>
+        <div className={`${ITEM} group relative grid gap-2 overflow-hidden py-3 ${onSelecionar && aberta ? 'pl-12' : 'pl-4'} pr-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-4 hover:border-zinc-700 ${s === 'cancelada' ? 'opacity-50' : ''} ${selecionado ? 'border-amber-500/60 bg-amber-500/[0.04]' : ''}`}>
+            {onSelecionar && aberta && (
+                <label className="absolute left-1 top-1/2 -translate-y-1/2 inline-flex h-11 w-11 items-center justify-center cursor-pointer" title="Selecionar para pagar várias de uma vez">
+                    <input type="checkbox" checked={!!selecionado} onChange={() => onSelecionar(ob)} aria-label={`Selecionar ${ob.description}`} className="h-4 w-4 accent-amber-500" />
+                </label>
+            )}
             {/* Faixa de urgência à esquerda, como nos cartões do resto do app. */}
             {(s === 'vencida' || (aberta && faltam === 0)) && <span aria-hidden className={`absolute inset-y-0 left-0 w-[3px] ${s === 'vencida' ? 'bg-rose-500' : 'bg-amber-400'}`} />}
             <div className="min-w-0">
