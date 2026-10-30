@@ -98,6 +98,24 @@ export interface BudgetEditorProps {
   companyProfile?: CompanyProfile | null;
 }
 
+/**
+ * Modo cartão das três listas (itens, personalização, extras): abaixo de 960px de LARGURA DA LISTA
+ * (`@container`, não a janela) as 12 colunas viravam fiapos — a de itens rolava para o lado e as
+ * outras espremiam a quantidade em 28px. No cartão o cabeçalho some, então cada campo leva o
+ * próprio rótulo, e total + ações ficam num rodapé sempre à vista: no dedo não existe "passar o mouse".
+ * Acima de 960px nada disto aparece e a tabela é a de sempre.
+ */
+const RotuloDoCartao = ({ children }: { children: React.ReactNode }) => (
+  <span className="hidden @max-[960px]:block mb-1 text-[10px] font-black uppercase tracking-widest text-zinc-500">{children}</span>
+);
+
+const RodapeDoCartao = ({ total, children }: { total: number; children: React.ReactNode }) => (
+  <div className="hidden @max-[960px]:flex col-span-6 order-last items-center justify-between gap-2 pt-1">
+    <span className="text-sm font-black text-white tracking-tight">{formatCurrency(total)}</span>
+    <div className="flex items-center gap-1.5">{children}</div>
+  </div>
+);
+
 const SectionHeader = ({
   title,
   onAdd,
@@ -678,6 +696,10 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
     esquecerIndices(newItems);
   };
 
+  // Tabela e cartão chamam as mesmas duas: um conserto vale para os dois modos.
+  const excluirItem = (i: number) => { const novos = items.filter((_, idx) => idx !== i); setItems(novos); esquecerIndices(novos); };
+  const copiarEspecDe = (i: number) => setCopiando({ origem: i, grupos: ['opcionais', 'detalhes', 'tecido', 'preco'], destinos: new Set<number>() });
+
   // A lista deslocou: painel ou barra presos a um índice apontariam para outra linha.
   // O "+ mais" se refaz pela lista nova, para a linha com valor raro continuar aberta.
   const esquecerIndices = (novos: BudgetItem[]) => {
@@ -1239,11 +1261,11 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
             {/* ── ITEMS TABLE ── Largura mínima: abaixo de 960px as 12 colunas viravam fiapos ilegíveis.
                 Com o piso, só esta faixa rola para o lado (o resto do editor não); listas e balões saem em portal, então não são cortados. */}
-            <div className="overflow-x-auto min-w-0 pb-1 custom-scrollbar">
-            <div className={`${CARTAO} relative min-w-[960px]`}>
+            <div className="@container overflow-x-auto min-w-0 pb-1 custom-scrollbar">
+            <div className={`${CARTAO} relative min-w-[960px] @max-[960px]:min-w-0`}>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"></div>
 
-              <div className={`grid grid-cols-12 gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
+              <div className={`grid grid-cols-12 @max-[960px]:hidden gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
                 <div className="col-span-4 py-4 text-left pl-6">PRODUTO / REFERÊNCIA</div>
                 <div className="col-span-1 py-4">MODELO/REF</div>
                 <div className="col-span-2 py-4 text-left pl-4">TECIDO SELECIONADO</div>
@@ -1259,7 +1281,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                     <div key={i}>
                       {/* ── Main row ── */}
                       <div
-                        className={`grid grid-cols-12 gap-px items-center hover:bg-zinc-900/60 transition-all group relative ${draggedIndex === i ? 'opacity-30' : ''}`}
+                        className={`grid grid-cols-12 @max-[960px]:grid-cols-6 @max-[960px]:gap-2 @max-[960px]:p-3 gap-px items-center hover:bg-zinc-900/60 transition-all group relative ${draggedIndex === i ? 'opacity-30' : ''}`}
                         draggable
                         onDragStart={(e) => handleDragStart(e, i)}
                         onDragOver={(e) => handleDragOver(e, i)}
@@ -1268,11 +1290,11 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         <div className="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-amber-500/50 transition-colors"></div>
 
                         {/* Drag Handle */}
-                        <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all cursor-grab active:cursor-grabbing text-zinc-700 hover:text-amber-500">
+                        <div className="absolute left-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 @max-[960px]:hidden transition-all cursor-grab active:cursor-grabbing text-zinc-700 hover:text-amber-500">
                           <GripVertical size={14} />
                         </div>
 
-                        <div className="col-span-4 p-2 flex gap-2 pl-5 min-w-0">
+                        <div className="col-span-4 @max-[960px]:col-span-6 p-2 flex gap-2 pl-5 @max-[960px]:p-0 min-w-0">
                           {copiando && copiando.origem !== i && (
                             <input
                               type="checkbox"
@@ -1283,6 +1305,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                             />
                           )}
                           <div className="flex-1 relative min-w-0">
+                            <RotuloDoCartao>Produto</RotuloDoCartao>
                             <SearchableSelect
                               value={item.product_id}
                               onChange={(val) => updateItem(i, 'product_id', val)}
@@ -1341,7 +1364,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           </button>
                         </div>
 
-                        <div className="col-span-1 p-2">
+                        <div className="col-span-1 @max-[960px]:col-span-2 p-2 @max-[960px]:p-0">
+                          <RotuloDoCartao>Modelo</RotuloDoCartao>
                           <input
                             placeholder="MODELO..."
                             value={item.model}
@@ -1350,8 +1374,9 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           />
                         </div>
 
-                        <div className="col-span-2 p-2 flex gap-2 min-w-0">
+                        <div className="col-span-2 @max-[960px]:col-span-4 p-2 @max-[960px]:p-0 flex gap-2 @max-[960px]:items-end min-w-0">
                           <div className="flex-1 relative min-w-0">
+                            <RotuloDoCartao>Tecido</RotuloDoCartao>
                             <SearchableSelect
                               value={item.fabric_insumo_id || ''}
                               onChange={(val) => {
@@ -1394,7 +1419,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           </button>
                         </div>
 
-                        <div className="col-span-1 p-2">
+                        <div className="col-span-1 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                          <RotuloDoCartao>Cor</RotuloDoCartao>
                           {(() => {
                             const cores = colorOptionsFor(item.fabric_insumo_id);
                             // Tecido homologado → só cores da cartela (e a faixa de
@@ -1418,7 +1444,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           })()}
                         </div>
 
-                        <div className="col-span-1 p-2">
+                        <div className="col-span-1 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                          <RotuloDoCartao>Tamanho</RotuloDoCartao>
                           <input
                             placeholder="M"
                             value={item.size}
@@ -1427,7 +1454,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           />
                         </div>
 
-                        <div className="col-span-1 p-2">
+                        <div className="col-span-1 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                          <RotuloDoCartao>Quantidade</RotuloDoCartao>
                           <input
                             type="number"
                             value={item.quantity}
@@ -1436,7 +1464,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           />
                         </div>
 
-                        <div className="col-span-1 p-2">
+                        <div className="col-span-1 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                          <RotuloDoCartao>Unitário (R$)</RotuloDoCartao>
                           <input
                             type="number"
                             value={item.unit_price}
@@ -1445,7 +1474,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           />
                         </div>
 
-                        <div className="col-span-1 p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
+                        <div className="col-span-1 @max-[960px]:hidden p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
                           <span className="text-[11px] font-black text-white tracking-tight group-hover/cell:opacity-0 group-hover/cell:translate-x-12 group-focus-within/cell:opacity-0 group-focus-within/cell:translate-x-12 transition-all duration-150">
                             {formatCurrency(item.total)}
                           </span>
@@ -1465,7 +1494,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                             <div className="relative group/btn flex justify-center">
                               <button
                                 aria-label="Copiar especificação"
-                                onClick={(e) => { e.stopPropagation(); setCopiando({ origem: i, grupos: ['opcionais', 'detalhes', 'tecido', 'preco'], destinos: new Set<number>() }); }}
+                                onClick={(e) => { e.stopPropagation(); copiarEspecDe(i); }}
                                 className={`w-6 h-6 flex items-center justify-center rounded-lg border transition-all ${copiando?.origem === i
                                   ? 'bg-amber-500 border-amber-600 text-black'
                                   : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-amber-500 hover:border-amber-500/30'
@@ -1490,7 +1519,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                             </div>
                             <div className="relative group/btn flex justify-center">
                               <button
-                                onClick={() => { const novos = items.filter((_, idx) => idx !== i); setItems(novos); esquecerIndices(novos); }}
+                                onClick={() => excluirItem(i)}
                                 aria-label="Excluir item"
                                 className="w-6 h-6 flex items-center justify-center rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-500 hover:text-rose-500 hover:border-rose-500/30 transition-all active:scale-95"
                               >
@@ -1500,10 +1529,19 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                             </div>
                           </div>
                         </div>
+
+                        <RodapeDoCartao total={item.total}>
+                          <button type="button" onClick={() => handleCloneItem(i)} aria-label="Clonar item" title="Clonar" className="h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-500"><Copy size={16} /></button>
+                          <button type="button" onClick={() => copiarEspecDe(i)} aria-label="Copiar especificação" title="Copiar especificação"
+                            className={`h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 ${copiando?.origem === i ? 'bg-amber-500 border-amber-600 text-black' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-500'}`}><Paintbrush size={16} /></button>
+                          <button type="button" onClick={() => abrirGrade(i)} aria-label="Grade de tamanhos" title="Grade de tamanhos"
+                            className={`h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 ${gradeAberta === i ? 'bg-amber-500 border-amber-600 text-black' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-amber-500'}`}><Rows3 size={16} /></button>
+                          <button type="button" onClick={() => excluirItem(i)} aria-label="Excluir item" title="Excluir" className="h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-rose-500"><Trash2 size={16} /></button>
+                        </RodapeDoCartao>
                       </div>
 
                       {/* ── Resumo da especificação; o lápis abre e fecha o painel ── */}
-                      <div className="flex items-center gap-2 pl-6 pb-2">
+                      <div className="flex items-center gap-2 pl-6 @max-[960px]:pl-3 pb-2">
                         <span className={ROTULO_PEQUENO}>{resumoDaEspecificacao(item)}</span>
                         <button
                           type="button"
@@ -1518,7 +1556,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
                       {/* ── Grade de tamanhos numa linha só ── */}
                       {gradeAberta === i && (
-                        <div className="bg-zinc-950/80 border-t border-zinc-800/40 px-6 py-3 flex flex-wrap items-center gap-2">
+                        <div className="bg-zinc-950/80 border-t border-zinc-800/40 px-6 @max-[960px]:px-3 py-3 flex flex-wrap items-center gap-2">
                           <input
                             autoFocus
                             value={gradeTexto}
@@ -1535,7 +1573,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
                       {/* ── Production spec expansion panel ── */}
                       {expandedSpecRows.has(i) && (
-                        <div className="col-span-12 bg-zinc-950/80 border-t border-zinc-800/40 px-6 py-5 ease-out animate-in slide-in-from-top-2 duration-200">
+                        <div className="col-span-12 bg-zinc-950/80 border-t border-zinc-800/40 px-6 @max-[960px]:px-3 py-5 ease-out animate-in slide-in-from-top-2 duration-200">
                           <div className="flex items-center gap-3 mb-6">
                             <div className="w-1.5 h-1.5 bg-amber-500 rounded-full"></div>
                             <p className={ROTULO}>
@@ -1546,7 +1584,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                           {/* Um clique escolhe; clicar no ativo desmarca. */}
                           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                             {ESPECIFICACAO.map(g => (
-                              <div key={g.campo} className="flex items-center gap-1">
+                              <div key={g.campo} className="flex flex-wrap items-center gap-1">
                                 <span className={`${ROTULO_PEQUENO} mr-1`}>{g.rotulo}</span>
                                 {g.comuns.map(([valor, rotulo]) => (
                                   <button
@@ -1786,7 +1824,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                               rolava não sabia onde as especificações de um item
                               terminavam. O traço desbota nas pontas para marcar o
                               fim sem virar mais uma divisória de tabela. */}
-                          <div className="mt-5 -mx-6 -mb-3 pt-4">
+                          <div className="mt-5 -mx-6 @max-[960px]:-mx-3 -mb-3 pt-4">
                             <div className="h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent" />
                           </div>
                         </div>
@@ -1837,10 +1875,10 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
             }
           />
           {customizations.length > 0 && (
-            <div className={`${CARTAO} relative`}>
+            <div className={`${CARTAO} relative @container`}>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"></div>
 
-              <div className={`grid grid-cols-12 gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
+              <div className={`grid grid-cols-12 @max-[960px]:hidden gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
                 <div className="col-span-2 py-4 text-left pl-6">MÉTODO</div>
                 <div className="col-span-4 py-4 text-left pl-4">DESCRIÇÃO DA ARTE</div>
                 <div className="col-span-2 py-4">POSIÇÃO</div>
@@ -1852,11 +1890,12 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                 {customizations.map((custom, i) => (
                   <div
                     key={custom.id}
-                    className="grid grid-cols-12 gap-px items-center hover:bg-zinc-900/60 transition-all group relative"
+                    className="grid grid-cols-12 @max-[960px]:grid-cols-6 @max-[960px]:gap-2 @max-[960px]:p-3 gap-px items-center hover:bg-zinc-900/60 transition-all group relative"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-amber-500/50 transition-colors"></div>
 
-                    <div className="col-span-2 p-2 pl-4">
+                    <div className="col-span-2 @max-[960px]:col-span-3 @max-[960px]:order-1 p-2 pl-4 @max-[960px]:p-0">
+                      <RotuloDoCartao>Método</RotuloDoCartao>
                       <SearchableSelect
                         value={custom.type}
                         onChange={(val) => {
@@ -1873,7 +1912,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="text-[10px] font-black uppercase tracking-widest"
                       />
                     </div>
-                    <div className="col-span-4 p-2 pl-4">
+                    <div className="col-span-4 @max-[960px]:col-span-6 @max-[960px]:order-3 p-2 pl-4 @max-[960px]:p-0">
+                      <RotuloDoCartao>Descrição da arte</RotuloDoCartao>
                       <input
                         placeholder="EX: LOGOTIPO PEITO..."
                         value={custom.description}
@@ -1885,7 +1925,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950/50 text-zinc-200 text-[10px] font-black uppercase tracking-widest p-2.5 rounded-lg outline-none border border-zinc-800 hover:border-zinc-700 focus:border-amber-500/30 transition-all placeholder:text-zinc-800"
                       />
                     </div>
-                    <div className="col-span-2 p-2">
+                    <div className="col-span-2 @max-[960px]:col-span-3 @max-[960px]:order-2 p-2 @max-[960px]:p-0">
+                      <RotuloDoCartao>Posição</RotuloDoCartao>
                       <input
                         placeholder="EX: PEITO ESQ..."
                         value={custom.position}
@@ -1897,7 +1938,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950/50 text-zinc-200 text-[10px] font-black uppercase tracking-widest p-2.5 rounded-lg outline-none border border-zinc-800 hover:border-zinc-700 focus:border-amber-500/30 transition-all text-center placeholder:text-zinc-800"
                       />
                     </div>
-                    <div className="col-span-1 p-2">
+                    <div className="col-span-1 @max-[960px]:col-span-3 @max-[960px]:order-4 p-2 @max-[960px]:p-0">
+                      <RotuloDoCartao>Quantidade</RotuloDoCartao>
                       <input
                         type="number"
                         value={custom.quantity}
@@ -1910,7 +1952,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950 text-amber-500 font-black text-[11px] p-2 rounded-lg outline-none border border-amber-500/20 hover:border-amber-500/40 focus:border-amber-500 transition-all text-center"
                       />
                     </div>
-                    <div className="col-span-2 p-2">
+                    <div className="col-span-2 @max-[960px]:col-span-3 @max-[960px]:order-5 p-2 @max-[960px]:p-0">
+                      <RotuloDoCartao>Unitário (R$)</RotuloDoCartao>
                       <input
                         type="number"
                         value={custom.unit_price}
@@ -1923,7 +1966,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950/50 text-zinc-300 text-[11px] font-black p-2 rounded-lg outline-none border border-zinc-800 hover:border-zinc-700 focus:border-amber-500/30 transition-all text-right"
                       />
                     </div>
-                    <div className="col-span-1 p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
+                    <div className="col-span-1 @max-[960px]:hidden p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
                       <span className="text-[11px] font-black text-white tracking-tight group-hover/cell:opacity-0 group-hover/cell:translate-x-12 transition-all duration-150">
                         {formatCurrency(custom.total)}
                       </span>
@@ -1940,6 +1983,9 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         </div>
                       </div>
                     </div>
+                    <RodapeDoCartao total={custom.total}>
+                      <button type="button" onClick={() => setCustomizations(customizations.filter((_, idx) => idx !== i))} aria-label="Excluir personalização" title="Excluir" className="h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-rose-500"><Trash2 size={16} /></button>
+                    </RodapeDoCartao>
                   </div>
                 ))}
               </div>
@@ -1962,10 +2008,10 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
             }
           />
           {extras.length > 0 && (
-            <div className={`${CARTAO} relative`}>
+            <div className={`${CARTAO} relative @container`}>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"></div>
 
-              <div className={`grid grid-cols-12 gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
+              <div className={`grid grid-cols-12 @max-[960px]:hidden gap-px bg-zinc-950/50 border-b border-zinc-800/50 ${ROTULO_PEQUENO} text-center`}>
                 <div className="col-span-8 py-4 text-left pl-6">DESCRIÇÃO DO SERVIÇO / TAXA</div>
                 <div className="col-span-1 py-4 text-amber-500/80">QTD</div>
                 <div className="col-span-2 py-4 text-right">VALOR UNIT (R$)</div>
@@ -1975,11 +2021,12 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                 {extras.map((extra, i) => (
                   <div
                     key={extra.id}
-                    className="grid grid-cols-12 gap-px items-center hover:bg-zinc-900/60 transition-all group relative"
+                    className="grid grid-cols-12 @max-[960px]:grid-cols-6 @max-[960px]:gap-2 @max-[960px]:p-3 gap-px items-center hover:bg-zinc-900/60 transition-all group relative"
                   >
                     <div className="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-amber-500/50 transition-colors"></div>
 
-                    <div className="col-span-8 p-2 pl-4">
+                    <div className="col-span-8 @max-[960px]:col-span-6 p-2 pl-4 @max-[960px]:p-0">
+                      <RotuloDoCartao>Serviço ou taxa</RotuloDoCartao>
                       <input
                         placeholder="EX: TAXA DE ENTREGA / SERVIÇO DE CRIAÇÃO..."
                         value={extra.description}
@@ -1991,7 +2038,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950/50 text-zinc-200 text-[10px] font-black uppercase tracking-widest p-2.5 rounded-lg outline-none border border-zinc-800 hover:border-zinc-700 focus:border-amber-500/30 transition-all placeholder:text-zinc-800"
                       />
                     </div>
-                    <div className="col-span-1 p-2">
+                    <div className="col-span-1 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                      <RotuloDoCartao>Quantidade</RotuloDoCartao>
                       <input
                         type="number"
                         value={extra.quantity}
@@ -2004,7 +2052,8 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950 text-amber-500 font-black text-[11px] p-2 rounded-lg outline-none border border-amber-500/20 hover:border-amber-500/40 focus:border-amber-500 transition-all text-center"
                       />
                     </div>
-                    <div className="col-span-2 p-2">
+                    <div className="col-span-2 @max-[960px]:col-span-3 p-2 @max-[960px]:p-0">
+                      <RotuloDoCartao>Unitário (R$)</RotuloDoCartao>
                       <input
                         type="number"
                         value={extra.unit_price}
@@ -2017,7 +2066,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         className="w-full bg-zinc-950/50 text-zinc-300 text-[11px] font-black p-2 rounded-lg outline-none border border-zinc-800 hover:border-zinc-700 focus:border-amber-500/30 transition-all text-right"
                       />
                     </div>
-                    <div className="col-span-1 p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
+                    <div className="col-span-1 @max-[960px]:hidden p-2 pr-6 flex justify-end items-center relative overflow-hidden group/cell">
                       <span className="text-[11px] font-black text-white tracking-tight group-hover/cell:opacity-0 group-hover/cell:translate-x-12 transition-all duration-150">
                         {formatCurrency(extra.total)}
                       </span>
@@ -2034,6 +2083,9 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                         </div>
                       </div>
                     </div>
+                    <RodapeDoCartao total={extra.total}>
+                      <button type="button" onClick={() => setExtras(extras.filter((_, idx) => idx !== i))} aria-label="Excluir extra" title="Excluir" className="h-11 w-11 inline-flex items-center justify-center rounded-lg border transition-all active:scale-95 bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-rose-500"><Trash2 size={16} /></button>
+                    </RodapeDoCartao>
                   </div>
                 ))}
               </div>

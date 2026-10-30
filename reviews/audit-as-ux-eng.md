@@ -189,8 +189,12 @@ Ver pedido, Baixa parcial, Controle parcial e Rendimento do corte sem erro no co
   "Enviar" fora da tela. Agora abre para cima quando não cabe.
 - [x] **T4. Alvos pequenos:** botão do WhatsApp (24×20) e lupa do topo (42 px) passam a 44 px no toque.
 
-**Fica como recomendação (não feito — muda o layout de uma tela inteira):**
-- **Editor de orçamento no celular:** os itens são uma tabela de 960 px numa faixa que rola para o
-  lado. Funciona, mas editar item no celular é ruim. Conserto: cartão por item abaixo de 768 px.
-  Esforço: grande. Só vale se orçamento for feito no celular de verdade.
+- [x] **T5. Editor de orçamento em cartões** (pedido do Luiz depois da passada). Abaixo de 960 px de
+  largura da LISTA (`@container`, não a janela) itens, personalização e extras viram cartão: rótulo em
+  cada campo, total e ações (clonar, copiar especificação, grade, excluir) num rodapé sempre à vista com
+  44 px. Mesma marcação da tabela — não há segunda cópia do item. No computador a tabela é a mesma
+  (colunas medidas antes e depois em 1280 px). Junto: o balão de custo da peça abre para cima quando não
+  cabe embaixo. Fora: reordenar item no celular (arrastar não existe no toque; setas ↑↓ se fizer falta).
+
+**Fica como recomendação:**
 - **Fábrica vê o cliente e manda "Avisar andamento"** pelo WhatsApp — ligado à decisão 4.2 das pendências.

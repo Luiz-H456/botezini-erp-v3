@@ -60,7 +60,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
 }) => {
     const [aberto, setAberto] = useState(false);
     const [aguardando, setAguardando] = useState(false);
-    const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+    const [pos, setPos] = useState<{ top?: number; bottom?: number; left: number } | null>(null);
     const ancoraRef = useRef<HTMLButtonElement>(null);
     const esperaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const fechaRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -104,7 +104,10 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
             MARGEM_DA_JANELA,
             Math.min(r.left, window.innerWidth - largura - MARGEM_DA_JANELA),
         );
-        setPos({ top: r.bottom + 6, left });
+        // Sem espaço embaixo (item no fim da tela, celular), abre para cima: a conta tem ~320px
+        // e passava da borda de baixo com o "Piso" — a linha que importa — fora da tela.
+        const cabeAbaixo = window.innerHeight - r.bottom - 6 >= 330;
+        setPos(cabeAbaixo ? { top: r.bottom + 6, left } : { bottom: window.innerHeight - r.top + 6, left });
     }, []);
 
     const aoEntrar = () => {
@@ -210,7 +213,7 @@ export const CustoDaPecaBadge: React.FC<Props> = ({
                 <div
                     onMouseEnter={limpar}
                     onMouseLeave={agendarFechamento}
-                    style={{ top: pos.top, left: pos.left, width: Math.min(LARGURA, window.innerWidth - MARGEM_DA_JANELA * 2) }}
+                    style={{ top: pos.top, bottom: pos.bottom, left: pos.left, width: Math.min(LARGURA, window.innerWidth - MARGEM_DA_JANELA * 2) }}
                     className="fixed z-balao bg-zinc-950 border border-zinc-800 rounded-xl shadow-2xl shadow-black/60 p-3.5 flex flex-col gap-2.5 ease-out animate-in fade-in duration-150"
                 >
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
