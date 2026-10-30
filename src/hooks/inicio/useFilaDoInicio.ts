@@ -16,6 +16,7 @@ import { montarFila, contadoresDoMenu, pedidosEmProducao, semanaDe } from '@/uti
 import { computePurchaseList } from '@/utils/purchaseList';
 import { entraNasCompras } from '@/utils/fabrica/compras';
 import { tecidosSemPrecoUsados } from '@/utils/fabrica/tecidosSemPreco';
+import { carregarCustoDeReferencia } from '@/hooks/useTabelaVerdade';
 import type { PLInsumo, PLOrder } from '@/utils/purchaseList';
 import type { BlocoDaFila, LinhaDaFila } from '@/utils/inicio/fila';
 import { aplicarIgnorados, chaveDoAviso, podarIgnorados } from '@/utils/inicio/ignorados';
@@ -88,9 +89,10 @@ async function faltaComprarNaSemana(pedidos: Base[1], insumos: Base[2], hoje: st
  */
 async function tecidosSemPreco(pedidos: Base[1], insumos: Base[2], hoje: string): Promise<number | null> {
     try {
-        const [fichas, ultimoPreco] = await Promise.all([
+        const [fichas, ultimoPreco, referencia] = await Promise.all([
             comprasRepository.fichasDoPedidoEstrito(pedidos.flatMap(o => (o.items || []).map(i => i.product_id))),
             comprasRepository.ultimoPrecoPorInsumo(),
+            carregarCustoDeReferencia(),
         ]);
         const porId = new Map<string, PLInsumo>(insumos.map(i => [i.id, {
             id: i.id, name: i.name, unit: i.unit, current_stock: Number(i.current_stock) || 0,
@@ -100,7 +102,7 @@ async function tecidosSemPreco(pedidos: Base[1], insumos: Base[2], hoje: string)
             id: o.id, order_number: o.order_number, deadline: o.deadline, status: o.status, delivered_at: o.delivered_at,
             items: (o.items || []).map(it => ({ product_id: it.product_id, quantity: Number(it.quantity) || 0, fabric_insumo_id: it.fabric_insumo_id })),
         }));
-        return tecidosSemPrecoUsados({ pedidos: plPedidos, fichas, insumos: porId, ultimoPreco, hoje }).length;
+        return tecidosSemPrecoUsados({ pedidos: plPedidos, fichas, insumos: porId, ultimoPreco, referencia, hoje }).length;
     } catch (e) {
         console.error('tecidosSemPreco:', e);
         return null;

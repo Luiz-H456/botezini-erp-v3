@@ -1,6 +1,6 @@
 import {
     LayoutDashboard, FileText, ShoppingBag, KanbanSquare, PackageCheck, CalendarClock,
-    ShoppingCart, Package, DollarSign, Wallet, PiggyBank, BarChart3, Gauge, Database, Settings2,
+    ShoppingCart, Package, Table2, DollarSign, Wallet, PiggyBank, BarChart3, Gauge, Database, Settings2,
     NotebookPen, Radar, Factory, Users, Truck, Shirt, Landmark, Building2, Tags, MessageCircle, HeartPulse,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -15,6 +15,7 @@ export const ICONE_DA_VIEW: Record<View, LucideIcon> = {
     'controle-parcial': PackageCheck,
     cronograma: CalendarClock,
     compras: ShoppingCart,
+    tabelas: Table2,
     inventory: Package,
     finance: DollarSign,
     receivables: Wallet,

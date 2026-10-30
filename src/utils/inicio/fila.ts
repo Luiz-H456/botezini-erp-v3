@@ -22,7 +22,8 @@ export type DestinoDaFila =
     | { view: 'saude-caixa'; mes: string }
     | { view: 'clientes'; dormentes: true }
     | { view: 'produtos'; completude: true }
-    | { view: 'inventory' };
+    /** Abre os insumos já no recorte "Sem preço", com a busca digitada (o preço de tecido sem faixa se define lá). */
+    | { view: 'tabelas'; busca: string; semPreco: true };
 
 export interface LinhaDaFila {
     id: string;
@@ -157,7 +158,7 @@ export function montarFila(e: EntradaDaFila): BlocoDaFila[] {
     const semPreco = e.tecidosSemPreco ?? 0;
     add({ objetivo: 'cadastros', acao: 'Definir preço', quantidade: semPreco, urgente: false,
         texto: `Definir preço: ${s(semPreco, 'tecido usado', 'tecidos usados')} em pedidos`,
-        destino: { view: 'inventory' } });
+        destino: { view: 'tabelas', busca: 'tecido', semPreco: true } });
 
     return ORDEM
         .map(({ objetivo, rotulo }) => ({

@@ -141,12 +141,12 @@ const ImportarPersonalizacaoModal: React.FC<Props> = ({
                 <div className="overflow-y-auto min-h-0 flex-1 divide-y divide-zinc-800/50">
                     {origem === 'tabela' && precosVisiveis.length === 0 && (
                         <p className="p-12 text-center text-zinc-500 text-sm">
-                            Nenhum preço tabelado. Cadastre em <b className="text-zinc-300">Estoque → Personalização → Tabela de Preços</b>.
+                            Nenhum preço tabelado. Cadastre em <b className="text-zinc-300">Tabelas de custo → Personalização → Tabela de Preços</b>.
                         </p>
                     )}
                     {origem === 'artes' && artesVisiveis.length === 0 && (
                         <p className="p-12 text-center text-zinc-500 text-sm">
-                            Nenhuma arte cadastrada. Cadastre em <b className="text-zinc-300">Estoque → Personalização → Artes de Bordado</b>.
+                            Nenhuma arte cadastrada. Cadastre em <b className="text-zinc-300">Tabelas de custo → Personalização → Artes de Bordado</b>.
                         </p>
                     )}
 

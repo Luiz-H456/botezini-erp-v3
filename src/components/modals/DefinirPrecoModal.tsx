@@ -15,8 +15,8 @@ interface Props {
 }
 
 /**
- * Preço de referência de um insumo sem saldo: é o que o lucro por pedido usa quando o insumo ainda não
- * tem compra lançada. Com saldo, o preço é o do estoque e muda pelo Ajustar contagem.
+ * Preço de referência de um insumo sem sobra registrada: é o que o lucro por pedido usa quando o insumo
+ * ainda não tem compra lançada. Com sobra, o preço é o custo médio das compras e muda com a próxima.
  */
 export function DefinirPrecoModal({ insumo, onClose, onDone }: Props) {
     const [texto, setTexto] = useState('');

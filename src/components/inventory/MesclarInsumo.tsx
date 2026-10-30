@@ -70,7 +70,7 @@ export const MesclarInsumo: React.FC<Props> = ({ data, onChange, insumos }) => {
                     {consolidado && consolidado.cadastros > 1 && (
                         <div className={`flex items-center gap-4 ${ITEM} px-3 py-2`}>
                             <div>
-                                <p className={ROTULO_PEQUENO}>Estoque somado</p>
+                                <p className={ROTULO_PEQUENO}>Sobra somada</p>
                                 <p className="text-[12px] font-black font-mono text-zinc-200">
                                     {consolidado.estoque} {data.unit}
                                 </p>

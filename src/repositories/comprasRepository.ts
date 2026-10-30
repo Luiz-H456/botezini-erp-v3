@@ -211,14 +211,6 @@ export const comprasRepository = {
         return fila.map(o => porId.get(o.id)).filter((p): p is PedidoParaSobra => !!p);
     },
 
-    async usarDoEstoque(orderId: string, insumoId: string, quantidade: number): Promise<void> {
-        if (!supabase) throw new Error('Supabase não configurado');
-        const { error } = await supabase.rpc('usar_do_estoque', {
-            p_order_id: orderId, p_insumo_id: insumoId, p_quantidade: quantidade,
-        });
-        if (error) throw new Error(error.message);
-    },
-
     /** `null` quando a função ainda não existe no banco (SQL não rodado); a entrega segue sem apurar. */
     async apurarSobras(
         orderId: string,
@@ -237,13 +229,5 @@ export const comprasRepository = {
         }
         const r = (data || {}) as Record<string, unknown>;
         return { jaFeita: Boolean(r.ja_feita), movimentos: Number(r.movimentos) || 0 };
-    },
-
-    async ajustarContagem(insumoId: string, saldoReal: number, custo?: number): Promise<void> {
-        if (!supabase) throw new Error('Supabase não configurado');
-        const { error } = await supabase.rpc('ajustar_contagem', {
-            p_insumo_id: insumoId, p_saldo_real: saldoReal, p_custo: custo ?? null,
-        });
-        if (error) throw new Error(error.message);
     },
 };

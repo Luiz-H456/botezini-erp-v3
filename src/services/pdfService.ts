@@ -1665,7 +1665,7 @@ tY += 5;
         doc.save(`Relatorio_Executivo_${periodStr}.pdf`);
     }
 
-    // PCP — Lista de Compras semanal (consumo de matéria-prima × estoque).
+    // PCP — Lista de Compras semanal. Estoque zero (30/10): sem coluna de saldo, a sobra não abate.
     public generatePurchaseListPDF(
         lines: Array<{ insumo_name: string; unit: string; needed: number; in_stock: number; to_buy: number; unit_cost: number; est_cost: number }>,
         periodLabel: string,
@@ -1684,26 +1684,24 @@ tY += 5;
 
         autoTable(doc, {
             startY: 38,
-            head: [['Insumo', 'Necessário', 'Em estoque', 'Comprar', 'Custo unit.', 'Custo estimado']],
+            head: [['Insumo', 'Necessário', 'Comprar', 'Custo unit.', 'Custo estimado']],
             // Linha nula na lista derrubava a exportação inteira com TypeError.
             // Um PDF é saída de relatório: não pode quebrar por causa de um
             // registro sujo — descarta a linha e imprime o resto.
             body: (lines || []).filter(Boolean).map(l => [
                 l.insumo_name ?? '(insumo desconhecido)',
                 `${l.needed ?? 0} ${l.unit ?? ''}`.trim(),
-                `${l.in_stock ?? 0} ${l.unit ?? ''}`.trim(),
                 l.to_buy > 0 ? `${l.to_buy} ${l.unit ?? ''}`.trim() : '-',
                 formatCurrency(l.unit_cost),
                 l.est_cost > 0 ? formatCurrency(l.est_cost) : '-',
             ]),
-            foot: [['', '', '', '', 'Total a comprar', formatCurrency(totalCost)]],
+            foot: [['', '', '', 'Total a comprar', formatCurrency(totalCost)]],
             theme: 'striped',
             headStyles: { fillColor: [30, 30, 30], textColor: [255, 255, 255], fontSize: 8 },
             footStyles: { fillColor: [245, 245, 245], textColor: [20, 20, 20], fontStyle: 'bold' },
             bodyStyles: { fontSize: 8 },
             columnStyles: {
-                1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' },
-                4: { halign: 'right' }, 5: { halign: 'right' },
+                1: { halign: 'right' }, 2: { halign: 'right' }, 3: { halign: 'right' }, 4: { halign: 'right' },
             },
         });
 

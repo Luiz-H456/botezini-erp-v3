@@ -1,7 +1,8 @@
 /**
  * Tecidos usados em pedidos que não têm preço NENHUM (sugestões do lucro, 17/10).
  *
- * "Sem preço" pela mesma fila do lucro por pedido: sem compra (último preço pago) e sem custo médio.
+ * "Sem preço" pela mesma fila do lucro por pedido: sem referência da tabela do fornecedor, sem compra
+ * (último preço pago) e sem custo médio.
  * Sem um dos dois, o material do pedido sai incompleto e o lucro vira teto. Só conta o que importa
  * agora — pedidos ativos e os entregues nos últimos 90 dias —, no espírito de produtosSemFichaQueVenderam.
  * Puro, sem import do app.
@@ -21,6 +22,8 @@ export function tecidosSemPrecoUsados(e: {
     fichas: Map<string, PLBomLine[]>;
     insumos: Map<string, PLInsumo>;
     ultimoPreco: Map<string, number>;
+    /** insumo_id → custo de referência da tabela verdade (mapaDeReferencia): vem antes da compra no lucro. */
+    referencia?: Map<string, number>;
     hoje: string;
 }): { id: string; name: string }[] {
     const desde = somarDias(e.hoje, -DIAS_DE_ENTREGUES);
@@ -36,7 +39,7 @@ export function tecidosSemPrecoUsados(e: {
 
     return [...usados]
         .map(id => e.insumos.get(id))
-        .filter((i): i is PLInsumo => !!i && ehTecido(i)
+        .filter((i): i is PLInsumo => !!i && ehTecido(i) && !((e.referencia?.get(i.id) ?? 0) > 0)
             && !((e.ultimoPreco.get(i.id) ?? 0) > 0) && !(Number(i.average_unit_cost) > 0))
         .map(i => ({ id: i.id, name: i.name }))
         .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));

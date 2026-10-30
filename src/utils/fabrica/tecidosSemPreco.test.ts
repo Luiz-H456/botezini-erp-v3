@@ -25,6 +25,12 @@ test('tecido com ultimo preco de compra ou com custo medio nao entra', () => {
     assert.deepEqual(r, []);                                  // brim tem compra; dry tem custo médio
 });
 
+test('tecido com preco na tabela do fornecedor nao entra: e o primeiro preco que o lucro usa (30/10)', () => {
+    const pedidos = [pedido('Pendente', [{ product_id: 'calca', quantity: 1 }])];
+    const r = tecidosSemPrecoUsados({ pedidos, fichas, insumos, ultimoPreco: new Map(), referencia: new Map([['brim', 19.1]]), hoje });
+    assert.deepEqual(r, [], 'brim tem preço de referência na tabela; avisar "sem preço" mandaria definir um preço que o custo ignora');
+});
+
 test('o tecido escolhido no item conta, mesmo em produto sem ficha', () => {
     const r = tecidosSemPrecoUsados({ pedidos: [pedido('Pendente', [{ product_id: 'bone', quantity: 5, fabric_insumo_id: 'oxford' }])], fichas, insumos, ultimoPreco: new Map(), hoje });
     assert.deepEqual(r.map(t => t.id), ['oxford']);

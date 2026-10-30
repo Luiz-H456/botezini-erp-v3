@@ -126,7 +126,7 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
                     <div className="flex-1 min-w-0">
                         <p className={ROTULO}>Lançar compra</p>
                         <p className={`${ROTULO_PEQUENO} mt-1`}>
-                            Cada parte vai para um pedido ou para o estoque. Não cria conta a pagar.
+                            Cada parte vai para um pedido; o que sobrar fica registrado como sobra. Não cria conta a pagar.
                         </p>
                     </div>
                     <button type="button" aria-label="Fechar" title="Fechar" onClick={fechar}
@@ -194,7 +194,7 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
                                                 <div key={n} className="flex items-center gap-2">
                                                     <select className={`${CAMPO} flex-1 min-w-0`} value={p.destino} aria-label="Destino da parte"
                                                         onChange={e => mudarParte(it.key, n, { destino: e.target.value })}>
-                                                        <option value="">Estoque</option>
+                                                        <option value="">Sobra (só registro)</option>
                                                         {pedidos.map(o => <option key={o.id} value={o.id}>{o.order_number}</option>)}
                                                     </select>
                                                     <input className={`${CAMPO} w-28`} inputMode="decimal" value={p.quantidade} aria-label="Quantidade da parte"

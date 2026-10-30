@@ -207,13 +207,13 @@ test('semana de segunda a domingo, em data local', () => {
     assert.deepEqual(semanaDe('2026-11-01'), { inicio: '2026-10-26', fim: '2026-11-01' }); // vira o mês
 });
 
-test('tecidos usados em pedidos sem preco: linha em Cadastros, nao urgente, leva ao Estoque', () => {
+test('tecidos usados em pedidos sem preco: linha em Cadastros, nao urgente, leva aos insumos de tecido nas Tabelas de custo', () => {
     const blocos = montarFila({ ...vazia, tecidosSemPreco: 3 });
     assert.deepEqual(blocos.map(b => b.objetivo), ['cadastros']);
     const l = blocos[0].linhas[0];
     assert.equal(l.texto, 'Definir preço: 3 tecidos usados em pedidos');
     assert.equal(l.urgente, false);
-    assert.deepEqual(l.destino, { view: 'inventory' });
+    assert.deepEqual(l.destino, { view: 'tabelas', busca: 'tecido', semPreco: true });
     assert.equal(montarFila({ ...vazia, tecidosSemPreco: 1 })[0].linhas[0].texto, 'Definir preço: 1 tecido usado em pedidos');
 });
 

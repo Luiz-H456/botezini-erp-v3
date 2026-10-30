@@ -7,7 +7,7 @@ export type View =
     | 'dashboard'
     | 'budgets' | 'orders'
     | 'quadro' | 'controle-parcial'
-    | 'cronograma' | 'compras' | 'inventory'
+    | 'cronograma' | 'compras' | 'tabelas' | 'inventory'
     | 'finance' | 'receivables' | 'envelopes' | 'saude-caixa'
     | 'resultado' | 'itens-vendidos' | 'indicadores'
     | 'masterdata' | 'capacidade'
@@ -40,6 +40,7 @@ export const ROTULO_DA_VIEW: Record<View, string> = {
     'controle-parcial': 'Controle parcial',
     cronograma: 'Cronograma',
     compras: 'Lista de compras',
+    tabelas: 'Tabelas de custo',
     inventory: 'Estoque',
     finance: 'Contas',
     receivables: 'Clientes que devem',
@@ -70,7 +71,7 @@ export const SECOES: Secao[] = [
     { id: 'inicio', rotulo: 'Início', descricao: 'O que precisa de você hoje', tipo: 'inicio', views: ['dashboard'], numerado: false },
     { id: 'vender', rotulo: 'Vender', descricao: 'Do orçamento ao pedido', tipo: 'objetivo', views: ['budgets', 'orders'], numerado: true },
     { id: 'producao', rotulo: 'Como está a produção', descricao: 'O pedido andando pelos setores', tipo: 'objetivo', views: ['quadro', 'controle-parcial'], numerado: true },
-    { id: 'planejar', rotulo: 'Planejar a semana', descricao: 'O que a fábrica faz e o que comprar', tipo: 'objetivo', views: ['cronograma', 'compras', 'inventory'], numerado: true },
+    { id: 'planejar', rotulo: 'Planejar a semana', descricao: 'O que a fábrica faz e o que comprar', tipo: 'objetivo', views: ['cronograma', 'compras', 'tabelas'], numerado: true },
     { id: 'dinheiro', rotulo: 'Dinheiro', descricao: 'Pagar, receber e reservar', tipo: 'objetivo', views: ['finance', 'receivables', 'envelopes', 'saude-caixa'], numerado: false },
     { id: 'resultados', rotulo: 'Como estamos indo', descricao: 'Lucro, vendas e fábrica', tipo: 'objetivo', views: ['resultado', 'itens-vendidos', 'indicadores'], numerado: false },
     { id: 'cadastros', rotulo: 'Cadastros', descricao: 'Clientes, produtos, empresa e setores', tipo: 'apoio', views: ['cadastros'], numerado: false },
@@ -86,7 +87,8 @@ export const CARTOES_DO_FICHARIO: View[] = [
 ];
 
 /** Rotas antigas que continuam valendo (links, alertas). */
-export const ALIAS_DE_VIEW: Partial<Record<View, View>> = { pcp: 'quadro', production: 'quadro', masterdata: 'cadastros', capacidade: 'setores' };
+// inventory → tabelas: estoque zero (30/10). O Estoque saiu do menu; o dado fica no banco, a sobra é só registro.
+export const ALIAS_DE_VIEW: Partial<Record<View, View>> = { pcp: 'quadro', production: 'quadro', masterdata: 'cadastros', capacidade: 'setores', inventory: 'tabelas' };
 
 /** Views que existem e não moram no menu — cada uma com o motivo. */
 export const FORA_DO_MENU: View[] = [
@@ -95,6 +97,7 @@ export const FORA_DO_MENU: View[] = [
     'production', // alias → quadro
     'masterdata', // alias → cadastros
     'capacidade', // alias → setores
+    'inventory',  // alias → tabelas (estoque zero)
     'login',
 ];
 
@@ -147,7 +150,10 @@ export function enderecoDaView(view: View): string {
     return '#/inicio';
 }
 
+/** Endereços de telas que mudaram de nome: favorito antigo continua abrindo. */
+const ENDERECO_ANTIGO: Record<string, View> = { estoque: 'tabelas' };
+
 export function viewDoEndereco(hash: string | null | undefined): View | null {
     const slug = (hash || '').replace(/^#\/?/, '').split(/[?/]/)[0];
-    return slug ? VIEW_POR_SLUG.get(slug) ?? null : null;
+    return slug ? VIEW_POR_SLUG.get(slug) ?? ENDERECO_ANTIGO[slug] ?? null : null;
 }

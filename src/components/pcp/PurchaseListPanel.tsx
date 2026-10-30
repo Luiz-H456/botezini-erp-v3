@@ -6,12 +6,10 @@ import { usePurchaseList, WeekFilter } from '@/hooks/pcp/usePurchaseList';
 import { pdfService } from '@/services/pdfService';
 import { comprasRepository } from '@/repositories/comprasRepository';
 import type { Compra } from '@/types';
-import type { PurchaseLine } from '@/utils/purchaseList';
 import { numero } from '@/utils/numeros';
 import { reais } from '@/utils/financas/base';
 import { agruparItensDaCompra, semanaDe, totalDaCompra } from '@/utils/fabrica/lancarCompra';
 import { LancarCompraModal } from './LancarCompraModal';
-import { UsarDoEstoqueModal } from './UsarDoEstoqueModal';
 import { EntreguesSemSobra } from './EntreguesSemSobra';
 import { CARTAO, ITEM, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_SUAVE, pilula } from '@/components/finance/ui/estilo';
 import type { View } from '@/utils/navegacao';
@@ -29,7 +27,6 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
     const shortageCount = result.lines.filter(l => l.is_shortage).length;
     const [pdfError, setPdfError] = useState('');
     const [lancando, setLancando] = useState(false);
-    const [usando, setUsando] = useState<PurchaseLine | null>(null);
     const [avisoOk, setAvisoOk] = useState('');
     const [erroTela, setErroTela] = useState('');
     // Erro da exclusão aparece na seção das compras, onde a pessoa está olhando.
@@ -62,7 +59,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
             setExcluindo(null);
             depoisDeGravar('Compra excluída');
         } catch (e: any) {
-            // A recusa do banco (pedido já entregue, estoque já usado) vem explicada na mensagem.
+            // A recusa do banco (pedido já entregue, sobra já usada) vem explicada na mensagem.
             setExcluindo(null);
             setAvisoOk('');
             setErroCompras(mensagemDeErro(e, 'Falha ao excluir a compra'));
@@ -139,7 +136,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                             Para cada pedido em aberto, multiplica a ficha técnica do produto pela
                             quantidade e soma o consumo por insumo. A lista mostra o que falta depois do
                             que já foi comprado e vinculado a cada pedido, valorizado pelo <b>custo médio
-                            de compra</b> cadastrado. O estoque (sobras) aparece ao lado, mas não reduz o que falta.
+                            de compra</b> cadastrado. Estoque zero: a sobra de uma compra fica registrada, mas nunca abate o que um pedido precisa.
                         </p>
                         <p className="text-[10px] text-zinc-400 leading-relaxed mt-1.5">
                             Se o item do pedido escolheu um tecido diferente do da ficha, o consumo migra
@@ -187,7 +184,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                         não entram no total estimado:{' '}
                         <span className="text-zinc-400">{semCusto.map(l => l.insumo_name).join(', ')}</span>.
                         O total abaixo está subestimado até você lançar o custo de compra deles.{' '}
-                        {onIrPara && <button type="button" onClick={() => onIrPara('inventory')} className="underline font-black">Abrir Estoque</button>}
+                        {onIrPara && <button type="button" onClick={() => onIrPara('tabelas')} className="underline font-black">Abrir Tabelas de custo</button>}
                     </span>
                 </div>
             )}
@@ -225,9 +222,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                                     <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Previsto</th>
                                     <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Já comprado</th>
                                     <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Falta</th>
-                                    <th className="text-right px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Em estoque</th>
                                     <th className="text-left px-4 py-2.5 text-[10px] font-black text-zinc-500 uppercase tracking-widest">Pedidos</th>
-                                    <th className="px-4 py-2.5" />
                                 </tr>
                             </thead>
                             <tbody>
@@ -239,14 +234,8 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                                         <td className={`px-4 py-2.5 text-xs font-mono font-bold text-right ${l.to_buy > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                                             {l.to_buy > 0 ? `${numero(l.to_buy)} ${l.unit}` : '—'}
                                         </td>
-                                        <td className="px-4 py-2.5 text-xs font-mono text-right text-zinc-400">{l.in_stock > 0 ? `${numero(l.in_stock)} ${l.unit}` : ''}</td>
                                         <td className="px-4 py-2.5 text-[11px] text-zinc-500">
                                             {l.pedidos.map(p => `${p.order_number} (${numero(p.falta)} ${l.unit})`).join(' · ')}
-                                        </td>
-                                        <td className="px-4 py-2.5 text-right">
-                                            {l.in_stock > 0 && l.to_buy > 0 && (
-                                                <button type="button" onClick={() => setUsando(l)} disabled={pl.loading || pl.recarregando} className={BOTAO_SUAVE}>Usar do estoque</button>
-                                            )}
                                         </td>
                                     </tr>
                                 ))}
@@ -291,7 +280,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                                         <span className="font-bold text-zinc-300">{ins?.name ?? '(insumo)'}</span>{' '}
                                         <span className="font-mono text-zinc-500">
                                             {g.destinos.map(d =>
-                                                `${d.pedido_id ? (pl.numerosDosPedidos.get(d.pedido_id) ?? 'Pedido') : 'Estoque'} · ${numero(d.quantidade)} ${ins?.unit ?? ''}`.trim(),
+                                                `${d.pedido_id ? (pl.numerosDosPedidos.get(d.pedido_id) ?? 'Pedido') : 'Sobra'} · ${numero(d.quantidade)} ${ins?.unit ?? ''}`.trim(),
                                             ).join('  |  ')}
                                         </span>
                                     </li>
@@ -311,18 +300,10 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
                     onDone={() => { setLancando(false); depoisDeGravar('Compra lançada'); }}
                 />
             )}
-            {usando && (
-                <UsarDoEstoqueModal
-                    insumo={{ id: usando.insumo_id, name: usando.insumo_name, unit: usando.unit, current_stock: usando.in_stock }}
-                    pedidos={usando.pedidos.map(p => ({ id: p.order_id, order_number: p.order_number, falta: p.falta }))}
-                    onClose={() => setUsando(null)}
-                    onDone={() => { setUsando(null); depoisDeGravar('Estoque usado no pedido'); }}
-                />
-            )}
             <ConfirmDialog
                 isOpen={!!excluindo}
                 title="Excluir compra"
-                message={excluindo ? `Excluir a compra de ${nomeDoFornecedor(excluindo)} em ${formatDate(excluindo.data)}? O que entrou no estoque por ela é estornado.` : ''}
+                message={excluindo ? `Excluir a compra de ${nomeDoFornecedor(excluindo)} em ${formatDate(excluindo.data)}? O que ela vinculou aos pedidos e a sobra registrada saem junto.` : ''}
                 variant="danger" confirmLabel="Excluir" isLoading={excluindoBusy}
                 onConfirm={excluirCompra} onCancel={() => setExcluindo(null)}
             />

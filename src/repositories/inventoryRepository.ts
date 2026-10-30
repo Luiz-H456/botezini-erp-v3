@@ -145,7 +145,7 @@ export class InventoryRepository {
             .select('id');
         if (error) throw new Error(error.message);
         if (!data || data.length === 0) {
-            throw new Error('Este insumo tem saldo no estoque: o preço muda pelo Ajustar contagem, que pede o custo junto.');
+            throw new Error('Este insumo tem sobra registrada de compras: o preço é o custo médio delas e muda com a próxima compra.');
         }
     }
 

@@ -34,7 +34,7 @@ test('a ordem do menu: Início, os cinco objetivos, depois os apoios', () => {
 test('cada objetivo traz os passos na ordem do desenho', () => {
     assert.deepEqual(viewsDaSecao('vender'), ['budgets', 'orders']);
     assert.deepEqual(viewsDaSecao('producao'), ['quadro', 'controle-parcial']);
-    assert.deepEqual(viewsDaSecao('planejar'), ['cronograma', 'compras', 'inventory']);
+    assert.deepEqual(viewsDaSecao('planejar'), ['cronograma', 'compras', 'tabelas']);
     assert.deepEqual(viewsDaSecao('dinheiro'), ['finance', 'receivables', 'envelopes', 'saude-caixa']);
     assert.deepEqual(viewsDaSecao('resultados'), ['resultado', 'itens-vendidos', 'indicadores']);
     assert.deepEqual(viewsDaSecao('cadastros'), ['cadastros']);
@@ -111,4 +111,15 @@ test('endereço: apelidos levam à tela real; desconhecido, vazio e login não a
     assert.equal(viewDoEndereco(''), null);
     assert.equal(viewDoEndereco('#/entrar'), null);
     assert.equal(viewDoEndereco('#/contas?x=1'), 'finance');
+});
+
+test('estoque zero (30/10): o Estoque sai do menu e tudo que levava a ele abre as Tabelas de custo', async () => {
+    const { enderecoDaView, viewDoEndereco } = await import('./navegacao.ts');
+    assert.ok(!todasAsViewsDoMenu().includes('inventory'), 'Estoque não é mais passo do menu');
+    assert.ok(FORA_DO_MENU.includes('inventory'));
+    assert.equal(viewReal('inventory'), 'tabelas', 'link antigo no código');
+    assert.equal(secaoDaView('inventory'), 'planejar');
+    assert.equal(ROTULO_DA_VIEW.tabelas, 'Tabelas de custo');
+    assert.equal(enderecoDaView('tabelas'), '#/tabelas-de-custo');
+    assert.equal(viewDoEndereco('#/estoque'), 'tabelas', 'favorito e aba antigos');
 });

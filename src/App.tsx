@@ -12,7 +12,7 @@ const PCP = lazy(() => import('@/pages/PCP').then(m => ({ default: m.PCP })));
 const Budgets = lazy(() => import('@/pages/Budgets'));
 const Orders = lazy(() => import('@/pages/Orders'));
 const MasterData = lazy(() => import('@/pages/MasterData'));
-const Inventory = lazy(() => import('@/pages/Inventory'));
+const TabelasDeCusto = lazy(() => import('@/pages/TabelasDeCusto'));
 const ItensVendidos = lazy(() => import('@/pages/ItensVendidos'));
 const Login = lazy(() => import('@/pages/Login'));
 const Board = lazy(() => import('@/pages/Board'));
@@ -74,6 +74,7 @@ const App: React.FC = () => {
   const [aberturaBanco, setAberturaBanco] = useState<string | null>(null);
   const [aberturaReceber, setAberturaReceber] = useState<string | null>(null);
   const [aberturaSaude, setAberturaSaude] = useState<string | null>(null);
+  const [tabelasSemPreco, setTabelasSemPreco] = useState(false);
   const [destaqueQuadro, setDestaqueQuadro] = useState<'atrasados' | 'ultimo-setor' | null>(null);
   // O destaque vale só para a visita ao Quadro que o pediu; o banco a conferir, só para a das Contas.
   useEffect(() => { if (currentView !== 'quadro') setDestaqueQuadro(null); }, [currentView]);
@@ -249,6 +250,7 @@ const App: React.FC = () => {
     else if (d.view === 'produtos') setAberturaProdutos({ completude: true });
     else if (d.view === 'compras') setFiltroDeCompras(d.filtro);
     else if (d.view === 'saude-caixa') setAberturaSaude(d.mes);
+    else if (d.view === 'tabelas') { setTabelasSemPreco(d.semPreco); return handleNavigate(d.view, d.busca); }
     handleNavigate(d.view);
   };
 
@@ -309,7 +311,8 @@ const App: React.FC = () => {
           initialSearch={autoSearchTerm}
           clearSearch={() => setAutoSearchTerm('')}
         />;
-      case 'inventory': return <Inventory initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}
+      case 'tabelas': return <TabelasDeCusto initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}
+        semPrecoInicial={tabelasSemPreco} limparSemPreco={() => setTabelasSemPreco(false)}
         onAbrirFornecedor={(id) => { setAberturaFornecedores({ fornecedorId: id }); handleNavigate('fornecedores'); }} />;
       case 'itens-vendidos': return <ItensVendidos />;
       case 'finance': return <Finance initialSearch={autoSearchTerm} clearSearch={() => setAutoSearchTerm('')}

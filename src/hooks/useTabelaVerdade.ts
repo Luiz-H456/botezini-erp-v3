@@ -30,7 +30,8 @@ export function invalidarCustoDeReferencia() {
     ouvintes.forEach(f => f());
 }
 
-function carregar(): Promise<Map<string, number>> {
+/** O mesmo mapa fora de componente (a fila do Início): usa o cache de 60 s. */
+export function carregarCustoDeReferencia(): Promise<Map<string, number>> {
     if (cache && Date.now() - cache.quando < 60_000) return cache.mapa;
     const mapa = Promise.all([tabelaVerdadeRepository.catalogo(), tabelaVerdadeRepository.insumosComFaixa()])
         .then(([cat, insumos]) => mapaDeReferencia(cat, insumos, getTodayStr()))
@@ -44,7 +45,7 @@ export function useCustoDeReferencia(): Map<string, number> {
     const [mapa, setMapa] = useState<Map<string, number>>(new Map());
     useEffect(() => {
         let vivo = true;
-        const ler = () => { carregar().then(m => { if (vivo) setMapa(m); }); };
+        const ler = () => { carregarCustoDeReferencia().then(m => { if (vivo) setMapa(m); }); };
         ler();
         ouvintes.add(ler);
         return () => { vivo = false; ouvintes.delete(ler); };

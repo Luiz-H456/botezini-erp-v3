@@ -15,7 +15,7 @@ import { IndicadorRecarga } from '@/components/common/IndicadorRecarga';
 interface Props {
     /** Abre a edição do produto, onde mora a ficha técnica. */
     onAbrirProduto: (produtoId: string) => void;
-    /** Leva ao Estoque já buscando este insumo pelo nome. */
+    /** Leva às Tabelas de custo (aba Insumos) já buscando este insumo pelo nome. */
     onAbrirInsumo: (nomeDoInsumo: string) => void;
     /** Abre a ficha do primeiro produto sem ficha e deixa os outros na fila.
      *  Recebe os ids na ordem da lista: quem vende mais primeiro. */

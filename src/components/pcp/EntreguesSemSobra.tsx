@@ -31,7 +31,7 @@ export function EntreguesSemSobra({ onApurado }: { onApurado: (msg: string) => v
             const r = await apurarSobrasDoPedido(p);
             if ('semBanco' in r && r.semBanco) throw new Error('o banco ainda não tem compras por pedido');
             setFalhas(prev => { const n = new Map(prev); n.delete(p.id); return n; });
-            return `Pedido ${p.order_number}: ${avisoDaEntrega(r) ?? 'sem sobra para o estoque.'}`;
+            return `Pedido ${p.order_number}: ${avisoDaEntrega(r) ?? 'sem sobra a registrar.'}`;
         } catch (e: any) {
             setFalhas(prev => new Map(prev).set(p.id, mensagemDeErro(e, 'erro')));
             return null;
@@ -72,7 +72,7 @@ export function EntreguesSemSobra({ onApurado }: { onApurado: (msg: string) => v
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold text-zinc-200 truncate">Pedido {p.order_number}</p>
                             {falhas.has(p.id) && (
-                                <p className="text-[11px] font-bold text-rose-300 mt-0.5">A sobra não foi para o estoque: {falhas.get(p.id)}.</p>
+                                <p className="text-[11px] font-bold text-rose-300 mt-0.5">A sobra não foi registrada: {falhas.get(p.id)}.</p>
                             )}
                         </div>
                         <button type="button" onClick={() => apurar([p])} disabled={algumOcupado} className={BOTAO_SUAVE}>

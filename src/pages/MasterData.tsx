@@ -70,7 +70,7 @@ interface Props {
   onProfileUpdate?: () => void;
   /** Sai dos Cadastros para outra tela — usado pela página do cliente para
    *  abrir o orçamento pelo número. Mesmo canal do deep-link de produto. */
-  onNavigate?: (view: 'budgets' | 'orders' | 'inventory', searchTerm?: string) => void;
+  onNavigate?: (view: 'budgets' | 'orders' | 'tabelas', searchTerm?: string) => void;
   /** Deep-link: abre direto a edição deste produto (ex.: criar ficha técnica). */
   openProductId?: string;
   clearOpenProduct?: () => void;
@@ -391,7 +391,7 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
             const prod = products.find(p => p.id === id);
             if (prod) handleOpenModal('product', prod);
           }}
-          onAbrirInsumo={(nome) => onNavigate?.('inventory', nome)}
+          onAbrirInsumo={(nome) => onNavigate?.('tabelas', nome)}
           onComecarMutirao={comecarMutirao}
           // Só ao montar (a que vem da fila do Início) rola até o painel.
           destacar={!!abertura?.completude}
