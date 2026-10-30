@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
-import { Factory, Hexagon, AlertTriangle, LogOut, Shield, ChevronRight, Eye, EyeOff } from 'lucide-react';
+import { Factory, Hexagon, AlertTriangle, LogOut, Shield, ChevronRight, Eye, EyeOff, Search } from 'lucide-react';
 
 const Inicio = lazy(() => import('@/pages/Inicio'));
 const Finance = lazy(() => import('@/pages/Finance'));
@@ -42,6 +42,8 @@ import { carregarPreferenciaDePrivacidade } from '@/utils/privacidade';
 import { usePrivacidade } from '@/hooks/usePrivacidade';
 
 import { CentralDeAvisos } from '@/components/common/CentralDeAvisos';
+import { BuscaGeral } from '@/components/layout/BuscaGeral';
+import type { ResultadoDaBusca } from '@/utils/buscaGeral';
 // Lê a preferência salva antes do primeiro render, para não haver um piscar de
 // valores visíveis em quem deixou o modo privado ligado.
 carregarPreferenciaDePrivacidade();
@@ -162,6 +164,27 @@ const App: React.FC = () => {
     window.addEventListener('popstate', aoVoltar);
     return () => window.removeEventListener('popstate', aoVoltar);
   }, [isAuthenticated, userProfile?.role]);
+
+  // Busca geral (auditoria R1/N2): Ctrl+K de qualquer lugar; "/" quando não se está digitando.
+  const [buscaAberta, setBuscaAberta] = useState(false);
+  useEffect(() => {
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (!isAuthenticated || userProfile?.role === 'factory') return;
+      const alvo = e.target as HTMLElement | null;
+      const digitando = !!alvo && (alvo.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(alvo.tagName));
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setBuscaAberta(true); }
+      else if (e.key === '/' && !digitando && !e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); setBuscaAberta(true); }
+    };
+    window.addEventListener('keydown', aoTeclar);
+    return () => window.removeEventListener('keydown', aoTeclar);
+  }, [isAuthenticated, userProfile?.role]);
+  const abrirDaBusca = (r: ResultadoDaBusca) => {
+    if (r.tipo === 'cliente') { setAberturaClientes({ clienteId: r.chave }); handleNavigate('clientes'); }
+    else if (r.tipo === 'fornecedor') { setAberturaFornecedores({ fornecedorId: r.chave }); handleNavigate('fornecedores'); }
+    else if (r.tipo === 'pedido') handleNavigate('orders', r.chave);
+    else if (r.tipo === 'orcamento') handleNavigate('budgets', r.chave);
+    else handleNavigate('masterdata', r.chave);
+  };
 
   const handleLogout = async () => {
     window.history.replaceState(null, '', window.location.pathname);
@@ -369,6 +392,7 @@ const App: React.FC = () => {
   return (
     <div className="flex flex-col h-screen h-svh w-screen bg-zinc-950 overflow-hidden text-slate-200">
       <CentralDeAvisos />
+      <BuscaGeral aberta={buscaAberta} onFechar={() => setBuscaAberta(false)} onAbrir={abrirDaBusca} />
       <BarraDeTopo
         onNavegar={handleNavigate}
         onAbrirMenu={() => setGavetaAberta(true)}
@@ -379,6 +403,14 @@ const App: React.FC = () => {
         onSair={handleLogout}
         acoes={
           <>
+            <button
+              onClick={() => setBuscaAberta(true)}
+              title="Buscar cliente, pedido, orçamento, fornecedor ou produto (Ctrl+K)"
+              aria-label="Busca geral"
+              className="inline-flex h-11 items-center gap-2 rounded-xl px-3 text-zinc-500 hover:text-white hover:bg-zinc-800 transition-colors"
+            >
+              <Search size={18} /><span className="hidden md:inline text-xs text-zinc-600">Ctrl+K</span>
+            </button>
             <button
               onClick={alternarPrivacidade}
               title={valoresOcultos ? 'Mostrar valores' : 'Ocultar valores em todo o app'}
