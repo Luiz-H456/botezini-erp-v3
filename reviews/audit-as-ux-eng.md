@@ -42,14 +42,14 @@ Nada impede o uso, mas os 5 críticos custam trabalho refeito toda semana.
 
 ## Críticos — perda de trabalho ou engano (recomendo todos)
 
-- [ ] **C1. F5 e o botão voltar do navegador perdem a tela.**
+- [x] **C1. F5 e o botão voltar do navegador perdem a tela.**
   O app não guarda a tela no endereço: `App.tsx:49` começa sempre em `login` e não há rota/histórico (nenhum
   `pushState`/`popstate`/router no código). Dar F5 em Contas filtradas volta ao Início; o "voltar" do navegador
   (ou do mouse) **sai do app**; não dá para mandar o link de um pedido para alguém.
   **Conserto:** endereço por tela (`#/dinheiro/contas`, `#/vender/pedidos/PED-…`), o voltar do navegador anda dentro do
   app, F5 mantém a tela (e o filtro principal). Esforço: médio. Ganho: todo dia.
 
-- [ ] **C2. O editor de orçamento fecha sem salvar e sem perguntar — e não guarda rascunho.**
+- [x] **C2. O editor de orçamento fecha sem salvar e sem perguntar — e não guarda rascunho.**
   Testado: digitei nas observações e cliquei no "‹" → fechou, texto perdido (`BudgetEditor.tsx:954`, título
   "Fechar sem salvar"). F5 ou fechar a aba com um orçamento de 19 itens aberto também perde tudo (não há
   `beforeunload` nem rascunho no código).
@@ -57,7 +57,7 @@ Nada impede o uso, mas os 5 críticos custam trabalho refeito toda semana.
   (b) rascunho automático no navegador a cada alteração, oferecido ao reabrir ("Recuperar o que você estava fazendo?");
   (c) aviso do navegador ao fechar a aba com alteração pendente. Esforço: médio.
 
-- [ ] **C3. Janelas com formulário fecham com Esc ou com um clique fora, perdendo o que foi digitado.**
+- [x] **C3. Janelas com formulário fecham com Esc ou com um clique fora, perdendo o que foi digitado.**
   - Lançar compra: Esc fecha a compra inteira da semana (`LancarCompraModal.tsx:67-68`).
   - Conta nova (a pagar/receber): clique no fundo fecha o painel (`ObligationForm.tsx:148`).
   - Registrar pagamento: clique no fundo fecha (`PaymentModal.tsx:87`).
@@ -65,13 +65,13 @@ Nada impede o uso, mas os 5 críticos custam trabalho refeito toda semana.
   **Conserto:** uma regra só para o app (um hook): Esc/clique fora **só fecham se nada foi alterado**; com alteração,
   perguntam. Esforço: pequeno.
 
-- [ ] **C4. Login sem servidor diz "Acesso negado. Contate o administrador."**
+- [x] **C4. Login sem servidor diz "Acesso negado. Contate o administrador."**
   Visto hoje com o banco local fora do ar; o código cai nessa frase para qualquer erro que não seja senha/e-mail
   (`Login.tsx:44`). Parece senha bloqueada; é falta de conexão.
   **Conserto:** distinguir "Sem conexão com o servidor — confira a internet e tente de novo" de acesso negado de
   verdade. Esforço: pequeno.
 
-- [ ] **C5. Erro some em 3 segundos e às vezes vem em linguagem de banco.**
+- [x] **C5. Erro some em 3 segundos e às vezes vem em linguagem de banco.**
   O aviso padrão (`useToast.ts:4`, 3000 ms) some sozinho também quando é erro; quem desviou o olho não sabe o que
   falhou. ~43 pontos mostram a mensagem do banco crua (`e?.message || …`, ex.: `BudgetEditor.tsx:502`,
   `BancosPanel.tsx:111`), e o tradutor que já existe (`utils/errorHandling.ts`) só é usado em 2 lugares.
@@ -80,43 +80,43 @@ Nada impede o uso, mas os 5 críticos custam trabalho refeito toda semana.
 
 ## Recomendações — ganham tempo toda semana
 
-- [ ] **R1. Busca geral (Ctrl+K).** Cada tela tem a sua busca (Orçamentos, Pedidos, Contas, Estoque, Cadastros), mas não
+- [x] **R1. Busca geral (Ctrl+K).** Cada tela tem a sua busca (Orçamentos, Pedidos, Contas, Estoque, Cadastros), mas não
   há uma que ache "Laticínio Dona Rosa" ou "PED-047" de qualquer lugar. Uma caixa só: cliente, pedido, orçamento,
   fornecedor, tecido → abre a página. Junto com C1, vira o jeito mais rápido de andar no app. Esforço: médio.
-- [ ] **R2. Validação no campo, não em janela.** "Finalizar proposta" sem cliente abre a janela "Atenção — Selecione
+- [x] **R2. Validação no campo, não em janela.** "Finalizar proposta" sem cliente abre a janela "Atenção — Selecione
   um cliente — Entendido" (`Budgets.tsx`, `openAlert`), uma falta por vez. Melhor: marcar o campo em vermelho, rolar
   até ele e listar tudo o que falta de uma vez. Esforço: pequeno.
-- [ ] **R3. Pagar várias contas de uma vez.** Hoje há 9 salários vencidos em 05/10; cada um é "Paguei" + janela. A lista
+- [x] **R3. Pagar várias contas de uma vez.** Hoje há 9 salários vencidos em 05/10; cada um é "Paguei" + janela. A lista
   de Contas não tem seleção (`Finance.tsx` não tem nenhum "selecionar"). Seleção com caixas + "Paguei as 9 — R$ 13.019,44,
   do banco X, em DD/MM" numa confirmação só (cada conta continua com o seu rastro). Esforço: médio.
-- [ ] **R4. Destravar pedidos atrasados em lote.** O Início pede "Destravar 17 pedidos", alguns de agosto. No Quadro
+- [x] **R4. Destravar pedidos atrasados em lote.** O Início pede "Destravar 17 pedidos", alguns de agosto. No Quadro
   é um por um. Selecionar vários → "nova data de entrega" ou "registrar atraso" de uma vez. Esforço: médio.
-- [ ] **R5. Um jeito só de avisar.** Hoje são três: aviso que some (`Toast`), aviso do Financeiro (`AlertToast`) e janela
+- [x] **R5. Um jeito só de avisar.** Hoje são três: aviso que some (`Toast`), aviso do Financeiro (`AlertToast`) e janela
   com "Entendido" (Orçamentos). O mesmo tipo de coisa (salvou / falhou) aparece de jeitos diferentes conforme a tela.
   Esforço: médio.
-- [ ] **R6. Campos de número padronizados.** 65 campos `type="number"` em 21 arquivos convivem com campos de texto que
+- [x] **R6. Campos de número padronizados.** 65 campos `type="number"` em 21 arquivos convivem com campos de texto que
   aceitam vírgula (`parseBRL`, 10 arquivos). No `number`, a rodinha do mouse muda o valor sem querer (rolar a página
   com o cursor em cima de um preço altera o preço), e a vírgula funciona ou não conforme o navegador. Padronizar no
   campo de texto com vírgula que já existe. Esforço: médio (mecânico).
-- [ ] **R7. Lembrar filtros e a aba de cada tela.** Hoje só o modo privado e os avisos ignorados são lembrados. Voltar a
+- [x] **R7. Lembrar filtros e a aba de cada tela.** Hoje só o modo privado e os avisos ignorados são lembrados. Voltar a
   Contas, Orçamentos ou Estoque reabre tudo no padrão. Lembrar por aparelho o último filtro/aba de cada tela.
   Esforço: pequeno (complementa C1).
-- [ ] **R8. Rascunhos de orçamento parados.** A lista tem vários RASCUNHO de 02 a 16/10 nunca enviados; o Início avisa
+- [x] **R8. Rascunhos de orçamento parados.** A lista tem vários RASCUNHO de 02 a 16/10 nunca enviados; o Início avisa
   orçamento enviado e parado, mas não rascunho esquecido. Uma linha no Início: "Enviar 6 rascunhos parados há +7 dias".
   Esforço: pequeno.
 
 ## Bom ter
 
-- [ ] **N1. Título da aba do navegador por tela** ("Contas · Botezini", "PED-047 · Botezini"). Hoje é sempre "BOTEZINI ERP";
+- [x] **N1. Título da aba do navegador por tela** ("Contas · Botezini", "PED-047 · Botezini"). Hoje é sempre "BOTEZINI ERP";
   com 3 abas abertas não dá para saber qual é qual. Pequeno.
-- [ ] **N2. Atalhos:** `N` = novo (orçamento, conta, tecido) na tela atual; `/` = buscar; Ctrl+S salvar em todos os
+- [x] **N2. Atalhos:** `N` = novo (orçamento, conta, tecido) na tela atual; `/` = buscar; Ctrl+S salvar em todos os
   editores (hoje só no orçamento). Pequeno.
-- [ ] **N3. Textos de 8 e 9 px:** 286 ocorrências (mais em `ProductForm.tsx` 28, `BudgetEditor.tsx` 23,
+- [x] **N3. Textos de 8 e 9 px:** 286 ocorrências (mais em `ProductForm.tsx` 28, `BudgetEditor.tsx` 23,
   `QuickCreateModal.tsx` 22, `BudgetPreviewModal.tsx` 21). Abaixo de 10 px cansa a leitura no dia a dia, sobretudo no
   celular. Subir o piso para 10–11 px. Mecânico.
-- [ ] **N4. Exportar a lista de Contas (CSV/planilha)** filtrada, para o contador. Hoje só o Resultado exporta (PDF).
+- [x] **N4. Exportar a lista de Contas (CSV/planilha)** filtrada, para o contador. Hoje só o Resultado exporta (PDF).
   Pequeno.
-- [ ] **N5. Pendências pequenas da v3.1:** no orçamento, as faixas no seletor de cor na ordem do tecido (hoje seguem a
+- [x] **N5. Pendências pequenas da v3.1:** no orçamento, as faixas no seletor de cor na ordem do tecido (hoje seguem a
   cartela); no editor do tecido, ligar os rótulos aos campos de nome (leitor de tela). Pequeno.
 
 ---
@@ -145,3 +145,27 @@ Nada impede o uso, mas os 5 críticos custam trabalho refeito toda semana.
 3. C1 + R7 (endereço por tela e filtros lembrados)
 4. R1, R3, R4 (ganho de tempo)
 5. O resto, conforme você marcar.
+
+---
+
+## Estado em 30/10/2026 (ramo `feat/qualidade-de-vida`)
+
+Todos os 18 itens acima foram feitos, testados e verificados na tela. Diferenças em relação ao texto:
+- **R2:** linha sem produto ou com quantidade zero entra na lista só quando o salvar já está barrado
+  (cliente/itens); sozinha não barra — hoje o app salva essas linhas e mudar isso não foi pedido.
+- **R6:** em vez de trocar os 65 campos de número, a rodinha do mouse tira o foco do campo (a página
+  rola e o número fica). A vírgula já funciona no Chrome em português.
+- **R8:** janela de 7 a 60 dias. Rascunho mais velho é abandonado, não parado (eram 52 no dump).
+- **N2:** N abre o "novo" em Orçamentos, Contas e Estoque; Ctrl+S salva conta nova e tecido.
+
+### Segunda passada (achados novos, já feitos)
+
+- [x] **S1.** O Modal compartilhado (cadastro de cliente, produto, fornecedor…), o cadastro rápido de dentro
+  do orçamento, Registrar atraso e Usar do estoque também perdiam o digitado no X/Esc/clique fora. Agora
+  perguntam, como os de C3.
+- [x] **S2.** Excluir linha da tabela de personalização e lançamento do histórico de personalização apagavam
+  de vez com um clique. Agora confirmam (registro de operações sem volta).
+- [x] **S3.** Sessão que acabava sozinha (saiu em outra aba, token vencido) deixava a tela aberta com tudo
+  falhando. Agora volta ao login com aviso e, ao entrar, retoma a mesma tela.
+- [x] **S4.** Um atalho novo (N no Estoque) quebrava a tela por estar depois de um `return` — achado ao
+  percorrer as 25 telas e corrigido antes de qualquer push. As 25 telas abrem.
