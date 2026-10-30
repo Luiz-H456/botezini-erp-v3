@@ -151,6 +151,7 @@ export const storageService = {
   // Sempre pela cascata: o DELETE cru deixava a conta a receber órfã no
   // financeiro (order_id é ON DELETE SET NULL, a conta sobrevive vencida).
   deleteOrder: async (id: string) => orderRepository.deleteOrderWithCascade(id),
+  alterarPrazo: async (ids: string[], deadline: string) => orderRepository.alterarPrazo(ids, deadline),
 
   // -- ORÇAMENTOS (Budgets) --
   getBudgets: async () => budgetRepository.getAll(),

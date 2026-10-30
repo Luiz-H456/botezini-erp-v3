@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { RefreshCw, ChevronLeft, ChevronRight, AlertTriangle, PackageCheck, Maximize2, Minimize2, Lock, GripVertical, Eye, Boxes, X, ClipboardCheck } from 'lucide-react';
 import { usePcpKanban, KanbanCard } from '@/hooks/pcp/usePcpKanban';
@@ -20,6 +20,8 @@ import { FichaDeEntrega } from '@/components/orders/FichaDeEntrega';
 import type { View } from '@/utils/navegacao';
 import { OrderPreviewModal } from '@/components/orders/OrderPreviewModal';
 
+import { atrasadosDoQuadro } from '@/utils/fabrica/prazoEmLote';
+import { PrazoEmLoteModal } from '@/components/pcp/PrazoEmLoteModal';
 interface Props {
     /** Chão de fábrica: a janela de entrega não mostra valores nem edita parcelas. */
     semFinanceiro?: boolean;
@@ -145,6 +147,8 @@ export function KanbanPanel({ semFinanceiro = false, destaque, onIrPara, onVerRe
     // 'ultimo-setor': as colunas chegam depois do primeiro render, então o efeito
     // espera por elas e rola a faixa até a última.
     const ultimoSetor = kb.columns.length ? kb.columns[kb.columns.length - 1].sector.name : null;
+    const atrasados = useMemo(() => atrasadosDoQuadro(kb.columns.flatMap(c => c.cards), getTodayStr()), [kb.columns]);
+    const [prazoEmLote, setPrazoEmLote] = useState(false);
     useEffect(() => {
         if (destaque === 'ultimo-setor' && ultimoSetor)
             colunasRef.current.get(ultimoSetor)?.scrollIntoView({ inline: 'end', block: 'nearest' });
@@ -343,6 +347,16 @@ export function KanbanPanel({ semFinanceiro = false, destaque, onIrPara, onVerRe
                     <button type="button" onClick={() => setDispensado(true)}
                         className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">limpar</button>
                 </div>
+            )}
+            {!semFinanceiro && atrasados.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs text-rose-300">{atrasados.length} pedido(s) com prazo estourado</span>
+                    <button type="button" onClick={() => setPrazoEmLote(true)} className={BOTAO_SECUNDARIO}>Nova data para vários</button>
+                </div>
+            )}
+            {prazoEmLote && (
+                <PrazoEmLoteModal atrasados={atrasados} onClose={() => setPrazoEmLote(false)}
+                    onFeito={() => { setPrazoEmLote(false); kb.reload(); }} />
             )}
 
             {(kb.error || (erroBaixa && !baixa)) && <div className="text-center p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl"><p className="text-xs text-rose-400 font-bold">{kb.error || erroBaixa}</p></div>}

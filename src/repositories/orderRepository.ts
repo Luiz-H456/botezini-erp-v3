@@ -218,6 +218,17 @@ export class OrderRepository {
         if (error) throw error;
     }
 
+    /**
+     * Nova data de entrega para vários pedidos (Quadro, auditoria R4). Grava SÓ o prazo: o pedido
+     * inteiro traria de volta total e itens de quando a tela carregou (escritasDeRisco).
+     */
+    async alterarPrazo(ids: string[], deadline: string): Promise<void> {
+        if (!supabase) throw new Error('Supabase não configurado');
+        if (ids.length === 0) return;
+        const { error } = await supabase.from('orders').update({ deadline }).in('id', ids);
+        if (error) throw new Error(error.message);
+    }
+
     async saveOrder(order: Order): Promise<void> {
         if (!supabase) throw new Error("Supabase não configurado");
         const { data: { user } } = await supabase.auth.getUser();
