@@ -36,7 +36,7 @@ interface Props {
     initialSearch?: string;
     clearSearch?: () => void;
     /** Filtro pedido pela fila do Início. */
-    statusInicial?: 'Sent' | 'Approved';
+    statusInicial?: 'Sent' | 'Approved' | 'Draft';
     limparStatus?: () => void;
 }
 

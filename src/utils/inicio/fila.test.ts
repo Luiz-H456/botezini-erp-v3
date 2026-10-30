@@ -221,3 +221,22 @@ test('sem a conta dos tecidos (null ou ausente) nao ha linha: o Inicio nunca afi
     assert.deepEqual(montarFila({ ...vazia, tecidosSemPreco: null }), []);
     assert.deepEqual(montarFila({ ...vazia, tecidosSemPreco: 0 }), []);
 });
+
+test('rascunho de orçamento parado há mais de 7 dias vira linha "Enviar" em Vender (auditoria R8)', () => {
+    const orcamentos = [
+        { id: 'r1', status: 'Draft', date: '2026-09-28' },
+        { id: 'r2', status: 'Draft', date: '2026-09-30' },
+        { id: 'r3', status: 'Draft', date: '2026-10-05' },   // 3 dias: ainda é trabalho em andamento
+        { id: 's1', status: 'Sent', date: '2026-09-01' },
+    ];
+    const linha = montarFila({ ...vazia, orcamentos }).flatMap(b => b.linhas).find(l => l.acao === 'Enviar');
+    assert.equal(linha?.quantidade, 2);
+    assert.match(linha!.texto, /2 rascunhos parados/);
+    assert.deepEqual(linha?.destino, { view: 'budgets', status: 'Draft' });
+});
+
+test('rascunho com mais de 60 dias é abandonado, não parado: não entra no aviso', () => {
+    const orcamentos = [{ id: 'v', status: 'Draft', date: '2026-07-01' }, { id: 'p', status: 'Draft', date: '2026-09-20' }];
+    const linha = montarFila({ ...vazia, orcamentos }).flatMap(b => b.linhas).find(l => l.acao === 'Enviar');
+    assert.equal(linha?.quantidade, 1);
+});

@@ -69,7 +69,7 @@ const App: React.FC = () => {
 
   // Search state to pass between views
   const [autoSearchTerm, setAutoSearchTerm] = useState<string>('');
-  const [aberturaBudgets, setAberturaBudgets] = useState<'Sent' | 'Approved' | null>(null);
+  const [aberturaBudgets, setAberturaBudgets] = useState<'Sent' | 'Approved' | 'Draft' | null>(null);
   const [aberturaBanco, setAberturaBanco] = useState<string | null>(null);
   const [aberturaReceber, setAberturaReceber] = useState<string | null>(null);
   const [aberturaSaude, setAberturaSaude] = useState<string | null>(null);

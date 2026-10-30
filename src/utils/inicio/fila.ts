@@ -11,7 +11,7 @@ import type { OrcamentoEnviado } from '../acompanhamentoComercial.ts';
 export type ObjetivoDaFila = 'vender' | 'producao' | 'planejar' | 'dinheiro' | 'cadastros';
 
 export type DestinoDaFila =
-    | { view: 'budgets'; status: 'Sent' | 'Approved' }
+    | { view: 'budgets'; status: 'Sent' | 'Approved' | 'Draft' }
     | { view: 'quadro'; destaque: 'atrasados' | 'ultimo-setor' }
     | { view: 'compras'; filtro: 'this_week' }
     | { view: 'receivables' }
@@ -98,6 +98,17 @@ export function montarFila(e: EntradaDaFila): BlocoDaFila[] {
     const parados = filaDeFollowUp(e.orcamentos, e.hoje).filter(i => i.urgencia !== 'recente').length;
     add({ objetivo: 'vender', acao: 'Retomar', quantidade: parados, urgente: false,
         texto: `Retomar ${s(parados, 'orçamento parado', 'orçamentos parados')}`, destino: { view: 'budgets', status: 'Sent' } });
+    // Rascunho feito e nunca enviado some da vista: o follow-up só olha os enviados (auditoria R8).
+    // Janela de 7 a 60 dias: antes disso é trabalho em andamento; depois, abandonado — contar os
+    // abandonados (eram 52 no dump) faria da linha um ruído permanente.
+    const limiteDoRascunho = somarDias(e.hoje, -7);
+    const abandonadoAntesDe = somarDias(e.hoje, -60);
+    const rascunhosParados = e.orcamentos.filter(o => {
+        const d = (o.date || '').slice(0, 10);
+        return (o.status || '').trim() === 'Draft' && !!d && d <= limiteDoRascunho && d >= abandonadoAntesDe;
+    }).length;
+    add({ objetivo: 'vender', acao: 'Enviar', quantidade: rascunhosParados, urgente: false,
+        texto: `Enviar ${s(rascunhosParados, 'rascunho parado', 'rascunhos parados')} há mais de 7 dias`, destino: { view: 'budgets', status: 'Draft' } });
     const aprovados = e.orcamentos.filter(o => (o.status || '').trim() === 'Approved').length;
     add({ objetivo: 'vender', acao: 'Virar pedido', quantidade: aprovados, urgente: false,
         texto: `Virar pedido: ${s(aprovados, 'orçamento aprovado', 'orçamentos aprovados')}`, destino: { view: 'budgets', status: 'Approved' } });
