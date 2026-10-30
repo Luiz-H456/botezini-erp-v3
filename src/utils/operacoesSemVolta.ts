@@ -222,6 +222,17 @@ export const OPERACOES: Record<string, DescricaoDaOperacao> = {
         perigo: true,
     },
 
+    'descartar-alteracoes': {
+        id: 'descartar-alteracoes',
+        titulo: 'Sair sem salvar?',
+        oQueFaz: 'Fecha a janela e joga fora o que foi digitado desde que ela abriu.',
+        consequencia: 'As alterações que ainda não foram salvas se perdem; o que já estava salvo continua igual.',
+        reversibilidade: 'sem-volta',
+        antesDeContinuar: 'Para guardar, volte e use o botão de salvar.',
+        rotuloConfirmar: 'Descartar alterações',
+        perigo: true,
+    },
+
     'excluir-contato': {
         id: 'excluir-contato',
         titulo: 'Excluir este contato?',

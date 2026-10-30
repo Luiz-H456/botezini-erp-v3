@@ -18,6 +18,7 @@ import type { ItemForm } from '@/utils/fabrica/lancarCompra';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface Props {
     /** Todas as linhas da Lista: dão a divisão sugerida de qualquer insumo que esteja nela. */
     linhas: PurchaseLine[];
@@ -65,7 +66,9 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
     const [gravando, setGravando] = useState(false);
     const [erro, setErro] = useState('');
 
-    const fechar = () => { if (!gravando) onClose(); };
+    // Fechar com alteração pergunta antes (auditoria C3): Esc ou clique fora perdiam o que foi digitado.
+    const saida = useSaidaProtegida(() => { if (!gravando) onClose(); });
+    const fechar = saida.pedirParaFechar;
     useEscFecha(true, fechar);
 
     const mudar = (key: number, parte: Partial<ItemUI>) =>
@@ -114,11 +117,11 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
         ...suppliers.map(s => ({ value: s.id, label: s.company_name }))];
     const optsInsumo = insumos.map(i => ({ value: i.id, label: `${i.name} (${i.unit})` }));
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 z-modal bg-zinc-950/70 flex items-center justify-center p-4" onClick={fechar}>
             <div role="dialog" aria-modal="true" aria-label="Lançar compra"
                 className={`${CARTAO} max-w-3xl w-full max-h-[90vh] flex flex-col`}
-                onClick={e => e.stopPropagation()}>
+                onClick={e => e.stopPropagation()} {...saida.aoMexer}>
                 <div className="shrink-0 flex items-start gap-3 px-5 pt-5 pb-3">
                     <div className="flex-1 min-w-0">
                         <p className={ROTULO}>Lançar compra</p>
@@ -250,5 +253,5 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }

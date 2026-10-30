@@ -12,6 +12,7 @@ import {
 import type { CorDaCartela } from '@/utils/nomeDeTecido';
 import { ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 /**
  * O tecido da tabela verdade (v3.1): nome, unidade, rendimento, faixas de cor (1 a 6, livres)
  * e a cartela que liga cada cor a uma faixa. Salva tudo numa chamada (salvar_tecido_tipo), que
@@ -50,7 +51,8 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
     const [textoColado, setTextoColado] = useState('');
     const [salvando, setSalvando] = useState(false);
     const [erro, setErro] = useState('');
-    useEscFecha(true, () => { if (!salvando) onClose(); });
+    const saida = useSaidaProtegida(() => { if (!salvando) onClose(); });
+    useEscFecha(true, saida.pedirParaFechar);
 
     const nome = mexeuNoNome ? montarNomeDeTecido(partes) : (tipo?.nome ?? '');
     const nomesDasFaixas = faixas.map(f => f.nome.trim()).filter(Boolean);
@@ -105,9 +107,9 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
 
     const opcoesDeFaixa = nomesDasFaixas.map(f => ({ value: f, label: f.toUpperCase() }));
 
-    return createPortal(
+    return <>{saida.confirmacao}{createPortal(
         <div className="fixed inset-0 bg-zinc-950/85 flex items-center justify-center z-sobreposto p-4 backdrop-blur-md" role="dialog" aria-modal="true">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col" {...saida.aoMexer}>
                 <div className="px-5 py-4 bg-zinc-950/50 border-b border-zinc-900 flex justify-between items-center shrink-0">
                     <div className="flex items-center gap-3 min-w-0">
                         <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl shrink-0"><Layers size={16} className="text-amber-500" /></div>
@@ -116,7 +118,7 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
                             <p className="text-[10px] text-zinc-600 uppercase tracking-widest mt-0.5 truncate">{nome || 'monte o nome abaixo'}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} aria-label="Fechar" title="Fechar" className={`${BOTAO_SECUNDARIO} w-11 px-0 shrink-0`}><X size={18} /></button>
+                    <button onClick={saida.pedirParaFechar} aria-label="Fechar" title="Fechar" className={`${BOTAO_SECUNDARIO} w-11 px-0 shrink-0`}><X size={18} /></button>
                 </div>
 
                 <div className="p-5 space-y-6 overflow-y-auto custom-scrollbar">
@@ -258,11 +260,11 @@ export function EditorDeTecido({ linhaId, tipoId, catalogo, onClose, onSalvou }:
                 </div>
 
                 <div className="px-5 py-4 border-t border-zinc-900 flex justify-end gap-3 shrink-0 bg-zinc-950/40">
-                    <button onClick={onClose} className={BOTAO_SECUNDARIO}>Cancelar</button>
+                    <button onClick={saida.pedirParaFechar} className={BOTAO_SECUNDARIO}>Cancelar</button>
                     <button onClick={salvar} disabled={salvando} className={BOTAO_PRINCIPAL}><Check size={14} /> {salvando ? 'Salvando...' : 'Salvar tecido'}</button>
                 </div>
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }

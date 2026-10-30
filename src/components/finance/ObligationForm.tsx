@@ -19,6 +19,7 @@ import { ConfirmarLiquidacao } from './ConfirmarLiquidacao';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { SETOR } from '@/components/masterdata/setoresDeCategoria';
 import { AtalhosDeCategoria } from '@/components/masterdata/AtalhosDeCategoria';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 import {
     agruparPorCategoria, agruparPorTipo, opcoesDeCategoria, TIPO_DE_CONTA,
 } from '@/utils/opcoesAgrupadas';
@@ -144,21 +145,26 @@ export function ObligationForm({ type, clients, suppliers, bankAccounts, globalC
         }
     };
 
-    return createPortal(
-        <div className="fixed inset-0 z-modal" onClick={onClose}>
+    // Fechar com alteração pergunta antes (auditoria C3): o clique fora perdia a conta digitada.
+    const saida = useSaidaProtegida(onClose);
+    const fechar = saida.pedirParaFechar;
+
+    return <>{saida.confirmacao}{createPortal(
+        <div className="fixed inset-0 z-modal" onClick={fechar}>
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm ease-out animate-in fade-in duration-200" />
             {/* Drawer */}
             <div
                 className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-zinc-950 border-l border-zinc-800 shadow-2xl flex flex-col ease-out animate-in slide-in-from-right duration-200"
                 onClick={e => e.stopPropagation()}
+                {...saida.aoMexer}
             >
                 <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between shrink-0">
                     <div>
                         <p className="text-xs text-zinc-500">{type === 'receivable' ? 'Novo recebimento' : 'Novo pagamento'}</p>
                         <h3 className="text-sm font-black uppercase tracking-widest text-white leading-tight">Novo lançamento</h3>
                     </div>
-                    <button onClick={onClose} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-all">
+                    <button onClick={fechar} aria-label="Fechar" className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-all">
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
                     </button>
                 </div>
@@ -509,5 +515,5 @@ export function ObligationForm({ type, clients, suppliers, bankAccounts, globalC
             )}
         </div>,
         document.body,
-    );
+    )}</>;
 }

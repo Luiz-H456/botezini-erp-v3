@@ -62,6 +62,8 @@ import { lerGrade } from '@/utils/vendas/grade';
 import { copiarEspecificacao, resumoDaEspecificacao, type GrupoCopiavel } from '@/utils/vendas/especificacao';
 import { aplicarEntrada, planoParaMostrar, entradaPctDoPlano, descreverCondicao } from '@/utils/condicaoDePagamento';
 import { mensagemDeErro } from '@/utils/errorHandling';
+import { assinatura, chaveDoRascunho, rascunhoParaOferecer, type Rascunho } from '@/utils/rascunho';
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 import {
   CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula,
 } from '@/components/finance/ui/estilo';
@@ -209,6 +211,11 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
   const [condicoesAberto, setCondicoesAberto] = useState(!budget?.id);
 
   const [isSaving, setIsSaving] = useState(false);
+  // De onde o editor carrega: o orçamento salvo ou, depois de "Recuperar", o rascunho (auditoria C2).
+  const [fonte, setFonte] = useState<Budget | null | undefined>(budget);
+  useEffect(() => { setFonte(budget); }, [budget]);
+  /** Init terminou: só então o estado é o "salvo" contra o qual se mede a alteração. */
+  const [pronto, setPronto] = useState(false);
 
   // Insumos query
   const { data: insumosData } = useInsumos();
@@ -290,6 +297,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
   useEffect(() => {
     const init = async () => {
+      const budget = fonte;
       if (budget) {
         setHeaderInfo({
           serial_number: budget.serial_number,
@@ -328,9 +336,51 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
         const serial = await idService.getNextSequence('budget');
         setHeaderInfo((prev) => ({ ...prev, serial_number: serial }));
       }
+      setPronto(true);
     };
     init();
-  }, [budget]);
+  }, [fonte]);
+
+  // ── Rascunho automático e saída protegida (auditoria C2) ──────────────────
+  //
+  // Fechar, dar F5 ou fechar a aba com um orçamento de 19 itens aberto perdia tudo. Agora o que
+  // muda fica guardado no navegador e, ao reabrir, aparece "Recuperar"; fechar com alteração
+  // pergunta antes. O "salvo" é o estado logo depois de carregar.
+  const chaveRascunho = chaveDoRascunho('orcamento', budget?.id);
+  const estadoEditavel = useMemo(() => ({
+    id: budget?.id || '', serial_number: headerInfo.serial_number, client_id: selectedClientId,
+    date: headerInfo.date, status: headerInfo.status, validity_days: headerInfo.validity,
+    items, customizations, extras, reference_photos: referencePhotos, discount,
+    down_payment_percent: paymentInfo.down_payment_percent, notes: paymentInfo.notes,
+    delivery_time_days, factory_notes: factoryNotes, payment_plan: paymentPlan, payment_method: paymentMethod,
+  }), [budget?.id, headerInfo, selectedClientId, items, customizations, extras, referencePhotos, discount,
+       paymentInfo, delivery_time_days, factoryNotes, paymentPlan, paymentMethod]);
+  const assinaturaAtual = useMemo(() => assinatura(estadoEditavel), [estadoEditavel]);
+  const salvoRef = useRef<{ assinatura: string; estado: typeof estadoEditavel } | null>(null);
+  const [oferta, setOferta] = useState<Rascunho<typeof estadoEditavel> | null>(null);
+  useEffect(() => {
+    if (!pronto || salvoRef.current) return;
+    salvoRef.current = { assinatura: assinaturaAtual, estado: estadoEditavel };
+    let guardado: string | null = null;
+    try { guardado = localStorage.getItem(chaveRascunho); } catch { /* sem armazenamento */ }
+    setOferta(rascunhoParaOferecer(guardado, estadoEditavel, Date.now()));
+  }, [pronto, assinaturaAtual, estadoEditavel, chaveRascunho]);
+  const alterado = pronto && !!salvoRef.current && assinaturaAtual !== salvoRef.current.assinatura;
+  useEffect(() => {
+    if (!alterado) return;
+    const t = setTimeout(() => {
+      try { localStorage.setItem(chaveRascunho, JSON.stringify({ quando: Date.now(), dados: estadoEditavel })); } catch { /* cheio ou bloqueado */ }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [alterado, assinaturaAtual, chaveRascunho, estadoEditavel]);
+  const apagarRascunho = () => { try { localStorage.removeItem(chaveRascunho); } catch { /* idem */ } };
+  const recuperarRascunho = () => {
+    if (!oferta) return;
+    // Orçamento novo continua com o número que acabou de receber: o do rascunho pode já ter sido usado.
+    setFonte({ ...(budget ?? {}), ...oferta.dados, serial_number: budget ? oferta.dados.serial_number : headerInfo.serial_number } as Budget);
+    setOferta(null);
+  };
+  const saida = useSaidaProtegida(() => { apagarRascunho(); onClose(); }, alterado);
 
   // Um índice só para a tabela inteira: montar por linha varreria todos os
   // orçamentos uma vez por peça, sempre para chegar no mesmo resultado.
@@ -498,6 +548,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
         payment_method: paymentMethod || undefined,
       };
       await onSave(payload);
+      apagarRascunho();
     } catch (e: any) {
       // Sem isto o botão ficava em "salvando" para sempre e só restava descartar.
       showToast(mensagemDeErro(e, 'Não consegui salvar o orçamento.'), 'error');
@@ -952,9 +1003,9 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
       <div className="border-b border-zinc-800/50 bg-zinc-900/50 backdrop-blur-md flex flex-wrap lg:flex-nowrap items-center gap-x-4 gap-y-2 px-4 md:px-6 py-3 shrink-0 relative z-20">
         <div className="flex items-center gap-3 min-w-0 shrink-0">
           <button
-            onClick={onClose}
+            onClick={saida.pedirParaFechar}
             aria-label="Fechar o editor"
-            title="Fechar sem salvar"
+            title="Fechar (pergunta antes se houver alteração)"
             className="text-zinc-500 hover:text-white transition-colors p-2 rounded-xl hover:bg-zinc-800 border border-transparent hover:border-zinc-700"
           >
             <ChevronLeft size={22} />
@@ -1062,8 +1113,20 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
         </button>
       </div>
 
+      {saida.confirmacao}
       <div className="flex-1 overflow-y-auto bg-zinc-950 p-4 md:px-6 custom-scrollbar">
         <div className="w-full min-w-0 space-y-6 pb-6">
+          {oferta && (
+            <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+              <p className="text-sm text-amber-200">
+                Há alterações neste orçamento que não foram salvas, de {new Date(oferta.quando).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}.
+              </p>
+              <div className="flex gap-2">
+                <button type="button" onClick={recuperarRascunho} className={BOTAO_PRINCIPAL}>Recuperar</button>
+                <button type="button" onClick={() => { apagarRascunho(); setOferta(null); }} className={BOTAO_SECUNDARIO}>Descartar</button>
+              </div>
+            </div>
+          )}
           {/* ── ITENS ── */}
           <section className="space-y-3 min-w-0">
             <h3 className={ROTULO}>Itens</h3>

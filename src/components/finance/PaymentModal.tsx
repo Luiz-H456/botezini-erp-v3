@@ -12,6 +12,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { SearchableSelect } from '@/components/common';
 import { agruparPorTipo, TIPO_DE_CONTA } from '@/utils/opcoesAgrupadas';
 
+import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
 interface PaymentModalProps {
     obligation: ObligationSummary;
     bankAccounts: BankAccount[];
@@ -78,14 +79,18 @@ export function PaymentModal({ obligation: ob, bankAccounts, existingPayments, i
         handleDeleteAttachment
     } = usePaymentModal(ob, bankAccounts, existingPayments, onSuccess, onRefresh);
 
-    return createPortal(
+    // Fechar com alteração pergunta antes (auditoria C3).
+    const saida = useSaidaProtegida(onClose);
+    const fechar = saida.pedirParaFechar;
+
+    return <>{saida.confirmacao}{createPortal(
         // Altura travada no viewport e rolagem por dentro. Sem isto o modal
         // crescia com o conteúdo — anexos, avisos de desconto, histórico — e em
         // tela pequena o botão de confirmar ficava fora da janela, sem barra
         // nenhuma para alcançá-lo. Mais largo (4xl) porque as duas colunas em
         // 672px viravam duas colunas espremidas.
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-modal p-3 sm:p-4 backdrop-blur-sm ease-out animate-in fade-in duration-200" onClick={onClose}>
-            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-4xl max-h-[92vh] shadow-2xl ease-out animate-in slide-in-from-bottom-2 duration-200 flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-modal p-3 sm:p-4 backdrop-blur-sm ease-out animate-in fade-in duration-200" onClick={fechar}>
+            <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-4xl max-h-[92vh] shadow-2xl ease-out animate-in slide-in-from-bottom-2 duration-200 flex flex-col overflow-hidden" onClick={e => e.stopPropagation()} {...saida.aoMexer}>
 
                 {/* Cabeçalho: shrink-0 para não ser comprimido pelo corpo rolável */}
                 <div className="shrink-0 px-6 py-4 border-b border-zinc-800 flex items-start justify-between gap-3">
@@ -100,7 +105,7 @@ export function PaymentModal({ obligation: ob, bankAccounts, existingPayments, i
                             <span>Restante <span className="text-zinc-200 font-semibold tabular-nums">{isPrivacy ? '••••' : formatCurrency(ob.remaining_amount)}</span></span>
                         </div>
                     </div>
-                    <button onClick={onClose} aria-label="Fechar" className="shrink-0 h-10 w-10 text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-lg">✕</button>
+                    <button onClick={fechar} aria-label="Fechar" className="shrink-0 h-10 w-10 text-zinc-500 hover:text-white transition-colors border border-zinc-800 rounded-lg">✕</button>
                 </div>
 
                 {/* Corpo. min-h-0 é o que deixa o filho de flex encolher abaixo do
@@ -390,5 +395,5 @@ export function PaymentModal({ obligation: ob, bankAccounts, existingPayments, i
             </div>
         </div>,
         document.body,
-    );
+    )}</>;
 }
