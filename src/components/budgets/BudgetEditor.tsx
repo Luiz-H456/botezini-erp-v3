@@ -64,6 +64,7 @@ import { aplicarEntrada, planoParaMostrar, entradaPctDoPlano, descreverCondicao 
 import { mensagemDeErro } from '@/utils/errorHandling';
 import { assinatura, chaveDoRascunho, rascunhoParaOferecer, type Rascunho } from '@/utils/rascunho';
 import { useSaidaProtegida } from '@/hooks/useSaidaProtegida';
+import { faltasDoOrcamento, type FaltaNoOrcamento } from '@/utils/vendas/faltasDoOrcamento';
 import {
   CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula,
 } from '@/components/finance/ui/estilo';
@@ -211,6 +212,14 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
   const [condicoesAberto, setCondicoesAberto] = useState(!budget?.id);
 
   const [isSaving, setIsSaving] = useState(false);
+  const [faltas, setFaltas] = useState<FaltaNoOrcamento[]>([]);
+  const corpoRef = useRef<HTMLDivElement>(null);
+  // Corrigiu o que faltava: a lista some sozinha, sem esperar o próximo "salvar".
+  useEffect(() => {
+    if (faltas.length === 0) return;
+    const ainda = faltasDoOrcamento({ clienteId: selectedClientId, itens: items, servicos: customizations });
+    if (!ainda.some(f => f.campo !== 'linha')) setFaltas([]);
+  }, [selectedClientId, items, customizations]); // eslint-disable-line react-hooks/exhaustive-deps
   // De onde o editor carrega: o orçamento salvo ou, depois de "Recuperar", o rascunho (auditoria C2).
   const [fonte, setFonte] = useState<Budget | null | undefined>(budget);
   useEffect(() => { setFonte(budget); }, [budget]);
@@ -502,14 +511,15 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
 
   /** Devolve false quando a validação recusou salvar (o Ctrl+S usa isso para devolver o foco). */
   const handleSave = async (): Promise<boolean> => {
-    if (!selectedClientId) {
-      showToast('Selecione um cliente', 'error');
+    // Tudo o que falta, de uma vez, no topo do editor; o campo do cliente fica marcado (auditoria R2).
+    // Barram o salvar só cliente e itens (como antes); problemas de linha vão junto na lista.
+    const faltas = faltasDoOrcamento({ clienteId: selectedClientId, itens: items, servicos: customizations });
+    if (faltas.some(f => f.campo !== 'linha')) {
+      setFaltas(faltas);
+      corpoRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       return false;
     }
-    if (items.length === 0 && customizations.length === 0) {
-      showToast('Adicione itens ou serviços ao orçamento.', 'error');
-      return false;
-    }
+    setFaltas([]);
     setIsSaving(true);
     try {
       // Fonte única: se há plano, entrada/saldo derivam DELE (a 1ª parcela é a
@@ -1028,7 +1038,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
                 <User size={18} className="text-zinc-600 shrink-0" />
                 {/* Largura elástica com piso: o campo encolhe até 160 px quando o
                     nome é longo, em vez de exigir 280 px e estourar a barra. */}
-                <div className="min-w-[160px] w-[240px] max-w-full">
+                <div className={`min-w-[160px] w-[240px] max-w-full rounded-xl ${faltas.some(f => f.campo === 'cliente') ? 'ring-2 ring-rose-500/70' : ''}`}>
                   <SearchableSelect
                     value={selectedClientId}
                     onChange={(val) => setSelectedClientId(val)}
@@ -1114,8 +1124,16 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
       </div>
 
       {saida.confirmacao}
-      <div className="flex-1 overflow-y-auto bg-zinc-950 p-4 md:px-6 custom-scrollbar">
+      <div ref={corpoRef} className="flex-1 overflow-y-auto bg-zinc-950 p-4 md:px-6 custom-scrollbar">
         <div className="w-full min-w-0 space-y-6 pb-6">
+          {faltas.length > 0 && (
+            <div role="alert" className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3">
+              <p className="text-sm font-bold text-rose-300">Para salvar, falta:</p>
+              <ul className="mt-1 list-disc pl-5 text-sm text-rose-200/90">
+                {faltas.map(f => <li key={f.texto}>{f.texto}</li>)}
+              </ul>
+            </div>
+          )}
           {oferta && (
             <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
               <p className="text-sm text-amber-200">
