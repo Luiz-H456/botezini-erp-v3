@@ -5,6 +5,7 @@ import { simulateInsertion, SimulationResult, SchedOrder, TravasAtraso } from '.
 import { segundaDaSemana } from '../../utils/pcpSemana';
 import { getTodayStr } from '../../utils/date';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export function usePcpSimulator() {
     const [baseOrders, setBaseOrders] = useState<SchedOrder[]>([]);
     const [families, setFamilies] = useState<string[]>([]);
@@ -50,7 +51,7 @@ export function usePcpSimulator() {
                         };
                     }));
             } catch (e: any) {
-                setError(e?.message || 'Falha ao carregar dados para simulação');
+                setError(mensagemDeErro(e, 'Falha ao carregar dados para simulação'));
             } finally {
                 setLoading(false);
             }

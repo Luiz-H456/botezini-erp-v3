@@ -25,7 +25,7 @@ export const useOrders = (initialSearch?: string) => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = ITENS_POR_PAGINA;
 
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
     const orderRepo = useMemo(() => new OrderRepository(), []);
 
     const loadData = useCallback(async () => {
@@ -142,6 +142,6 @@ export const useOrders = (initialSearch?: string) => {
         currentPage, setCurrentPage,
         paginatedOrders, totalPages, processedOrders,
         itemsPerPage,
-        loadData, deleteOrder, saveOrder, toast, showToast
+        loadData, deleteOrder, saveOrder, showToast
     };
 };

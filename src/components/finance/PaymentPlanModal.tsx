@@ -7,6 +7,7 @@ import { PAYMENT_TERMS_OPTIONS } from '@/types/finance';
 import { storageService } from '@/services/storage';
 import { SearchableSelect } from '@/components/common';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface LockedRow { label: string; amount: number; status: string; }
 
 interface Props {
@@ -64,7 +65,7 @@ export function PaymentPlanModal(props: Props) {
                 setLocked(lockedRows);
                 setPlan(openRows.length ? openRows : [{ label: 'Parcela 1', amount: 0, due: props.deliveryDate }]);
             } catch (e: any) {
-                setError(e?.message || 'Falha ao carregar parcelas');
+                setError(mensagemDeErro(e, 'Falha ao carregar parcelas'));
             } finally {
                 if (alive) setLoading(false);
             }
@@ -100,7 +101,7 @@ export function PaymentPlanModal(props: Props) {
         try {
             await props.onConfirm(plan.map(p => ({ label: p.label, amount: Number(p.amount), due: p.due, method: p.method })));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao salvar plano');
+            setError(mensagemDeErro(e, 'Falha ao salvar plano'));
             setSaving(false);
         }
     };

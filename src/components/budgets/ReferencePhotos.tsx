@@ -7,6 +7,7 @@ import {
     Miniatura, FotoAmpliada, TIPOS_DE_IMAGEM_ACEITOS, TAMANHO_MAX_MB_IMAGEM,
 } from '@/components/common/GaleriaDeFotos';
 import { mensagemDaRemocao } from '@/utils/anexoCompartilhado';
+import { mensagemDeErro } from '@/utils/errorHandling';
 import {
     ehPdf, novaBase, nomeDaPagina, paginasDoPdf, removerComPaginas, TAMANHO_MAX_MB_PDF,
 } from '@/utils/anexosDeReferencia';
@@ -107,7 +108,7 @@ export function ReferencePhotos({ photos, onChange, folder, registroId = '', dis
                 }
             }
         } catch (e: any) {
-            avisos.push(e?.message || 'Falha ao enviar o arquivo');
+            avisos.push(mensagemDeErro(e, 'Falha ao enviar o arquivo'));
         } finally {
             if (novos.length > 0) onChange([...photos, ...novos]);
             setErro(avisos.join(' · '));

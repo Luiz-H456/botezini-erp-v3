@@ -4,7 +4,6 @@ import { PersonalizacaoNotas, TecnicaPersonalizacao } from '@/types';
 import { TECNICAS, ROTULO_TECNICA, sugerirPrecoBordado } from '@/utils/personalizacao';
 import { usePersonalizacaoMutations } from '@/hooks/usePersonalizacao';
 import { useToast } from '@/hooks/useToast';
-import { Toast } from '@/components/common/Toast';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL } from '@/components/finance/ui/estilo';
 
 const inputCls = `${CAMPO} w-full font-mono text-right`;
@@ -25,7 +24,7 @@ interface Props { notas: PersonalizacaoNotas[]; }
 
 const NotasPersonalizacao: React.FC<Props> = ({ notas }) => {
     const { saveNotas } = usePersonalizacaoMutations();
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
     const [rascunho, setRascunho] = useState<Record<string, Partial<PersonalizacaoNotas>>>({});
 
     // O servidor é a fonte da verdade; o rascunho só existe entre digitar e
@@ -116,7 +115,6 @@ const NotasPersonalizacao: React.FC<Props> = ({ notas }) => {
                 })}
             </div>
 
-            <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />
         </div>
     );
 };

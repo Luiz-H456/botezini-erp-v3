@@ -16,6 +16,7 @@ import { EntreguesSemSobra } from './EntreguesSemSobra';
 import { CARTAO, ITEM, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_SUAVE, pilula } from '@/components/finance/ui/estilo';
 import type { View } from '@/utils/navegacao';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const FILTERS: { value: WeekFilter; label: string }[] = [
     { value: 'open', label: 'Em aberto' },
     { value: 'this_week', label: 'Esta semana' },
@@ -40,7 +41,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
     const carregarCompras = useCallback(async () => {
         const { de, ate } = semanaDe(new Date());
         try { setCompras(await comprasRepository.comprasDoPeriodo(de, ate)); }
-        catch (e: any) { setErroTela(`Não consegui ler as compras desta semana: ${e?.message || 'falha'}`); }
+        catch (e: any) { setErroTela(`Não consegui ler as compras desta semana: ${mensagemDeErro(e, 'falha')}`); }
     }, []);
     useEffect(() => { carregarCompras(); }, [carregarCompras]);
 
@@ -64,7 +65,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
             // A recusa do banco (pedido já entregue, estoque já usado) vem explicada na mensagem.
             setExcluindo(null);
             setAvisoOk('');
-            setErroCompras(e?.message || 'Falha ao excluir a compra');
+            setErroCompras(mensagemDeErro(e, 'Falha ao excluir a compra'));
         } finally {
             setExcluindoBusy(false);
         }
@@ -83,7 +84,7 @@ export function PurchaseListPanel({ onIrPara, filtroInicial }: { onIrPara?: (v: 
             pdfService.generatePurchaseListPDF(result.lines, filterLabel, result.total_cost);
         } catch (e: any) {
             // Sem isto a exceção sobe pro handler do React e vira tela de erro.
-            setPdfError(e?.message || 'Falha ao gerar o PDF');
+            setPdfError(mensagemDeErro(e, 'Falha ao gerar o PDF'));
             console.error('generatePurchaseListPDF:', e);
         }
     };

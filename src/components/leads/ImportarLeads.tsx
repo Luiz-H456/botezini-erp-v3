@@ -12,6 +12,7 @@ import type { Lead } from '@/utils/funilDeLeads';
 import { PRE_PROMPT_DO_CSV } from '@/utils/prePromptDoCsv';
 import { CARTAO, ITEM, CAMPO, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     clientes: ClienteConhecido[];
     leadsExistentes: Lead[];
@@ -98,7 +99,7 @@ export const ImportarLeads: React.FC<Props> = ({
             setNomeDoArquivo('');
             onPronto();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao importar');
+            setErro(mensagemDeErro(e, 'Falha ao importar'));
         } finally {
             setGravando(false);
         }

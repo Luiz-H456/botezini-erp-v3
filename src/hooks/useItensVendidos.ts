@@ -6,6 +6,7 @@ import {
 } from '../utils/itensVendidos';
 import { margemPorProduto } from '../utils/lucratividade';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export type OrdenacaoItens = 'data' | 'valor' | 'quantidade' | 'empresa' | 'produto';
 
 export function useItensVendidos() {
@@ -42,7 +43,7 @@ export function useItensVendidos() {
                 (id?: string) => (id && nomePorId.get(id)) || '—',
             ));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar os itens vendidos');
+            setError(mensagemDeErro(e, 'Falha ao carregar os itens vendidos'));
         } finally {
             carga.terminar();
         }

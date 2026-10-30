@@ -3,6 +3,7 @@ import { storageService } from '../../services/storage';
 import { CashEnvelope, EnvelopeOverview } from '../../types/finance';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 /** Fase 6 — estado das Caixinhas + operações. */
 export function useEnvelopes() {
     const [envelopes, setEnvelopes] = useState<CashEnvelope[]>([]);
@@ -22,7 +23,7 @@ export function useEnvelopes() {
             setEnvelopes(envs);
             setOverview(ov);
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar caixinhas');
+            setError(mensagemDeErro(e, 'Falha ao carregar caixinhas'));
         } finally {
             carga.terminar();
         }
@@ -37,7 +38,7 @@ export function useEnvelopes() {
             await fn();
             await load();
         } catch (e: any) {
-            setError(e?.message || 'Operação falhou');
+            setError(mensagemDeErro(e, 'Operação falhou'));
             throw e;
         } finally {
             setBusy(false);

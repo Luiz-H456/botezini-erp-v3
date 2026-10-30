@@ -6,6 +6,7 @@ import { parseBRL } from '@/utils/currency';
 import type { SaldoItem } from '@/utils/baixaPorItem';
 import { ITEM, CAMPO, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export interface Lancamento {
     qty_done: number;
     qty_expedited?: number;
@@ -58,7 +59,7 @@ export function BaixaModal({ titulo, saldos, semItem, sectors, busy, aviso, onCo
     const confirm = async () => {
         if (!canConfirm) return;
         try { await onConfirm(lancamentos); }
-        catch (e: any) { setError(e?.message || 'Falha ao lançar'); }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha ao lançar')); }
     };
 
     const preencherTudo = () => {

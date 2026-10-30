@@ -8,6 +8,7 @@ import { numero } from '@/utils/numeros';
 import { ajusteDeContagem } from '@/utils/fabrica/ajusteDeContagem';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     insumo: { id: string; name: string; unit: string; current_stock: number; average_unit_cost: number };
     onClose: () => void;
@@ -34,7 +35,7 @@ export function AjustarContagemModal({ insumo, onClose, onDone }: Props) {
             await comprasRepository.ajustarContagem(insumo.id, parseBRL(contado), ajuste.custo);
             onDone();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao ajustar a contagem');
+            setErro(mensagemDeErro(e, 'Falha ao ajustar a contagem'));
             setGravando(false);
         }
     };

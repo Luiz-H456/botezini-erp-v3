@@ -7,6 +7,7 @@ import { segundaDaSemana } from '../../utils/pcpSemana';
 import { getTodayStr } from '../../utils/date';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const EMPTY: ScheduleResult = { weeks: [], late_count: 0, setup_changes: 0, setup_changes_ungrouped: 0, setup_saved: 0 };
 
 /**
@@ -83,7 +84,7 @@ export function usePcpSchedule() {
             setResult(planSchedule(sched, capacity, segundaDaSemana(getTodayStr()), travasVigentes(vivos)));
             setRecalculadoEm(new Date());
         } catch (e: any) {
-            setError(e?.message || 'Falha ao gerar o cronograma');
+            setError(mensagemDeErro(e, 'Falha ao gerar o cronograma'));
             setResult(EMPTY);
         } finally {
             carga.terminar();
@@ -98,7 +99,7 @@ export function usePcpSchedule() {
             await storageService.registrarOrderDelay(opts);
             await load();   // replaneja já com a trava nova
         } catch (e: any) {
-            setError(e?.message || 'Falha ao registrar o atraso');
+            setError(mensagemDeErro(e, 'Falha ao registrar o atraso'));
             throw e;
         } finally {
             setBusy(false);
@@ -111,7 +112,7 @@ export function usePcpSchedule() {
             await storageService.deleteOrderDelay(id);
             await load();
         } catch (e: any) {
-            setError(e?.message || 'Falha ao remover o atraso');
+            setError(mensagemDeErro(e, 'Falha ao remover o atraso'));
         } finally {
             setBusy(false);
         }

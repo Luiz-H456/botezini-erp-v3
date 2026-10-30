@@ -3,6 +3,7 @@ import { authService } from '@/services/auth';
 import { CARTAO, ROTULO, ROTULO_PEQUENO, CAMPO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 import { Lock, Mail, AlertTriangle, ArrowRight, ShieldCheck, HelpCircle, X, Loader2 } from 'lucide-react';
 
+import { ehErroDeConexao } from '@/utils/errorHandling';
 interface Props {
     onLoginSuccess: () => void;
 }
@@ -36,7 +37,10 @@ const Login: React.FC<Props> = ({ onLoginSuccess }) => {
             onLoginSuccess();
         } catch (err: any) {
             console.error(err);
-            if (err.message.includes('Invalid login credentials')) {
+            // Sem conexão não é "acesso negado": a pessoa ia achar que a senha foi bloqueada (auditoria C4).
+            if (ehErroDeConexao(err)) {
+                setError('Sem conexão com o servidor. Confira a internet e tente de novo em instantes.');
+            } else if (err.message.includes('Invalid login credentials')) {
                 setError('Credenciais incorretas. Verifique e tente novamente.');
             } else if (err.message.includes('Email not confirmed')) {
                 setError('Email não confirmado. Verifique sua caixa de entrada.');

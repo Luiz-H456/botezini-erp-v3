@@ -17,6 +17,7 @@ import {
 import type { ItemForm } from '@/utils/fabrica/lancarCompra';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     /** Todas as linhas da Lista: dão a divisão sugerida de qualquer insumo que esteja nela. */
     linhas: PurchaseLine[];
@@ -104,7 +105,7 @@ export function LancarCompraModal({ linhas, insumos, suppliers, pedidos, onClose
             );
             onDone();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao lançar a compra');
+            setErro(mensagemDeErro(e, 'Falha ao lançar a compra'));
             setGravando(false);
         }
     };

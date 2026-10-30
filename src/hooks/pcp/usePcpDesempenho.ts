@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { storageService } from '../../services/storage';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 import { ProductionLog } from '../../types/pcp';
+import { mensagemDeErro } from '@/utils/errorHandling';
 import {
     resumirPontualidade, pontualidadePorMes, ritmoDeProducao, tempoPorTipoDePeca,
     entregasApuradas,
@@ -27,7 +28,7 @@ export function usePcpDesempenho() {
             setLogs(prodLogs as ProductionLog[]);
             setProdutos(new Map(prods.map(p => [p.id, p.name])));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar o desempenho');
+            setError(mensagemDeErro(e, 'Falha ao carregar o desempenho'));
         } finally {
             carga.terminar();
         }

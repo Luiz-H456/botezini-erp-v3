@@ -4,6 +4,8 @@ import { useCargaProgressiva } from '../useCargaProgressiva';
 import type { Client, ObligationSummary } from '../../types';
 import { DeliveredUnpaidRow, OrderReconciliationRow } from '../../types/finance';
 
+import { avisar } from '../../utils/avisos';
+import { mensagemDeErro } from '../../utils/errorHandling';
 /**
  * "Clientes que devem": carrega os pedidos entregues com saldo, as divergências
  * de parcelas, as contas (base da tabela por cliente) e os clientes (telefone).
@@ -34,7 +36,7 @@ export function useReceivablesControl() {
             setContas(o);
             setClientes(c);
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar recebíveis');
+            setError(mensagemDeErro(e, 'Falha ao carregar recebíveis'));
         } finally {
             carga.terminar();
         }
@@ -50,7 +52,7 @@ export function useReceivablesControl() {
             await storageService.applyOrderAdjustment(orderId, delta, 'Reconciliação (pedido revisado)');
             await load();
         } catch (e: any) {
-            setError(e?.message || 'Falha ao aplicar ajuste');
+            setError(mensagemDeErro(e, 'Falha ao aplicar ajuste'));
         } finally {
             setBusy(false);
         }
@@ -58,22 +60,15 @@ export function useReceivablesControl() {
 
     /** Resultado do "Recalcular scores", para a tela mostrar em aviso (some sozinho). */
     const [recalculando, setRecalculando] = useState(false);
-    const [avisoDosScores, setAvisoDosScores] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-    useEffect(() => {
-        if (!avisoDosScores) return;
-        const t = setTimeout(() => setAvisoDosScores(null), 3500);
-        return () => clearTimeout(t);
-    }, [avisoDosScores]);
 
     /** Fase 3: materializa o score de todos os clientes no cache. */
     const refreshScores = useCallback(async () => {
         setRecalculando(true);
-        setAvisoDosScores(null);
         try {
             await storageService.refreshClientScores();
-            setAvisoDosScores({ msg: 'Scores recalculados', type: 'success' });
+            avisar('Scores recalculados', 'success');
         } catch (e: any) {
-            setAvisoDosScores({ msg: e?.message || 'Falha ao recalcular scores', type: 'error' });
+            avisar(mensagemDeErro(e, 'Falha ao recalcular scores'), 'error');
         } finally {
             setRecalculando(false);
         }
@@ -81,7 +76,7 @@ export function useReceivablesControl() {
 
     return {
         delivered, reconciliation, contas, clientes,
-        error, reload: load, applyAdjustment, refreshScores, recalculando, avisoDosScores,
+        error, reload: load, applyAdjustment, refreshScores, recalculando,
         loading: carga.carregando, busy: busy || carga.recarregando,
     };
 }

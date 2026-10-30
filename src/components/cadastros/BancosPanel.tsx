@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { Loader2 } from 'lucide-react';
 import { storageService } from '@/services/storage';
 import type { BankAccount } from '@/types';
 import { BankAccountModal } from '@/components/modals';
-import { AlertToast, ConfirmModal } from '@/components/finance';
+import { ConfirmModal } from '@/components/finance';
 import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 import { useMostrarValor } from '@/hooks/financas/useMostrarValor';
 import {
@@ -13,6 +12,8 @@ import {
 } from '@/utils/conferenciaDeSaldo';
 import type { ResultadoDaConferencia, PreviaDaSincronizacao } from '@/utils/conferenciaDeSaldo';
 import { TIPO_DE_CONTA } from '@/utils/opcoesAgrupadas';
+import { avisar } from '@/utils/avisos';
+import { mensagemDeErro } from '@/utils/errorHandling';
 import {
     CARTAO, ITEM, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE,
     BOTAO_SECUNDARIO, BOTAO_PERIGO, pilula,
@@ -37,15 +38,8 @@ export default function BancosPanel() {
     const [selecionado, setSelecionado] = useState<BankAccount | null>(null);
     const [confirmar, setConfirmar] = useState<{ tipo: 'inativar' | 'reativar'; banco: BankAccount } | null>(null);
     const [sincronizarAberto, setSincronizarAberto] = useState(false);
-    const [aviso, setAviso] = useState<Aviso | null>(null);
-    const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const showAlert = useCallback((msg: string, type: Aviso['type'] = 'success') => {
-        setAviso({ msg, type });
-        if (timer.current) clearTimeout(timer.current);
-        timer.current = setTimeout(() => setAviso(null), 3500);
-    }, []);
-    useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+    // Avisos vão para a central do app (utils/avisos): erro fica até fechar, sucesso some sozinho.
+    const showAlert = useCallback((msg: string, type: Aviso['type'] = 'success') => { avisar(msg, type); }, []);
 
     // Cada carga ganha um número; só a mais recente escreve na tela (alternar
     // "Mostrar inativos" rápido não deixa uma resposta velha por cima da nova).
@@ -199,7 +193,7 @@ export default function BancosPanel() {
                         } catch (e: any) {
                             // `set_bank_balance` vem de finance_phase10_lancamento_informativo.sql; sem
                             // esta tradução o erro chegava como texto cru do Postgres.
-                            const msg = String(e?.message || '');
+                            const msg = String(mensagemDeErro(e, ''));
                             if (/set_bank_balance/.test(msg) && /(does not exist|could not find|schema cache)/i.test(msg)) {
                                 throw new Error(
                                     'O ajuste de saldo nao esta instalado neste banco. '
@@ -269,7 +263,6 @@ export default function BancosPanel() {
                 />
             )}
 
-            {aviso && createPortal(<AlertToast msg={aviso.msg} type={aviso.type} />, document.body)}
         </div>
     );
 }

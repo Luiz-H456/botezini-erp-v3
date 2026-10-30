@@ -7,6 +7,7 @@ import { parseBRL } from '@/utils/currency';
 import { numero } from '@/utils/numeros';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     insumo: { id: string; name: string; unit: string; current_stock: number };
     pedidos: { id: string; order_number: string; falta?: number }[];
@@ -39,7 +40,7 @@ export function UsarDoEstoqueModal({ insumo, pedidos, onClose, onDone }: Props) 
             await comprasRepository.usarDoEstoque(pedidoId, insumo.id, q);
             onDone();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao usar do estoque');
+            setErro(mensagemDeErro(e, 'Falha ao usar do estoque'));
             setGravando(false);
         }
     };

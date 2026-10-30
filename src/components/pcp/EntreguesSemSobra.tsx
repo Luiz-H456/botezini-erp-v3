@@ -5,6 +5,7 @@ import { apurarSobrasDoPedido } from '@/hooks/pcp/apurarSobrasDoPedido';
 import { avisoDaEntrega } from '@/utils/fabrica/avisoDaEntrega';
 import { CARTAO, ROTULO, BOTAO_SUAVE } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 /**
  * Recuperação da sobra: entregues (últimos 90 dias) com compra ou uso do estoque vinculado e
  * sem sobra apurada. Cobre falha no Quadro, recarga da página e pedido entregue pelo menu de
@@ -19,7 +20,7 @@ export function EntreguesSemSobra({ onApurado }: { onApurado: (msg: string) => v
 
     const carregar = useCallback(async () => {
         try { setPedidos(await comprasRepository.entreguesSemSobra()); setErroLeitura(''); }
-        catch (e: any) { setErroLeitura(`Não consegui ler os pedidos entregues sem sobra apurada: ${e?.message || 'falha'}`); }
+        catch (e: any) { setErroLeitura(`Não consegui ler os pedidos entregues sem sobra apurada: ${mensagemDeErro(e, 'falha')}`); }
     }, []);
     useEffect(() => { carregar(); }, [carregar]);
 
@@ -32,7 +33,7 @@ export function EntreguesSemSobra({ onApurado }: { onApurado: (msg: string) => v
             setFalhas(prev => { const n = new Map(prev); n.delete(p.id); return n; });
             return `Pedido ${p.order_number}: ${avisoDaEntrega(r) ?? 'sem sobra para o estoque.'}`;
         } catch (e: any) {
-            setFalhas(prev => new Map(prev).set(p.id, e?.message || 'erro'));
+            setFalhas(prev => new Map(prev).set(p.id, mensagemDeErro(e, 'erro')));
             return null;
         } finally {
             setOcupado(prev => { const n = new Set(prev); n.delete(p.id); return n; });

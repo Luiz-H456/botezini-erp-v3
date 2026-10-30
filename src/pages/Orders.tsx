@@ -11,7 +11,6 @@ import { Search, Eye, PackageCheck, Printer, Clock, ChevronRight, Package, Link,
 import { OrderPreviewModal } from '@/components/orders/OrderPreviewModal';
 import { OrderRevertModal, OrderDeleteModal } from '@/components/modals';
 import InvoiceModal from '@/components/modals/InvoiceModal';
-import { Toast } from '@/components/common/Toast';
 import { SearchableSelect } from '@/components/common';
 import { useOrders } from '@/hooks/useOrders';
 import { pdfService } from '@/services/pdfService';
@@ -64,7 +63,7 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
         currentPage, setCurrentPage,
         paginatedOrders, totalPages, processedOrders,
         itemsPerPage,
-        deleteOrder, toast, showToast, loadData
+        deleteOrder, showToast, loadData
     } = useOrders(initialSearch);
 
     const [isRevertModalOpen, setIsRevertModalOpen] = useState(false);
@@ -513,7 +512,6 @@ const Orders: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch }) => 
                 />
             )}
 
-            <Toast visible={toast.visible} message={toast.message} title={toast.title} type={toast.type} />
         </div>
     );
 };

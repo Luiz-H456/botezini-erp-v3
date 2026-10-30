@@ -6,6 +6,7 @@ import { PcpDashboard } from '../../types/pcp';
 import { computePcpDashboard } from '../../utils/pcpDashboard';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const EMPTY: PcpDashboard = {
     factory_occupancy_pct: 0, pending_count: 0, in_production_count: 0,
     late: [], upcoming: [], sector_loads: [], total_active_pieces: 0, total_capacity: 0,
@@ -42,7 +43,7 @@ export function usePcpDashboard() {
                 getTodayStr(),
             ));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar o painel');
+            setError(mensagemDeErro(e, 'Falha ao carregar o painel'));
             setData(EMPTY);
         } finally {
             carga.terminar();

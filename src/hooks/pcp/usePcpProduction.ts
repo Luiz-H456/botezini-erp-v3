@@ -6,6 +6,7 @@ import { computeOrderProgress } from '../../utils/pcpProduction';
 import { saldoPorItem, feitoSemItem, SaldoItem } from '../../utils/baixaPorItem';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export interface ProdOrderRow {
     order: Order;
     progress: OrderProgress;
@@ -52,7 +53,7 @@ export function usePcpProduction() {
                 return { order: o, progress: progress.get(o.id)!, client: c, client_name: c?.company_name, client_contact: c?.contact_person };
             }));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar controle de produção');
+            setError(mensagemDeErro(e, 'Falha ao carregar controle de produção'));
         } finally {
             carga.terminar();
         }
@@ -63,7 +64,7 @@ export function usePcpProduction() {
     const logProduction = useCallback(async (opts: Parameters<typeof storageService.logProduction>[0]) => {
         setBusy(true); setError('');
         try { await storageService.logProduction(opts); await load(); }
-        catch (e: any) { setError(e?.message || 'Falha ao lançar baixa'); throw e; }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha ao lançar baixa')); throw e; }
         finally { setBusy(false); }
     }, [load]);
 

@@ -5,7 +5,6 @@ import { formatCurrency } from '@/utils';
 import { TECNICAS, ROTULO_TECNICA } from '@/utils/personalizacao';
 import { usePersonalizacaoMutations } from '@/hooks/usePersonalizacao';
 import { useToast } from '@/hooks/useToast';
-import { Toast } from '@/components/common/Toast';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
@@ -20,7 +19,7 @@ interface Props { precos: PersonalizacaoPreco[]; }
 
 const TabelaDePrecos: React.FC<Props> = ({ precos }) => {
     const { savePreco, deletePreco } = usePersonalizacaoMutations();
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
     const [editando, setEditando] = useState<string | 'novo' | null>(null);
     const [form, setForm] = useState<Partial<PersonalizacaoPreco>>(vazio());
 
@@ -175,7 +174,6 @@ const TabelaDePrecos: React.FC<Props> = ({ precos }) => {
                 </div>
             )}
 
-            <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />
         </div>
     );
 };

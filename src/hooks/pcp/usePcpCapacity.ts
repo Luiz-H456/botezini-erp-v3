@@ -3,6 +3,7 @@ import { storageService } from '../../services/storage';
 import { ProductionSector, CapacityConfig } from '../../types/pcp';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export function usePcpCapacity() {
     const [sectors, setSectors] = useState<ProductionSector[]>([]);
     const [config, setConfig] = useState<CapacityConfig>({ id: 1, working_days: 5, holidays: [], overtime_enabled: false });
@@ -22,7 +23,7 @@ export function usePcpCapacity() {
             setSectors(secs);
             setConfig(cfg);
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar capacidade');
+            setError(mensagemDeErro(e, 'Falha ao carregar capacidade'));
         } finally {
             carga.terminar();
         }
@@ -33,7 +34,7 @@ export function usePcpCapacity() {
     const run = useCallback(async (fn: () => Promise<void>) => {
         setBusy(true); setError('');
         try { await fn(); await load(); }
-        catch (e: any) { setError(e?.message || 'Operação falhou'); throw e; }
+        catch (e: any) { setError(mensagemDeErro(e, 'Operação falhou')); throw e; }
         finally { setBusy(false); }
     }, [load]);
 

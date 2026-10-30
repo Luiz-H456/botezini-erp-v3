@@ -4,6 +4,7 @@ import { BoardNote, BoardNoteColor, BoardConnection, BoardDrawing, BoardDrawingK
 import { proximaPosicaoCascata, proximoZIndex, clamp, corAleatoria } from '@/utils/board';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const LARGURA_NOTA_PADRAO = 240;
 const ALTURA_NOTA_PADRAO = 220;
 const LARGURA_MINIMA = 140;
@@ -46,7 +47,7 @@ export function useBoard() {
             setConnections(c);
             setDrawings(d);
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar o quadro');
+            setError(mensagemDeErro(e, 'Falha ao carregar o quadro'));
         } finally {
             carga.terminar();
         }
@@ -88,7 +89,7 @@ export function useBoard() {
             setNotes(prev => [...prev, criada]);
             return criada;
         } catch (e: any) {
-            setError(e?.message || 'Falha ao criar nota');
+            setError(mensagemDeErro(e, 'Falha ao criar nota'));
             throw e;
         }
     }, []);
@@ -103,7 +104,7 @@ export function useBoard() {
         if (existente) clearTimeout(existente);
         timers.current.set(id, setTimeout(() => {
             timers.current.delete(id);
-            persistir().catch((e: any) => setError(e?.message || 'Falha ao salvar'));
+            persistir().catch((e: any) => setError(mensagemDeErro(e, 'Falha ao salvar')));
         }, DEBOUNCE_MS));
     };
 
@@ -119,7 +120,7 @@ export function useBoard() {
     const updateColor = useCallback(async (id: string, color: BoardNoteColor) => {
         setNotes(prev => prev.map(n => n.id === id ? { ...n, color } : n));
         try { await storageService.updateBoardNoteContent(id, { color }); }
-        catch (e: any) { setError(e?.message || 'Falha ao salvar cor'); }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha ao salvar cor')); }
     }, []);
 
     const toggleDone = useCallback(async (id: string) => {
@@ -128,7 +129,7 @@ export function useBoard() {
         const is_done = !nota.is_done;
         setNotes(prev => prev.map(n => n.id === id ? { ...n, is_done } : n));
         try { await storageService.updateBoardNoteContent(id, { is_done }); }
-        catch (e: any) { setError(e?.message || 'Falha ao salvar'); }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha ao salvar')); }
     }, []);
 
     /** Move/redimensiona localmente sem gravar — chamado a cada pixel do gesto. */
@@ -169,7 +170,7 @@ export function useBoard() {
         try { await storageService.deleteBoardNote(id); }
         catch (e: any) {
             setNotes(anterior); // desfaz se o servidor recusar
-            setError(e?.message || 'Falha ao apagar nota');
+            setError(mensagemDeErro(e, 'Falha ao apagar nota'));
         }
     }, []);
 
@@ -181,7 +182,7 @@ export function useBoard() {
             setConnections(prev => [...prev, criada]);
             return criada;
         } catch (e: any) {
-            setError(e?.message || 'Falha ao ligar notas');
+            setError(mensagemDeErro(e, 'Falha ao ligar notas'));
             throw e;
         }
     }, []);
@@ -192,7 +193,7 @@ export function useBoard() {
         try { await storageService.deleteBoardConnection(id); }
         catch (e: any) {
             setConnections(anterior);
-            setError(e?.message || 'Falha ao apagar ligação');
+            setError(mensagemDeErro(e, 'Falha ao apagar ligação'));
         }
     }, [connections]);
 
@@ -204,7 +205,7 @@ export function useBoard() {
             setDrawings(prev => [...prev, criado]);
             return criado;
         } catch (e: any) {
-            setError(e?.message || 'Falha ao salvar o traço');
+            setError(mensagemDeErro(e, 'Falha ao salvar o traço'));
             throw e;
         }
     }, []);
@@ -215,7 +216,7 @@ export function useBoard() {
         try { await storageService.deleteBoardDrawing(id); }
         catch (e: any) {
             setDrawings(anterior);
-            setError(e?.message || 'Falha ao apagar traço');
+            setError(mensagemDeErro(e, 'Falha ao apagar traço'));
         }
     }, [drawings]);
 

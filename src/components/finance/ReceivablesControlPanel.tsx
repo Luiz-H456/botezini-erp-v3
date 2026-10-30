@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { SlidersHorizontal, AlertTriangle, Clock, Factory, MessageCircle } from 'lucide-react';
 import { Indicador } from '@/components/finance/ui/Indicador';
 import { CARTAO, ITEM, ROTULO, ROTULO_PEQUENO, BOTAO_SUAVE, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
@@ -10,7 +9,6 @@ import { OrderReconciliationRow } from '@/types/finance';
 import { useReceivablesControl } from '@/hooks/finance/useReceivablesControl';
 import { useMostrarValor } from '@/hooks/financas/useMostrarValor';
 import { PaymentPlanModal } from '@/components/finance/PaymentPlanModal';
-import { AlertToast } from '@/components/finance/AlertToast';
 import type { PlanInstallment } from '@/utils/paymentPlan';
 import { storageService } from '@/services/storage';
 import { clientesQueDevem, parcelasParaReceber } from '@/utils/financas/clientes';
@@ -236,7 +234,6 @@ export function ReceivablesControlPanel({ abrirContas, clienteInicial, limparCli
                     onConcluido={() => { setBaixa(null); setApoio(null); void ctl.reload(); }} />
             )}
 
-            {ctl.avisoDosScores && createPortal(<AlertToast msg={ctl.avisoDosScores.msg} type={ctl.avisoDosScores.type} />, document.body)}
         </div>
     );
 }

@@ -5,6 +5,7 @@ import type { BankAccount } from '@/types';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { InfoTooltip } from '@/components/common';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     isOpen: boolean;
     onClose: () => void;
@@ -98,7 +99,7 @@ export const BankAccountModal: React.FC<Props> = ({ isOpen, onClose, onSave, onD
                     ? 'Saldo gravado e ponto de partida reancorado.'
                     : 'Saldo gravado.');
         } catch (e: any) {
-            setAjusteMsg(e?.message || 'Falha ao ajustar');
+            setAjusteMsg(mensagemDeErro(e, 'Falha ao ajustar'));
         } finally {
             setAjustando(false);
         }

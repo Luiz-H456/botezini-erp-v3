@@ -6,6 +6,7 @@ import type { PedidoVendido, OrcamentoRef } from '../utils/itensVendidos';
 import type { Completude } from '../utils/completudeDoCadastro';
 import type { Insumo, Product } from '../types';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 /**
  * Junta o que a completude precisa: o que foi vendido, o que está cadastrado e
  * a ficha técnica de cada produto.
@@ -50,7 +51,7 @@ export function useCompletudeDoCadastro() {
             setTemDados(true);
         } catch (e: any) {
             if (minha !== sequencia.current) return;
-            setErro(e?.message || 'Falha ao levantar o cadastro');
+            setErro(mensagemDeErro(e, 'Falha ao levantar o cadastro'));
         } finally {
             if (minha === sequencia.current) carga.terminar();
         }

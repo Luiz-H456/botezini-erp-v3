@@ -1,38 +1,16 @@
-import { useState, useCallback } from 'react';
-import type { ToastType } from '../components/common/Toast';
+import { useCallback } from 'react';
+import { avisar, type TipoDeAviso } from '../utils/avisos';
 
-const DEFAULT_DURATION = 3000;
+export type ToastType = TipoDeAviso;
 
-interface ToastState {
-  visible: boolean;
-  message: string;
-  title: string;
-  type: ToastType;
-}
-
-export function useToast(duration = DEFAULT_DURATION) {
-  const [toast, setToast] = useState<ToastState>({
-    visible: false,
-    message: '',
-    title: '',
-    type: 'success',
-  });
-
-  const showToast = useCallback(
-    (message: string, type: ToastType = 'success', title?: string) => {
-      setToast({
-        visible: true,
-        message,
-        title: title ?? (type === 'error' ? 'Erro' : type === 'success' ? 'Sucesso' : 'Info'),
-        type,
-      });
-      setTimeout(
-        () => setToast((prev) => ({ ...prev, visible: false })),
-        duration
-      );
-    },
-    [duration]
-  );
-
-  return { toast, showToast };
+/**
+ * Avisos de uma tela. Desde a auditoria de 29/10 (C5/R5) eles vão para a central única do app
+ * (utils/avisos + CentralDeAvisos, montada no App): erro fica até fechar, sucesso some sozinho,
+ * erro técnico chega traduzido. O nome e a assinatura ficaram, para as telas não mudarem.
+ */
+export function useToast() {
+  const showToast = useCallback((message: string, type: ToastType = 'success', title?: string) => {
+    avisar(message, type, title);
+  }, []);
+  return { showToast };
 }

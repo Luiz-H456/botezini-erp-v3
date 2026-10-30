@@ -6,6 +6,7 @@ import { getTodayStr } from '@/utils';
 import type { DossieDoCliente } from '@/utils/dossieDoCliente';
 import type { EntregaDoPedido } from '@/utils/metricasEntrega';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 /**
  * Tudo o que a casa sabe de um cliente, buscado sob demanda.
  *
@@ -61,7 +62,7 @@ export function useDossieDoCliente(clientId: string | null) {
                 setEntregas([]);
             }
         } catch (e: any) {
-            setErro(e?.message || 'Não foi possível carregar os dados do cliente');
+            setErro(mensagemDeErro(e, 'Não foi possível carregar os dados do cliente'));
         } finally {
             setCarregando(false);
         }

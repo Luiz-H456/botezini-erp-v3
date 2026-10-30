@@ -7,6 +7,7 @@ import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 import { msgPrimeiroContato } from '@/utils/mensagensCliente';
 import { CARTAO, ITEM, CAMPO, ROTULO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_SUAVE } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     clientId: string;
     /** O contato do campo antigo, mostrado enquanto a migração não roda. */
@@ -69,7 +70,7 @@ export const ContatosDoCliente: React.FC<Props> = ({ clientId, contatoAntigo }) 
             // cá, então nesse estado a lista nunca deveria estar vazia.
             setMigrado(!(lista.length === 0 && !!(contatoAntigo || '').trim()));
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao ler os contatos');
+            setErro(mensagemDeErro(e, 'Falha ao ler os contatos'));
         } finally {
             setCarregando(false);
         }
@@ -90,7 +91,7 @@ export const ContatosDoCliente: React.FC<Props> = ({ clientId, contatoAntigo }) 
             setRascunho(null);
             await carregar();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao gravar');
+            setErro(mensagemDeErro(e, 'Falha ao gravar'));
         } finally {
             setSalvando(false);
         }
@@ -101,7 +102,7 @@ export const ContatosDoCliente: React.FC<Props> = ({ clientId, contatoAntigo }) 
             await storageService.saveClientContact({ ...c, principal: true });
             await carregar();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao marcar');
+            setErro(mensagemDeErro(e, 'Falha ao marcar'));
         }
     };
 
@@ -113,7 +114,7 @@ export const ContatosDoCliente: React.FC<Props> = ({ clientId, contatoAntigo }) 
             await storageService.deleteClientContact(id);
             await carregar();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao excluir');
+            setErro(mensagemDeErro(e, 'Falha ao excluir'));
         }
     };
 

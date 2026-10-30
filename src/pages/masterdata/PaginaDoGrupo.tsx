@@ -16,6 +16,7 @@ import { BudgetPreviewModal } from '@/components/budgets/BudgetPreviewModal';
 import { Indicador } from '@/components/finance/ui/Indicador';
 import { CARTAO, ROTULO, ROTULO_PEQUENO, pilula } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     grupo: string;
     clientes: Client[];
@@ -120,7 +121,7 @@ export function PaginaDoGrupo({
                 const meus = new Set(ids);
                 setOrcamentosCompletos((orcamentos as any[]).filter(o => meus.has(o.client_id)));
             })
-            .catch((e: any) => { if (vivo) setErro(e?.message || 'Não foi possível carregar o grupo'); })
+            .catch((e: any) => { if (vivo) setErro(mensagemDeErro(e, 'Não foi possível carregar o grupo')); })
             .finally(() => { if (vivo) setCarregando(false); });
 
         return () => { vivo = false; };

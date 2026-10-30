@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { storageService } from '@/services/storage';
 import { clientSchema, productSchema, supplierSchema } from '@/utils';
 import { Product } from '@/types';
-import type { ToastType } from '@/components/common/Toast';
+import type { ToastType } from '@/hooks/useToast';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export type ModalEntityType = 'client' | 'supplier' | 'product';
 
 interface UseMasterDataActionsProps {
@@ -87,7 +88,7 @@ export function useMasterDataActions({
       return savedItem ?? payload;
     } catch (err: any) {
       console.error('Error saving entity:', err);
-      const msg = err?.message || 'Erro desconhecido';
+      const msg = mensagemDeErro(err, 'Erro desconhecido');
       showToast(`Erro ao salvar: ${msg}`, 'error');
       // O modal segue aberto: o erro também aparece no rodapé dele.
       setErrors({ salvar: `Erro ao salvar: ${msg}` });
@@ -112,7 +113,7 @@ export function useMasterDataActions({
       showToast('Item excluído.', 'success');
       loadData();
     } catch (e: any) {
-      const msg = e?.message || '';
+      const msg = mensagemDeErro(e, '');
       if (msg.includes('foreign key constraint') || msg.includes('violates foreign key') || e?.code === '23503') {
         const typeName = itemToDelete.type === 'client' ? 'Cliente' : itemToDelete.type === 'supplier' ? 'Fornecedor' : itemToDelete.type === 'product' ? 'Produto' : 'Centro de custo';
         showToast(`Não é possível excluir. ${typeName} possui pedidos/cadastros vinculados.`, 'error');

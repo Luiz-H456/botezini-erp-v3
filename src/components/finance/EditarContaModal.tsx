@@ -17,6 +17,7 @@ import {
 import { ConfirmarOperacao } from '@/components/common/ConfirmarOperacao';
 import type { ObligationSummary } from '@/types';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     conta: ObligationSummary;
     /** Todas as contas carregadas — de onde saem as parcelas da mesma série. */
@@ -148,7 +149,7 @@ export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
             }
             onSaved();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao cancelar a série');
+            setErro(mensagemDeErro(e, 'Falha ao cancelar a série'));
             setCancelandoSerie(false);
         }
     };
@@ -191,7 +192,7 @@ export function EditarContaModal({ conta, todas, onClose, onSaved }: Props) {
             onSaved();
             onClose();
         } catch (e: any) {
-            setErro(e?.message || 'Não foi possível salvar');
+            setErro(mensagemDeErro(e, 'Não foi possível salvar'));
         } finally {
             setSalvando(false);
         }

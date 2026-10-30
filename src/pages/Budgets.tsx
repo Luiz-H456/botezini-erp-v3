@@ -29,6 +29,8 @@ import { resumoDaEspecificacao } from '@/utils/vendas/especificacao';
 import { MenuMais } from '@/components/common/MenuMais';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_SUAVE, BOTAO_PERIGO, pilula } from '@/components/finance/ui/estilo';
 
+import { avisar } from '@/utils/avisos';
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     onNavigate?: (view: 'orders' | 'budgets', searchTerm?: string) => void;
     initialSearch?: string;
@@ -120,15 +122,8 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
         setDialog({ isOpen: true, type: 'confirm', title, message, onConfirm, variant });
     };
 
-    const openAlert = (message: string, type: 'error' | 'success' = 'error') => {
-        setDialog({
-            isOpen: true,
-            type: 'alert',
-            title: type === 'error' ? 'Atenção' : 'Sucesso',
-            message,
-            variant: type === 'error' ? 'danger' : 'success'
-        });
-    };
+    // Avisos (salvou / falhou / falta algo) vão para a central do app; a janela fica só para confirmações.
+    const openAlert = (message: string, type: 'error' | 'success' = 'error') => { avisar(message, type); };
 
     const handleOpenEditor = (budget?: Budget) => {
         setPasso(null);
@@ -209,7 +204,7 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
             await storageService.saveBudget({ ...atual, status: 'Approved' } as Budget);
             refresh();
             oferecerProximoPasso({ ...atual, status: 'Approved' } as Budget);
-        } catch (e: any) { openAlert(e?.message || 'Não consegui marcar como aprovado.'); }
+        } catch (e: any) { openAlert(mensagemDeErro(e, 'Não consegui marcar como aprovado.')); }
     };
 
     /** Mostra o aviso do próximo passo; devolve se havia um para mostrar. */
@@ -281,7 +276,7 @@ const Budgets: React.FC<Props> = ({ onNavigate, initialSearch, clearSearch, stat
             pdfService.generateBudgetPDF(budget, client, companyProfile, fotos);
         } catch (e: any) {
             console.error('[orçamento] falha ao gerar o PDF:', e);
-            openAlert(`Não foi possível gerar o PDF: ${e?.message || 'erro desconhecido'}.`, 'error');
+            openAlert(`Não foi possível gerar o PDF: ${mensagemDeErro(e, 'erro desconhecido')}.`, 'error');
         }
     };
 

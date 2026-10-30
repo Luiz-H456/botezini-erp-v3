@@ -61,6 +61,7 @@ import { respostaCabeNaSemana } from '@/utils/cabeNaSemana';
 import { lerGrade } from '@/utils/vendas/grade';
 import { copiarEspecificacao, resumoDaEspecificacao, type GrupoCopiavel } from '@/utils/vendas/especificacao';
 import { aplicarEntrada, planoParaMostrar, entradaPctDoPlano, descreverCondicao } from '@/utils/condicaoDePagamento';
+import { mensagemDeErro } from '@/utils/errorHandling';
 import {
   CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula,
 } from '@/components/finance/ui/estilo';
@@ -499,7 +500,7 @@ export const BudgetEditor: React.FC<BudgetEditorProps> = ({
       await onSave(payload);
     } catch (e: any) {
       // Sem isto o botão ficava em "salvando" para sempre e só restava descartar.
-      showToast(e?.message || 'Não consegui salvar o orçamento.', 'error');
+      showToast(mensagemDeErro(e, 'Não consegui salvar o orçamento.'), 'error');
       return false;
     } finally {
       setIsSaving(false);

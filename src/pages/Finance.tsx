@@ -5,7 +5,7 @@ import { Indicador } from '../components/finance/ui/Indicador';
 import { CARTAO, ITEM, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, pilula } from '../components/finance/ui/estilo';
 import { storageService } from '../services/storage';
 import {
-    ObligationCard, PaymentModal, AlertToast, ObligationForm,
+    ObligationCard, PaymentModal, ObligationForm,
     EditarContaModal,
 } from '../components/finance';
 // formatCurrency e getTodayStr agora vêm de utils — o getTodayStr de lá usa data
@@ -37,6 +37,7 @@ import { caixaDoPeriodo } from '@/utils/financas/caixa';
 import { normalizeCategoryName } from '@/utils/categoryResolver';
 import { nomeDoMes, mesDe, mesAnterior, proximoMes } from '@/utils/financas/base';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface FinanceProps {
     initialSearch?: string;
     clearSearch?: () => void;
@@ -79,7 +80,6 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
         envelopes,
         loading,
         recarregando,
-        alertState,
         showAlert,
         loadData
     } = useFinanceData();
@@ -354,7 +354,7 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
             // pagamento entrou depois do último carregamento. Vale a mesma
             // tradução: dizer o obstáculo sem dizer a saída é o que faz a pessoa
             // lançar um valor inverso para "corrigir".
-            const msg = String(e?.message || '');
+            const msg = String(mensagemDeErro(e, ''));
             if (type === 'cancel_ob' && /pagamentos? ativos?/i.test(msg)) {
                 showAlert('Esta conta tem pagamento lançado. Estorne o pagamento primeiro — '
                     + 'depois o cancelamento fica liberado.', 'error');
@@ -750,7 +750,6 @@ export default function Finance({ initialSearch, clearSearch, filtrosIniciais, l
             )}
 
             {/* Aviso em portal: no z-10 do conteúdo ficava escondido sob as janelas. */}
-            {alertState && createPortal(<AlertToast msg={alertState.msg} type={alertState.type} />, document.body)}
         </div>
     );
 }

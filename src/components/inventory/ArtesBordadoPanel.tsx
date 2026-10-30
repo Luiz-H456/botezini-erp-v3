@@ -7,7 +7,6 @@ import { storageService } from '@/services/storage';
 import { coresDaArte, ritmoDeBordado, estimarTempo, sugerirPrecoBordado } from '@/utils/personalizacao';
 import { usePersonalizacaoMutations } from '@/hooks/usePersonalizacao';
 import { useToast } from '@/hooks/useToast';
-import { Toast } from '@/components/common/Toast';
 import { DeleteConfirmModal } from '@/components/modals/DeleteConfirmModal';
 import SearchableSelect from '@/components/common/SearchableSelect';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
@@ -24,7 +23,7 @@ interface Props { artes: ArteBordado[]; notas: PersonalizacaoNotas[]; }
 
 const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
     const { saveArte, deleteArte } = usePersonalizacaoMutations();
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
     const [editando, setEditando] = useState<string | 'nova' | null>(null);
     const [form, setForm] = useState<Partial<ArteBordado>>(vazia());
     const [busca, setBusca] = useState('');
@@ -266,7 +265,6 @@ const ArtesBordadoPanel: React.FC<Props> = ({ artes, notas }) => {
             )}
 
             <DeleteConfirmModal isOpen={!!paraExcluir} itemName={paraExcluir?.nome || ''} onConfirm={excluir} onClose={() => setParaExcluir(null)} />
-            <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />
         </div>
     );
 };

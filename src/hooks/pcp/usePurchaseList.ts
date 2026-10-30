@@ -8,6 +8,7 @@ import {
 } from '../../utils/purchaseList';
 import { entraNasCompras } from '../../utils/fabrica/compras';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export interface PedidoAtivo { id: string; order_number: string; deadline: string }
 
 export type WeekFilter = 'open' | 'this_week' | 'next_week';
@@ -105,7 +106,7 @@ export function usePurchaseList(filtroInicial: WeekFilter = 'open') {
             setSuppliers(fornecedores);
             setResult(computePurchaseList(plOrders, bomByProduct, insumoById, vinculados));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao gerar a lista de compras');
+            setError(mensagemDeErro(e, 'Falha ao gerar a lista de compras'));
             setResult(EMPTY);
         } finally {
             carga.terminar();

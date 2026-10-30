@@ -10,6 +10,7 @@ import {
 } from '@/utils/aditivoDePedido';
 import type { Order, OrderAddendum, Client } from '@/types';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     order: Order;
     client?: Client | null;
@@ -112,7 +113,7 @@ export function FichaDeEntrega({ order, client, onClose, onSaved }: Props) {
             });
             onSaved();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao gravar o aditivo');
+            setErro(mensagemDeErro(e, 'Falha ao gravar o aditivo'));
             setSalvando(false);
         }
     };

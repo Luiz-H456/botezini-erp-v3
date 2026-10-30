@@ -41,6 +41,7 @@ import type { AberturaDeCadastro } from '@/pages/MasterData';
 import { carregarPreferenciaDePrivacidade } from '@/utils/privacidade';
 import { usePrivacidade } from '@/hooks/usePrivacidade';
 
+import { CentralDeAvisos } from '@/components/common/CentralDeAvisos';
 // Lê a preferência salva antes do primeiro render, para não haver um piscar de
 // valores visíveis em quem deixou o modo privado ligado.
 carregarPreferenciaDePrivacidade();
@@ -323,6 +324,7 @@ const App: React.FC = () => {
   if (userProfile?.role === 'factory') {
     return (
       <div className="h-screen h-svh w-screen bg-zinc-950 text-slate-200 flex flex-col overflow-hidden">
+        <CentralDeAvisos />
         <header className="h-16 bg-zinc-900 border-b border-zinc-800 px-6 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             {companyProfile?.logo_url ? (
@@ -366,6 +368,7 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen h-svh w-screen bg-zinc-950 overflow-hidden text-slate-200">
+      <CentralDeAvisos />
       <BarraDeTopo
         onNavegar={handleNavigate}
         onAbrirMenu={() => setGavetaAberta(true)}

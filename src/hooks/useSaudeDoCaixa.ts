@@ -10,6 +10,7 @@ import {
 import { movimentosPrevistos } from '../utils/financas/projecao';
 import { montarItensVendidos, LinhaVendida } from '../utils/itensVendidos';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const hoje = getTodayStr;
 const fimDoMes = (iso: string) => {
     const [a, m] = iso.split('-').map(Number);
@@ -65,7 +66,7 @@ export function useSaudeDoCaixa(mesInicial?: string) {
                 .filter((p: any) => Number(p.average_unit_cost) > 0)
                 .map((p: any) => [p.name, Number(p.average_unit_cost)])));
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar a saúde do caixa');
+            setError(mensagemDeErro(e, 'Falha ao carregar a saúde do caixa'));
         } finally {
             carga.terminar();
         }
@@ -173,7 +174,7 @@ export function useSaudeDoCaixa(mesInicial?: string) {
             await storageService.saveGlobalCategory({ ...c, natureza });
             await load();
         } catch (e: any) {
-            setError(e?.message || 'Falha ao classificar a categoria');
+            setError(mensagemDeErro(e, 'Falha ao classificar a categoria'));
         } finally {
             setSalvando(false);
         }

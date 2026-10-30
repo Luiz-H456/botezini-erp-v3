@@ -6,6 +6,7 @@ import { useEscFecha } from '@/hooks/useEscFecha';
 import { precoDeReferencia } from '@/utils/fabrica/tecidosSemPreco';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SECUNDARIO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     insumo: { id: string; name: string; unit: string };
     onClose: () => void;
@@ -32,7 +33,7 @@ export function DefinirPrecoModal({ insumo, onClose, onDone }: Props) {
             await storageService.definirPrecoDeReferencia(insumo.id, preco);
             onDone();
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao definir o preço');
+            setErro(mensagemDeErro(e, 'Falha ao definir o preço'));
             setGravando(false);
         }
     };

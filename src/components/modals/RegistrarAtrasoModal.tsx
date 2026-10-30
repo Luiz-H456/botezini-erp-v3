@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Clock, AlertTriangle } from 'lucide-react';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     orderNumber: string;
     clientName?: string;
@@ -49,7 +50,7 @@ export const RegistrarAtrasoModal: React.FC<Props> = ({ orderNumber, clientName,
         try {
             await onConfirm(Math.round(dias), motivo.trim());
         } catch (e: any) {
-            setErro(e?.message || 'Não foi possível registrar o atraso');
+            setErro(mensagemDeErro(e, 'Não foi possível registrar o atraso'));
             setSalvando(false);
         }
     };

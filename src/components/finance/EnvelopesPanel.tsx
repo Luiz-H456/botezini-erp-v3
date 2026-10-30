@@ -10,6 +10,7 @@ import { useMostrarValor } from '@/hooks/financas/useMostrarValor';
 import { CashEnvelope, EnvelopeMovement } from '@/types/finance';
 import { SearchableSelect, InfoTooltip, ConfirmDialog, MenuMais } from '@/components/common';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const COLORS = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#14b8a6', '#f97316'];
 const PURPOSES = ['Impostos', 'Folha de pagamento', 'Fornecedores', 'Reserva de emergência', '13º / Férias', 'Investimento', 'Outro'];
 
@@ -209,7 +210,7 @@ function EnvelopeForm({ initial, busy, onSave, onClose }: {
             target_date: initial.target_date,
             min_balance: initial.min_balance ?? 0,
             auto_fund_pct: Number(autoPct) || 0,
-        }); } catch (e: any) { setError(e?.message || 'Falha ao salvar a caixinha'); }
+        }); } catch (e: any) { setError(mensagemDeErro(e, 'Falha ao salvar a caixinha')); }
     };
 
     return createPortal(
@@ -346,7 +347,7 @@ function TransferModal({ from, others, busy, onConfirm, onClose }: {
     const confirm = async () => {
         if (!canConfirm) return;
         try { await onConfirm(toId, parsed); }
-        catch (e: any) { setError(e?.message || 'Falha na transferência'); }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha na transferência')); }
     };
 
     return createPortal(
@@ -408,7 +409,7 @@ function ProvisionModal({ envelopes, free, busy, onConfirm, onClose }: {
     const confirm = async () => {
         if (!canConfirm) return;
         try { await onConfirm(base); }
-        catch (e: any) { setError(e?.message || 'Falha ao distribuir'); }
+        catch (e: any) { setError(mensagemDeErro(e, 'Falha ao distribuir')); }
     };
 
     return createPortal(

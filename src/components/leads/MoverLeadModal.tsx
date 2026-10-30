@@ -5,6 +5,7 @@ import { ROTULO_DA_ETAPA, nomeDoLead } from '@/utils/funilDeLeads';
 import type { Lead, EtapaDoLead } from '@/utils/funilDeLeads';
 import { CAMPO, ROTULO_PEQUENO, BOTAO_PRINCIPAL, BOTAO_SUAVE, BOTAO_SECUNDARIO, BOTAO_PERIGO } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     lead: Lead;
     destino: EtapaDoLead;
@@ -93,7 +94,7 @@ export const MoverLeadModal: React.FC<Props> = ({ lead, destino, onConfirmar, on
                 motivo_perda: descartando ? motivo.trim() : null,
             });
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao mover');
+            setErro(mensagemDeErro(e, 'Falha ao mover'));
             setSalvando(false);
         }
     };

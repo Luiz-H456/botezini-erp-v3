@@ -1,9 +1,10 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { storageService } from '../../services/storage';
 import { ObligationSummary, ObligationPayment, BankAccount, Client, Supplier, CostCenter, GlobalCategory } from '../../types';
 import type { CashEnvelope, EnvelopeOverview } from '@/types/finance';
 import { useCargaProgressiva } from '../useCargaProgressiva';
 
+import { avisar } from '../../utils/avisos';
 export function useFinanceData() {
     const [obligations, setObligations] = useState<ObligationSummary[]>([]);
     const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
@@ -16,14 +17,8 @@ export function useFinanceData() {
     const [envelopeOverview, setEnvelopeOverview] = useState<EnvelopeOverview>({ total_real: 0, allocated: 0, free: 0 });
     const carga = useCargaProgressiva();
 
-    const [alertState, setAlertState] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
-    const alertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const showAlert = useCallback((msg: string, type: 'success' | 'error' = 'success') => {
-        setAlertState({ msg, type });
-        if (alertTimer.current) clearTimeout(alertTimer.current);
-        alertTimer.current = setTimeout(() => setAlertState(null), 3500);
-    }, []);
+    // Avisos vão para a central do app (utils/avisos): erro fica até fechar, sucesso some sozinho.
+    const showAlert = useCallback((msg: string, type: 'success' | 'error' = 'success') => { avisar(msg, type); }, []);
 
     const loadData = useCallback(async () => {
         carga.iniciar();
@@ -56,9 +51,6 @@ export function useFinanceData() {
     }, [showAlert]);
 
     // A carga inicial é de quem usa o hook (Finance.tsx chama loadData ao montar).
-    useEffect(() => () => {
-        if (alertTimer.current) clearTimeout(alertTimer.current);
-    }, []);
 
     return {
         obligations,
@@ -72,7 +64,6 @@ export function useFinanceData() {
         envelopeOverview,
         loading: carga.carregando,
         recarregando: carga.recarregando,
-        alertState,
         showAlert,
         loadData
     };

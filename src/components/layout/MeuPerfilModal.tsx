@@ -7,6 +7,7 @@ import { useSignedUrl, TIPOS_DE_IMAGEM_ACEITOS, TAMANHO_MAX_MB_IMAGEM } from '@/
 import { iniciais, corDoAvatar, rotuloDoCargo } from '@/utils/perfilDoUsuario';
 import type { UserProfile } from '@/types';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     perfil: UserProfile | null;
     onSalvo: () => void;
@@ -63,7 +64,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
         try {
             setCaminhoDaFoto(await storageService.uploadAttachment(arquivo, 'perfis'));
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao enviar a foto');
+            setErro(mensagemDeErro(e, 'Falha ao enviar a foto'));
         } finally {
             setEnviando(false);
         }
@@ -82,7 +83,7 @@ export function MeuPerfilModal({ perfil, onSalvo, onFechar }: Props) {
             onSalvo();
             onFechar();
         } catch (e: any) {
-            setErro(e?.message || 'Não foi possível salvar');
+            setErro(mensagemDeErro(e, 'Não foi possível salvar'));
         } finally {
             setSalvando(false);
         }

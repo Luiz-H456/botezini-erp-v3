@@ -1,5 +1,4 @@
-export { Toast } from './Toast';
-export type { ToastProps, ToastType } from './Toast';
+export { CentralDeAvisos } from './CentralDeAvisos';
 export { Modal } from './Modal';
 export type { ModalProps } from './Modal';
 export { ConfirmDialog } from './ConfirmDialog';

@@ -13,6 +13,7 @@ import { IndicadorRecarga } from '@/components/common/IndicadorRecarga';
 import { InfoTooltip } from '@/components/common';
 import { CARTAO, ITEM, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_PRINCIPAL } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const TOM: Record<Veredito, string> = {
     economia: 'text-emerald-400',
     dentro: 'text-zinc-300',
@@ -51,7 +52,7 @@ export const RendimentoDoCortePanel: React.FC = () => {
         try {
             setLinhas(await productionRepository.getRendimentoDoCorte());
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao ler o rendimento');
+            setErro(mensagemDeErro(e, 'Falha ao ler o rendimento'));
         } finally {
             setCarregando(false);
             setRecarregando(false);
@@ -96,7 +97,7 @@ export const RendimentoDoCortePanel: React.FC = () => {
                 : x));
             setRascunho(r => { const { [l.id]: _, ...resto } = r; return resto; });
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao gravar');
+            setErro(mensagemDeErro(e, 'Falha ao gravar'));
         } finally {
             setSalvando(null);
         }

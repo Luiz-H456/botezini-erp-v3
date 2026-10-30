@@ -10,6 +10,7 @@ import type { Lead, EtapaDoLead } from '../utils/funilDeLeads';
 import { getTodayStr } from '../utils/date';
 import type { Client } from '../types';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 /**
  * Tudo que a aba de prospecção precisa, numa carga só.
  *
@@ -36,7 +37,7 @@ export function useLeads() {
             setClientes(cs);
             setMigrado(leadRepository.migrado);
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao carregar a prospecção');
+            setErro(mensagemDeErro(e, 'Falha ao carregar a prospecção'));
         } finally {
             carga.terminar();
         }

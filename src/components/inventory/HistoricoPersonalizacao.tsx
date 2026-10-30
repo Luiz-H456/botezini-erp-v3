@@ -11,7 +11,6 @@ import {
 } from '@/utils/personalizacao';
 import { usePersonalizacaoMutations } from '@/hooks/usePersonalizacao';
 import { useToast } from '@/hooks/useToast';
-import { Toast } from '@/components/common/Toast';
 import { Pagination } from '@/components/common/Pagination';
 import { ITENS_POR_PAGINA } from '@/utils/constants';
 import SearchableSelect from '@/components/common/SearchableSelect';
@@ -32,7 +31,7 @@ interface Props {
 
 const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) => {
     const { saveHistorico, deleteHistorico } = usePersonalizacaoMutations();
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
     const [lancando, setLancando] = useState(false);
     const [form, setForm] = useState<Partial<PersonalizacaoHistorico>>(vazio());
     const [filtro, setFiltro] = useState<TecnicaPersonalizacao | 'todas'>('todas');
@@ -290,7 +289,6 @@ const HistoricoPersonalizacao: React.FC<Props> = ({ historico, artes, precos }) 
                     itemsPerPage={ITENS_POR_PAGINA} onPageChange={setPagina} />
             )}
 
-            <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />
         </div>
     );
 };

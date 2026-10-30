@@ -10,6 +10,7 @@ import { useCargaProgressiva } from '../useCargaProgressiva';
 import { apurarSobrasDoPedido } from './apurarSobrasDoPedido';
 import { avisoDaEntrega as montarAvisoDaEntrega, avisoDeFalhaNaSobra } from '../../utils/fabrica/avisoDaEntrega';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export interface KanbanCard {
     id: string;
     order_number: string;
@@ -151,7 +152,7 @@ export function usePcpKanban() {
             setColumns(cols);
             setOrphan(orphans);
         } catch (e: any) {
-            setError(e?.message || 'Falha ao carregar o quadro');
+            setError(mensagemDeErro(e, 'Falha ao carregar o quadro'));
         } finally {
             carga.terminar();
         }
@@ -220,7 +221,7 @@ export function usePcpKanban() {
             setPasso({ tipo: 'entregue', order, client: clientesPorId.get(order.client_id) || null });
         } catch (e: any) {
             // Não entregou: a apuração só roda depois que o status 'Entregue' foi gravado.
-            setError(e?.message || 'Falha ao concluir o pedido');
+            setError(mensagemDeErro(e, 'Falha ao concluir o pedido'));
             return;
         } finally {
             setBusy(false);

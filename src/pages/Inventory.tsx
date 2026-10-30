@@ -12,7 +12,6 @@ import {
     ChevronRight, ChevronDown, StickyNote, Brush, Boxes, Layers
 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
-import { Toast } from '@/components/common/Toast';
 import { AjustarContagemModal } from '@/components/modals/AjustarContagemModal';
 import { DefinirPrecoModal } from '@/components/modals/DefinirPrecoModal';
 import { UsarDoEstoqueModal } from '@/components/pcp/UsarDoEstoqueModal';
@@ -30,6 +29,7 @@ import { ehCritico, filtrarCriticos } from '@/utils/fabrica/estoqueCritico';
 import { numero } from '@/utils/numeros';
 import { semCamposDoEstoque } from '@/utils/fabrica/semCamposDoEstoque';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 type AbaEstoque = 'insumos' | 'personalizacao';
 
 const ABAS: { id: AbaEstoque; label: string; icon: React.ElementType }[] = [
@@ -86,7 +86,7 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
     const lista: Insumo[] = soCriticos ? filtrarCriticos(allItems as Insumo[], searchTerm, categoriaFiltro, SEM_CATEGORIA) : paginatedItems;
 
     const { saveInsumoMutation, deleteInsumoMutation } = useInventoryMutations();
-    const { toast, showToast } = useToast();
+    const { showToast } = useToast();
 
     // Suppliers for FK link
     const { data: suppliers = [] } = useQuery({
@@ -170,7 +170,7 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
                 .map(o => ({ id: o.id, order_number: o.order_number }));
             setUsando({ insumo: item, pedidos });
         } catch (e: any) {
-            showToast(e?.message || 'Não consegui carregar os pedidos.', 'error');
+            showToast(mensagemDeErro(e, 'Não consegui carregar os pedidos.'), 'error');
         }
     };
 
@@ -648,7 +648,6 @@ const Inventory: React.FC<Props> = ({ initialSearch, clearSearch, onAbrirFornece
                 onClose={() => setItemToDelete(null)}
             />
 
-            <Toast visible={toast.visible} message={toast.message} type={toast.type} title={toast.title} />
             </>)}
         </div>
     );

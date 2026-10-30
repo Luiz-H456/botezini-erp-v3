@@ -17,7 +17,6 @@ import { useMasterDataActions } from '@/hooks/useMasterDataActions';
 import { useFilteredPaginatedData } from '@/hooks/useFilteredPaginatedData';
 import { useToast } from '@/hooks/useToast';
 import { useInventoryMutations } from '@/hooks/useInventoryQueries';
-import { Toast } from '@/components/common/Toast';
 import { Pagination } from '@/components/common/Pagination';
 import { EntityModal, DeleteConfirmModal, GlobalCategoryQuickAdd } from '@/components/modals';
 import { ClientForm, SupplierForm, ProductForm } from '@/components/masterdata';
@@ -38,6 +37,7 @@ import { ClientesDormentes } from '@/components/masterdata/ClientesDormentes';
 import { BotaoMensagem } from '@/components/common/BotaoMensagem';
 import { msgPrimeiroContato, msgCompletarCadastro } from '@/utils/mensagensCliente';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 export type TabId = 'company' | 'clients' | 'suppliers' | 'products' | 'bancos' | 'categorias' | 'mensagens';
 type ModalEntityType = 'client' | 'supplier' | 'product';
 
@@ -102,7 +102,7 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
     name: string;
   } | null>(null);
 
-  const { toast, showToast } = useToast();
+  const { showToast } = useToast();
   const {
     clients,
     suppliers,
@@ -232,7 +232,7 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
       setSelecionados(new Set());
       loadData();
     } catch (e: any) {
-      showToast(`Erro ao agrupar: ${e?.message || 'desconhecido'}`, 'error');
+      showToast(`Erro ao agrupar: ${mensagemDeErro(e, 'desconhecido')}`, 'error');
     }
   };
 
@@ -283,7 +283,7 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
       onProfileUpdate?.();
       showToast('Dados atualizados!', 'success');
     } catch (e: any) {
-      const msg = e?.message || 'Erro desconhecido';
+      const msg = mensagemDeErro(e, 'Erro desconhecido');
       console.error('saveCompanyProfile error:', e);
       showToast(`Falha ao salvar perfil: ${msg}`, 'error');
     } finally {
@@ -602,12 +602,6 @@ export default function MasterData({ aba, abertura, limparAbertura, onProfileUpd
         />
       )}
 
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        title={toast.title}
-        type={toast.type}
-      />
     </div>
   );
 }

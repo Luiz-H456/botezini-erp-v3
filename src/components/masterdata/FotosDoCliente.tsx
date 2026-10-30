@@ -8,6 +8,7 @@ import {
 } from '@/components/common/GaleriaDeFotos';
 import { mensagemDaRemocao } from '@/utils/anexoCompartilhado';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 interface Props {
     /** Caminhos já salvos (não URLs — a URL assinada é buscada aqui). */
     photos: string[];
@@ -67,7 +68,7 @@ export function FotosDoCliente({ photos, onChange, clientId }: Props) {
             }
             onChange([...photos, ...novos]);
         } catch (e: any) {
-            setErro(e?.message || 'Falha ao enviar a foto');
+            setErro(mensagemDeErro(e, 'Falha ao enviar a foto'));
         } finally {
             setEnviando(false);
         }

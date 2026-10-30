@@ -23,6 +23,7 @@ import { storageService } from '@/services/storage';
 import type { CompanyProfile } from '@/types';
 import { CARTAO, CAMPO, ROTULO, ROTULO_PEQUENO, BOTAO_SUAVE, BOTAO_SECUNDARIO, pilula } from '@/components/finance/ui/estilo';
 
+import { mensagemDeErro } from '@/utils/errorHandling';
 const SELETOR = `${CAMPO} cursor-pointer`;
 
 type Aba = 'hoje' | 'funil' | 'importar' | 'conversao';
@@ -124,7 +125,7 @@ export default function Leads({ onNavigate, companyProfile }: Props) {
             await v.mover(lead.id, 'cliente', { client_id: id });
             setAviso(`${nomeDoLead(lead)} virou cliente. Confira o cadastro e complete o que faltar.`);
         } catch (e: any) {
-            setAviso(e?.message || 'Falha ao converter o lead');
+            setAviso(mensagemDeErro(e, 'Falha ao converter o lead'));
         } finally {
             setConvertendo(null);
         }
