@@ -37,7 +37,11 @@ Está no ramo `feat/v3.1-tabela-verdade`, testada no banco local. **Não vai par
   MALHA PV JUMIRIM, Tecido Térmico Acolchoado, Lâmina PVC Impermeável.
   (O insumo antigo continua em Tabelas de custo › Insumos; quando quiser, junte os dois pelo "Mesclar" dele.)
 
-### 1b. Estampas com arquivos (parte D, 30/10) — depois do 1.1
+### 1b. Estampas e custos de personalização (partes D e E, 30/10)
+
+Não dependem do 1.1 e não mexem em nada que existe: só acrescentam colunas (D) e criam duas tabelas (E).
+Provado no dump de 16/10 restaurado: tabelas, contagens, políticas, restrições, funções e views iguais
+antes e depois; cada arquivo rodou duas vezes sem erro; o app de hoje continua criando e editando arte.
 
 - [ ] **1.7 Rodar `supabase/estampas_v3_d.sql`** no mesmo SQL Editor.
   - O que faz: as artes de bordado viram a biblioteca de **Estampas** (bordado, silk, DTF, sublimação) e cada uma
@@ -46,10 +50,11 @@ Está no ramo `feat/v3.1-tabela-verdade`, testada no banco local. **Não vai par
   - Pode rodar mais de uma vez. **Conferir:** a última tabela (DEPOIS) mostra `bordado` com o mesmo número de
     artes da primeira (ANTES).
   - Sem ele, salvar uma estampa avisa "rode supabase/estampas_v3_d.sql" em vez de quebrar.
-- [ ] **1.8 Rodar `supabase/custos_personalizacao_v3_e.sql`** (parte E, 30/10), depois do 1.1.
+- [ ] **1.8 Rodar `supabase/custos_personalizacao_v3_e.sql`** (parte E, 30/10).
   - O que faz: cria as tabelas de custo de **silk** (grade tamanho × cores por estamparia) e **DTF** (metro
     linear, largura do rolo, espaço entre artes e frete por estamparia). Só admin e gerente veem.
-  - O que assume: `is_admin_or_manager()`, que o 1.1 cria. Só cria tabelas novas; pode rodar de novo.
+  - O que assume: `is_admin_or_manager()`, que já existe em produção. Só cria tabelas novas; pode rodar de novo.
+  - Excluir um fornecedor leva junto o custo de silk/DTF dele (como já acontece com condições e frete).
   - **Conferir:** a última tabela mostra `custo_dtf` e `custo_silk` com `rls_ligado = t` e `politicas = 1`.
   - Depois, em Tabelas de custo › Silk / DTF, cadastre as estamparias. Bordado usa as notas do bordado
     (valor do milheiro, mínimo e programação da arte) em Personalização › Notas.

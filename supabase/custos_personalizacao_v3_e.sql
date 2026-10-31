@@ -16,8 +16,10 @@
 --   não vê.
 --
 -- O QUE ASSUME
---   supabase/v3_1_tabela_verdade.sql já rodou (cria is_admin_or_manager).
+--   public.is_admin_or_manager() existe (já está em produção desde antes da v3).
 --   Estamparia é um fornecedor (public.suppliers). Só cria tabelas novas.
+--   Provado em 30/10 no dump de 16/10 restaurado: nenhuma tabela, política,
+--   restrição, função ou view existente mudou; rodou duas vezes sem erro.
 --
 -- COMO RODAR
 --   Inteiro, no SQL Editor. Pode rodar de novo (IF NOT EXISTS / DROP POLICY IF EXISTS).
@@ -63,6 +65,8 @@ DROP POLICY IF EXISTS custo_dtf_gestao ON public.custo_dtf;
 CREATE POLICY custo_dtf_gestao ON public.custo_dtf FOR ALL TO authenticated
   USING (public.is_admin_or_manager()) WITH CHECK (public.is_admin_or_manager());
 
+-- O Supabase dá tudo ao anon em tabela nova; o RLS já barra, isto é a segunda tranca.
+REVOKE ALL ON public.custo_silk, public.custo_dtf FROM anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.custo_silk, public.custo_dtf TO authenticated;
 
 COMMIT;
